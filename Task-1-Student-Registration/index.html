@@ -1,272 +1,674 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
+    <!-- ==========================================
+         DOCUMENT SETUP
+    =========================================== -->
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Student Registration | Full Stack Development</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="style.css">
+    <meta
+        name="description"
+        content="StudentHub — Secure student registration and data storage portal."
+    >
+
+    <meta
+        name="theme-color"
+        content="#0b0d12"
+    >
+
+    <title>
+        StudentHub — Student Registration
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
+
 
 <body>
 
-    <header class="navbar">
-        <div class="brand">
-            <div class="brand-icon">S</div>
 
-            <div>
-                <h2>StudentHub</h2>
-                <span>Registration Portal</span>
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <header class="site-header">
+
+        <nav
+            class="navbar"
+            aria-label="Main navigation"
+        >
+
+            <!-- BRAND -->
+
+            <a
+                href="index.html"
+                class="brand"
+                aria-label="StudentHub Home"
+            >
+
+                <span class="brand-logo">
+                    S
+                </span>
+
+                <span class="brand-info">
+
+                    <strong>
+                        StudentHub
+                    </strong>
+
+                    <small>
+                        Registration Portal
+                    </small>
+
+                </span>
+
+            </a>
+
+
+            <!-- SYSTEM STATUS -->
+
+            <div
+                class="system-status"
+                aria-label="System status"
+            >
+
+                <span
+                    class="status-dot"
+                    aria-hidden="true"
+                ></span>
+
+                <span>
+                    System Online
+                </span>
+
             </div>
-        </div>
 
-        <div class="status">
-            <span class="status-dot"></span>
-            Online
-        </div>
+        </nav>
+
     </header>
 
 
-    <main class="container">
+
+    <!-- ==========================================
+         MAIN CONTENT
+    =========================================== -->
+
+    <main>
+
+
+        <!-- ==========================================
+             HERO SECTION
+        =========================================== -->
 
         <section class="hero">
 
-            <div class="hero-text">
-                <span class="badge">FULL STACK DEVELOPMENT · TASK 1</span>
+            <div class="hero-container">
 
-                <h1>
-                    Student Registration
-                    <span>& Data Storage</span>
-                </h1>
 
-                <p>
-                    Register student information securely and store it
-                    in a cloud database using Supabase.
-                </p>
-            </div>
+                <div class="hero-content">
 
-            <div class="hero-card">
-                <div class="hero-card-icon">✓</div>
+                    <p class="eyebrow">
+                        FULL STACK DEVELOPMENT
+                        <span>·</span>
+                        TASK 01
+                    </p>
 
-                <div>
-                    <strong>Secure Registration</strong>
-                    <p>Cloud-powered data storage</p>
+
+                    <h1>
+                        Student
+                        <span>Registration.</span>
+                    </h1>
+
+
+                    <p class="hero-description">
+                        Register student information and securely
+                        store records in a cloud-powered
+                        PostgreSQL database.
+                    </p>
+
+
+                    <!-- TRUST FEATURES -->
+
+                    <div class="trust-list">
+
+                        <span class="trust-item">
+                            <b>✓</b>
+                            Secure storage
+                        </span>
+
+                        <span class="trust-item">
+                            <b>✓</b>
+                            PostgreSQL
+                        </span>
+
+                        <span class="trust-item">
+                            <b>✓</b>
+                            RLS protected
+                        </span>
+
+                    </div>
+
                 </div>
+
+
+                <!-- HERO STATUS -->
+
+                <div class="hero-status">
+
+                    <span class="status-label">
+                        DATABASE
+                    </span>
+
+                    <strong>
+                        Supabase
+                    </strong>
+
+                    <span class="status-line"></span>
+
+                    <span class="status-label">
+                        STATUS
+                    </span>
+
+                    <strong class="online">
+                        Operational
+                    </strong>
+
+                </div>
+
             </div>
 
         </section>
 
 
-        <section class="form-section">
 
-            <div class="section-heading">
-                <div>
-                    <span class="small-label">STUDENT INFORMATION</span>
-                    <h2>Create Student Record</h2>
-                    <p>Enter the student's details below.</p>
-                </div>
+        <!-- ==========================================
+             REGISTRATION SECTION
+        =========================================== -->
 
-                <span class="required-note">
-                    * Required fields
-                </span>
-            </div>
+        <section
+            class="registration-section"
+            aria-labelledby="registration-title"
+        >
+
+            <div class="registration-container">
 
 
-            <form id="studentForm">
+                <!-- ==================================
+                     LEFT INFORMATION PANEL
+                =================================== -->
 
-                <div class="form-grid">
+                <aside class="registration-info">
 
-                    <!-- Name -->
-                    <div class="form-group full-width">
-                        <label for="name">
-                            Full Name <span>*</span>
-                        </label>
+                    <span class="step-number">
+                        01
+                    </span>
 
-                        <input
-                            type="text"
-                            id="name"
-                            placeholder="Enter student's full name"
-                            required
-                        >
-                    </div>
-
-
-                    <!-- Email -->
-                    <div class="form-group">
-
-                        <label for="email">
-                            Email Address <span>*</span>
-                        </label>
-
-                        <input
-                            type="email"
-                            id="email"
-                            placeholder="student@example.com"
-                            required
-                        >
-
-                    </div>
-
-
-                    <!-- DOB -->
-                    <div class="form-group">
-
-                        <label for="dob">
-                            Date of Birth <span>*</span>
-                        </label>
-
-                        <input
-                            type="date"
-                            id="dob"
-                            required
-                        >
-
-                    </div>
-
-
-                    <!-- Department -->
-                    <div class="form-group">
-
-                        <label for="department">
-                            Department <span>*</span>
-                        </label>
-
-                        <select id="department" required>
-
-                            <option value="">
-                                Select department
-                            </option>
-
-                            <option value="Computer Science and Engineering">
-                                Computer Science and Engineering
-                            </option>
-
-                            <option value="Information Technology">
-                                Information Technology
-                            </option>
-
-                            <option value="Electronics and Communication Engineering">
-                                Electronics and Communication Engineering
-                            </option>
-
-                            <option value="Electrical and Electronics Engineering">
-                                Electrical and Electronics Engineering
-                            </option>
-
-                            <option value="Mechanical Engineering">
-                                Mechanical Engineering
-                            </option>
-
-                            <option value="Civil Engineering">
-                                Civil Engineering
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- Phone -->
-                    <div class="form-group">
-
-                        <label for="phone">
-                            Phone Number <span>*</span>
-                        </label>
-
-                        <input
-                            type="tel"
-                            id="phone"
-                            placeholder="Enter 10-digit phone number"
-                            maxlength="10"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-footer">
-
-                    <p class="privacy-text">
-                        Your information is securely stored in the
-                        student database.
+                    <p class="section-eyebrow">
+                        STUDENT INFORMATION
                     </p>
 
-                    <button
-                        type="submit"
-                        id="submitBtn"
+
+                    <h2 id="registration-title">
+                        Create a
+                        <span>student record.</span>
+                    </h2>
+
+
+                    <p class="info-description">
+                        Enter the required information to create
+                        a new student record. The data is validated
+                        before being securely stored.
+                    </p>
+
+
+                    <!-- PROCESS -->
+
+                    <div class="process">
+
+                        <div class="process-step active">
+
+                            <span>
+                                01
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Enter details
+                                </strong>
+
+                                <small>
+                                    Student information
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="process-step">
+
+                            <span>
+                                02
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Validate
+                                </strong>
+
+                                <small>
+                                    Check submitted data
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="process-step">
+
+                            <span>
+                                03
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Store securely
+                                </strong>
+
+                                <small>
+                                    Save to PostgreSQL
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </aside>
+
+
+
+                <!-- ==================================
+                     FORM CARD
+                =================================== -->
+
+                <div class="registration-card">
+
+
+                    <!-- CARD HEADER -->
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <span class="card-label">
+                                NEW RECORD
+                            </span>
+
+                            <h3>
+                                Student details
+                            </h3>
+
+                        </div>
+
+
+                        <span class="required-label">
+                            <b>*</b> Required
+                        </span>
+
+                    </div>
+
+
+
+                    <!-- ==================================
+                         REGISTRATION FORM
+                    =================================== -->
+
+                    <form
+                        id="studentForm"
+                        novalidate
                     >
-                        <span>Register Student</span>
-                        <span class="arrow">→</span>
-                    </button>
+
+
+                        <div class="form-grid">
+
+
+                            <!-- FULL NAME -->
+
+                            <div class="form-group full-width">
+
+                                <label for="name">
+                                    Full Name
+                                    <span>*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    placeholder="e.g. Hithesh Kumar"
+                                    autocomplete="name"
+                                    maxlength="100"
+                                    required
+                                >
+
+                                <small class="field-hint">
+                                    Enter the student's full name.
+                                </small>
+
+                            </div>
+
+
+
+                            <!-- EMAIL -->
+
+                            <div class="form-group">
+
+                                <label for="email">
+                                    Email Address
+                                    <span>*</span>
+                                </label>
+
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    placeholder="student@example.com"
+                                    autocomplete="email"
+                                    maxlength="150"
+                                    required
+                                >
+
+                            </div>
+
+
+
+                            <!-- DATE OF BIRTH -->
+
+                            <div class="form-group">
+
+                                <label for="dob">
+                                    Date of Birth
+                                    <span>*</span>
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="dob"
+                                    name="dob"
+                                    required
+                                >
+
+                            </div>
+
+
+
+                            <!-- DEPARTMENT -->
+
+                            <div class="form-group">
+
+                                <label for="department">
+                                    Department
+                                    <span>*</span>
+                                </label>
+
+                                <select
+                                    id="department"
+                                    name="department"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select department
+                                    </option>
+
+                                    <option value="Computer Science and Engineering">
+                                        Computer Science and Engineering
+                                    </option>
+
+                                    <option value="Information Technology">
+                                        Information Technology
+                                    </option>
+
+                                    <option value="Electronics and Communication Engineering">
+                                        Electronics and Communication Engineering
+                                    </option>
+
+                                    <option value="Electrical and Electronics Engineering">
+                                        Electrical and Electronics Engineering
+                                    </option>
+
+                                    <option value="Mechanical Engineering">
+                                        Mechanical Engineering
+                                    </option>
+
+                                    <option value="Civil Engineering">
+                                        Civil Engineering
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+
+                            <!-- PHONE -->
+
+                            <div class="form-group">
+
+                                <label for="phone">
+                                    Phone Number
+                                    <span>*</span>
+                                </label>
+
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    placeholder="10-digit mobile number"
+                                    maxlength="10"
+                                    inputmode="numeric"
+                                    autocomplete="tel"
+                                    pattern="[0-9]{10}"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ==================================
+                             FORM FOOTER
+                        =================================== -->
+
+                        <div class="form-footer">
+
+
+                            <!-- PRIVACY -->
+
+                            <div class="privacy-note">
+
+                                <span
+                                    class="privacy-icon"
+                                    aria-hidden="true"
+                                >
+                                    🔒
+                                </span>
+
+                                <div>
+
+                                    <strong>
+                                        Privacy protected
+                                    </strong>
+
+                                    <small>
+                                        Your information is securely
+                                        stored using Supabase RLS.
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+
+
+                            <!-- SUBMIT -->
+
+                            <button
+                                type="submit"
+                                id="submitBtn"
+                                class="submit-button"
+                            >
+
+                                <span>
+                                    Register Student
+                                </span>
+
+                                <span
+                                    class="button-arrow"
+                                    aria-hidden="true"
+                                >
+                                    →
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+
+
+                    <!-- ==================================
+                         STATUS MESSAGE
+                    =================================== -->
+
+                    <div
+                        id="message"
+                        class="message"
+                        aria-live="polite"
+                        role="status"
+                    ></div>
 
                 </div>
 
-            </form>
-
-
-            <div
-                id="message"
-                class="message"
-                aria-live="polite"
-            ></div>
+            </div>
 
         </section>
 
 
-        <section class="info-grid">
 
-            <div class="info-card">
+        <!-- ==========================================
+             TECHNOLOGY SECTION
+        =========================================== -->
 
-                <div class="info-icon">
-                    ☁
-                </div>
+        <section
+            class="technology-section"
+            aria-label="Technology used"
+        >
+
+
+            <div class="technology-item">
+
+                <span class="technology-icon">
+                    DB
+                </span>
 
                 <div>
-                    <h3>Cloud Database</h3>
 
-                    <p>
-                        Student records are stored using
-                        Supabase PostgreSQL.
-                    </p>
+                    <strong>
+                        PostgreSQL
+                    </strong>
+
+                    <small>
+                        Cloud database
+                    </small>
+
                 </div>
 
             </div>
 
 
-            <div class="info-card">
 
-                <div class="info-icon">
-                    🔒
-                </div>
+            <div class="technology-item">
+
+                <span class="technology-icon">
+                    JS
+                </span>
 
                 <div>
-                    <h3>Secure Storage</h3>
 
-                    <p>
-                        Database access is protected using
-                        Supabase security policies.
-                    </p>
+                    <strong>
+                        JavaScript
+                    </strong>
+
+                    <small>
+                        Application logic
+                    </small>
+
                 </div>
 
             </div>
 
 
-            <div class="info-card">
 
-                <div class="info-icon">
-                    ⚡
-                </div>
+            <div class="technology-item">
+
+                <span class="technology-icon">
+                    RLS
+                </span>
 
                 <div>
-                    <h3>Fast & Responsive</h3>
 
-                    <p>
-                        Modern responsive interface built
-                        with HTML, CSS and JavaScript.
-                    </p>
+                    <strong>
+                        Row Level Security
+                    </strong>
+
+                    <small>
+                        Database protection
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="technology-item">
+
+                <span class="technology-icon">
+                    ✓
+                </span>
+
+                <div>
+
+                    <strong>
+                        Responsive
+                    </strong>
+
+                    <small>
+                        Desktop & mobile
+                    </small>
+
                 </div>
 
             </div>
@@ -276,16 +678,59 @@
     </main>
 
 
-    <footer>
 
-        <p>
-            © 2026 StudentHub · Full Stack Development Task 1
-        </p>
+    <!-- ==========================================
+         FOOTER
+    =========================================== -->
+
+    <footer class="site-footer">
+
+        <div class="footer-container">
+
+            <div class="footer-brand">
+
+                <span class="brand-logo small">
+                    S
+                </span>
+
+                <strong>
+                    StudentHub
+                </strong>
+
+            </div>
+
+
+            <span>
+                Full Stack Development · Task 01
+            </span>
+
+
+            <span>
+                © 2026
+            </span>
+
+        </div>
 
     </footer>
 
 
+
+    <!-- ==========================================
+         SUPABASE CLIENT
+    =========================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+
+    <!-- ==========================================
+         APPLICATION JAVASCRIPT
+    =========================================== -->
+
     <script src="script.js"></script>
 
+
 </body>
+
 </html>
