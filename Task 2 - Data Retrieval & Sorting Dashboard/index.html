@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="StudentHub student data retrieval and sorting dashboard"
+    >
+
+    <title>StudentHub — Student Data Dashboard</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONTS
+    ====================================================== -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         STYLESHEET
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+
+    <!-- =====================================================
+         SUPABASE
+    ====================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         BACKGROUND
+    ====================================================== -->
+
+    <div class="page-background"></div>
+
+
+    <!-- =====================================================
+         MAIN APPLICATION
+    ====================================================== -->
+
+    <main class="dashboard-shell">
+
+
+        <!-- =================================================
+             TOP NAVIGATION
+        ================================================== -->
+
+        <nav class="topbar">
+
+            <!-- BRAND -->
+
+            <div class="brand">
+
+                <div class="brand-mark">
+                    <span>SH</span>
+                </div>
+
+                <div class="brand-text">
+
+                    <strong>
+                        StudentHub
+                    </strong>
+
+                    <span>
+                        Data Management
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- NAVIGATION STATUS -->
+
+            <div class="topbar-right">
+
+                <div class="task-badge">
+
+                    <span class="task-dot"></span>
+
+                    FULL STACK • TASK 02
+
+                </div>
+
+
+                <div
+                    id="connectionStatus"
+                    class="status loading-status"
+                >
+
+                    <span class="status-dot"></span>
+
+                    Connecting...
+
+                </div>
+
+            </div>
+
+        </nav>
+
+
+
+        <!-- =================================================
+             HERO
+        ================================================== -->
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="eyebrow">
+
+                    <span class="eyebrow-line"></span>
+
+                    STUDENT DATA DASHBOARD
+
+                </div>
+
+
+                <h1>
+
+                    Student records,
+
+                    <span>
+                        intelligently organized.
+                    </span>
+
+                </h1>
+
+
+                <p class="hero-description">
+
+                    Retrieve live student records from your
+                    Supabase database, explore department
+                    statistics, and instantly sort or filter
+                    your data.
+
+                </p>
+
+            </div>
+
+
+            <button
+                id="refreshBtn"
+                class="refresh-btn"
+                type="button"
+            >
+
+                <span class="refresh-icon">
+                    ↻
+                </span>
+
+                <span>
+                    Refresh Data
+                </span>
+
+            </button>
+
+        </section>
+
+
+
+        <!-- =================================================
+             STATISTICS
+        ================================================== -->
+
+        <section
+            class="stats-grid"
+            aria-label="Student statistics"
+        >
+
+
+            <!-- TOTAL -->
+
+            <article class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon purple">
+                        👥
+                    </div>
+
+                    <span class="stat-label">
+                        TOTAL
+                    </span>
+
+                </div>
+
+
+                <div class="stat-content">
+
+                    <p>
+                        Total Students
+                    </p>
+
+                    <h2 id="totalStudents">
+                        0
+                    </h2>
+
+                    <span class="stat-description">
+                        Registered records
+                    </span>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- CSE -->
+
+            <article class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon blue">
+                        💻
+                    </div>
+
+                    <span class="stat-label">
+                        DEPARTMENT
+                    </span>
+
+                </div>
+
+
+                <div class="stat-content">
+
+                    <p>
+                        Computer Science
+                    </p>
+
+                    <h2 id="cseCount">
+                        0
+                    </h2>
+
+                    <span class="stat-description">
+                        CSE students
+                    </span>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- ECE -->
+
+            <article class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon orange">
+                        ⚡
+                    </div>
+
+                    <span class="stat-label">
+                        DEPARTMENT
+                    </span>
+
+                </div>
+
+
+                <div class="stat-content">
+
+                    <p>
+                        Electronics
+                    </p>
+
+                    <h2 id="eceCount">
+                        0
+                    </h2>
+
+                    <span class="stat-description">
+                        ECE students
+                    </span>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- EEE -->
+
+            <article class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-icon green">
+                        🔧
+                    </div>
+
+                    <span class="stat-label">
+                        DEPARTMENT
+                    </span>
+
+                </div>
+
+
+                <div class="stat-content">
+
+                    <p>
+                        Electrical
+                    </p>
+
+                    <h2 id="eeeCount">
+                        0
+                    </h2>
+
+                    <span class="stat-description">
+                        EEE students
+                    </span>
+
+                </div>
+
+            </article>
+
+        </section>
+
+
+
+        <!-- =================================================
+             DATA CONTROLS
+        ================================================== -->
+
+        <section class="controls-card">
+
+
+            <div class="controls-heading">
+
+                <div class="controls-title">
+
+                    <div class="controls-icon">
+                        ☷
+                    </div>
+
+
+                    <div>
+
+                        <h2>
+                            Explore Records
+                        </h2>
+
+                        <p>
+                            Filter and organize student data
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <span class="live-label">
+
+                    <span></span>
+
+                    LIVE DATA
+
+                </span>
+
+            </div>
+
+
+
+            <div class="controls-row">
+
+
+                <!-- DEPARTMENT FILTER -->
+
+                <div class="control">
+
+                    <label for="departmentFilter">
+                        Department
+                    </label>
+
+
+                    <div class="select-wrapper">
+
+                        <span
+                            class="select-icon"
+                            aria-hidden="true"
+                        >
+                            ◈
+                        </span>
+
+
+                        <select
+                            id="departmentFilter"
+                            aria-label="Filter by department"
+                        >
+
+                            <option value="all">
+                                All Departments
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- SORT -->
+
+                <div class="control">
+
+                    <label for="sortOption">
+                        Sort By
+                    </label>
+
+
+                    <div class="select-wrapper">
+
+                        <span
+                            class="select-icon"
+                            aria-hidden="true"
+                        >
+                            ⇅
+                        </span>
+
+
+                        <select
+                            id="sortOption"
+                            aria-label="Sort student records"
+                        >
+
+                            <option value="nameAsc">
+                                Name A → Z
+                            </option>
+
+                            <option value="nameDesc">
+                                Name Z → A
+                            </option>
+
+                            <option value="dateAsc">
+                                Date Oldest → Newest
+                            </option>
+
+                            <option value="dateDesc">
+                                Date Newest → Oldest
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             STUDENT RECORDS
+        ================================================== -->
+
+        <section class="records-card">
+
+
+            <!-- RECORD HEADER -->
+
+            <div class="records-header">
+
+
+                <div class="records-title">
+
+                    <div class="records-icon">
+                        <span>≡</span>
+                    </div>
+
+
+                    <div>
+
+                        <h2>
+                            Student Records
+                        </h2>
+
+                        <p id="recordCount">
+                            Loading records...
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="records-meta">
+
+                    <span>
+                        Supabase Database
+                    </span>
+
+                    <span
+                        class="database-indicator"
+                        aria-label="Database connected"
+                    >
+                        ●
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- TABLE -->
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th scope="col">
+                                #
+                            </th>
+
+                            <th scope="col">
+                                STUDENT
+                            </th>
+
+                            <th scope="col">
+                                EMAIL
+                            </th>
+
+                            <th scope="col">
+                                DATE OF BIRTH
+                            </th>
+
+                            <th scope="col">
+                                DEPARTMENT
+                            </th>
+
+                            <th scope="col">
+                                PHONE
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="studentTableBody">
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="message"
+                            >
+                                Loading student records...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+
+            <!-- TABLE FOOTER -->
+
+            <div class="records-footer">
+
+                <span>
+                    StudentHub Data Dashboard
+                </span>
+
+
+                <span>
+
+                    Secure database connection
+
+                    <strong>•</strong>
+
+                    Live
+
+                </span>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer class="dashboard-footer">
+
+            <div>
+                © 2026 StudentHub
+            </div>
+
+            <div>
+
+                Full Stack Development
+
+                <span>•</span>
+
+                Task 02
+
+            </div>
+
+        </footer>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
