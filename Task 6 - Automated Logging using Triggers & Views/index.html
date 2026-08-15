@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Automated Logging | Task 6
+    </title>
+
+    <!-- Google Font -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Supabase -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+    <!-- CSS -->
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ============================================================
+         NAVBAR
+         ============================================================ -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <div class="logo">
+
+                <div class="logo-icon">
+                    ⚡
+                </div>
+
+                <div>
+
+                    <h2>
+                        StudentHub
+                    </h2>
+
+                    <span>
+                        Task 06
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="task-title">
+
+                Automated Logging using Triggers & Views
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- ============================================================
+         MAIN CONTAINER
+         ============================================================ -->
+
+    <main class="container">
+
+
+        <!-- ========================================================
+             PAGE HEADER
+             ======================================================== -->
+
+        <section class="page-header">
+
+            <div>
+
+                <span class="badge">
+                    DATABASE AUDIT SYSTEM
+                </span>
+
+                <h1>
+                    Automated Logging
+                </h1>
+
+                <p>
+                    Monitor database activity automatically using
+                    <strong>Triggers</strong> and
+                    <strong>Views</strong>.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================================
+             STATISTICS
+             ======================================================== -->
+
+        <section class="stats-grid">
+
+
+            <!-- Total Activities -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📊
+                </div>
+
+                <div>
+
+                    <p>
+                        Total Activities
+                    </p>
+
+                    <h2 id="totalActivities">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <!-- INSERT -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon insert-icon">
+                    ➕
+                </div>
+
+                <div>
+
+                    <p>
+                        INSERT Operations
+                    </p>
+
+                    <h2 id="insertCount">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <!-- UPDATE -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon update-icon">
+                    🔄
+                </div>
+
+                <div>
+
+                    <p>
+                        UPDATE Operations
+                    </p>
+
+                    <h2 id="updateCount">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <!-- Today's Activity -->
+
+            <div class="stat-card">
+
+                <div class="stat-icon today-icon">
+                    📅
+                </div>
+
+                <div>
+
+                    <p>
+                        Today's Activity
+                    </p>
+
+                    <h2 id="todayCount">
+                        0
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================================
+             ACTIVITY DEMO
+             ======================================================== -->
+
+        <section class="activity-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-tag">
+                        DATABASE ACTIVITY
+                    </span>
+
+                    <h2>
+                        Create Activity
+                    </h2>
+
+                    <p>
+                        Insert or update a record to automatically
+                        generate an audit log.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="activity-form">
+
+
+                <div class="form-group">
+
+                    <label for="recordName">
+                        Record Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="recordName"
+                        placeholder="Enter record name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="department">
+                        Department
+                    </label>
+
+                    <input
+                        type="text"
+                        id="department"
+                        placeholder="Enter department"
+                    >
+
+                </div>
+
+
+                <div class="button-group">
+
+                    <button
+                        type="button"
+                        class="insert-button"
+                        onclick="insertRecord()"
+                    >
+                        ➕ Insert Record
+                    </button>
+
+                    <button
+                        type="button"
+                        class="update-button"
+                        onclick="updateRecord()"
+                    >
+                        🔄 Update Record
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="statusMessage"
+                    class="status-message hidden"
+                >
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================================
+             AUTOMATION FLOW
+             ======================================================== -->
+
+        <section class="process-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-tag">
+                        AUTOMATION FLOW
+                    </span>
+
+                    <h2>
+                        How Automated Logging Works
+                    </h2>
+
+                    <p>
+                        The database automatically records every
+                        INSERT and UPDATE operation.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="process-grid">
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        01
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Database Operation
+                        </h3>
+
+                        <p>
+                            A user inserts or updates a record
+                            in the database.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        02
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Trigger Executes
+                        </h3>
+
+                        <p>
+                            PostgreSQL automatically executes the
+                            audit trigger.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        03
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Audit Log Created
+                        </h3>
+
+                        <p>
+                            The operation details are stored
+                            automatically.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        04
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            View Generates Report
+                        </h3>
+
+                        <p>
+                            The database view provides a
+                            daily activity summary.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================================
+             CURRENT RECORDS
+             ======================================================== -->
+
+        <section class="records-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-tag">
+                        DATABASE RECORDS
+                    </span>
+
+                    <h2>
+                        Recent Records
+                    </h2>
+
+                    <p>
+                        Records currently stored in the database.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Department
+                            </th>
+
+                            <th>
+                                Created
+                            </th>
+
+                            <th>
+                                Updated
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="recordsTable">
+
+                        <tr>
+
+                            <td
+                                colspan="5"
+                                class="empty-state"
+                            >
+                                Loading records...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================================
+             AUDIT LOG
+             ======================================================== -->
+
+        <section class="logs-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-tag">
+                        AUDIT LOG
+                    </span>
+
+                    <h2>
+                        Recent Activity
+                    </h2>
+
+                    <p>
+                        Automatically generated INSERT and UPDATE logs.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Log ID
+                            </th>
+
+                            <th>
+                                Record ID
+                            </th>
+
+                            <th>
+                                Operation
+                            </th>
+
+                            <th>
+                                Previous Data
+                            </th>
+
+                            <th>
+                                New Data
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="logsTable">
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="empty-state"
+                            >
+                                Loading audit logs...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================================
+             DAILY ACTIVITY REPORT
+             ======================================================== -->
+
+        <section class="report-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-tag">
+                        DATABASE VIEW
+                    </span>
+
+                    <h2>
+                        Daily Activity Report
+                    </h2>
+
+                    <p>
+                        Activity summarized using the
+                        <strong>daily_activity_report</strong> view.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Activity Date
+                            </th>
+
+                            <th>
+                                Operation
+                            </th>
+
+                            <th>
+                                Total Operations
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="reportTable">
+
+                        <tr>
+
+                            <td
+                                colspan="3"
+                                class="empty-state"
+                            >
+                                Loading daily activity...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================================
+             DATABASE INFORMATION
+             ======================================================== -->
+
+        <section class="info-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-tag">
+                        TASK 06
+                    </span>
+
+                    <h2>
+                        Database Audit Architecture
+                    </h2>
+
+                    <p>
+                        This system demonstrates automated database
+                        auditing using PostgreSQL triggers and views.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="process-grid">
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        DB
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            PostgreSQL
+                        </h3>
+
+                        <p>
+                            Stores student records and audit information.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        TR
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Audit Trigger
+                        </h3>
+
+                        <p>
+                            Automatically captures INSERT and UPDATE events.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        LG
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Audit Logs
+                        </h3>
+
+                        <p>
+                            Maintains a history of database changes.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        VW
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Database View
+                        </h3>
+
+                        <p>
+                            Generates daily activity reports.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+
+    <footer>
+
+        <p>
+            Task 06 • Automated Logging using Triggers & Views
+        </p>
+
+        <span>
+            Full Stack Development
+        </span>
+
+    </footer>
+
+
+
+    <!-- JavaScript -->
+
+    <script
+        src="script.js"
+    ></script>
+
+
+</body>
+
+</html>

@@ -1,253 +1,109 @@
-# Task 6: Automated Logging using Triggers & Views
+# Task 06 — Automated Logging using Triggers & Views
 
-## 📌 Description
+## 📌 Project Overview
 
-This project demonstrates automated database logging using **SQL Triggers** and **Database Views**.
+This project demonstrates automated database activity logging using
+PostgreSQL **Triggers** and **Views**.
 
-The system automatically records every `INSERT` and `UPDATE` operation performed on application data. A database view is then used to generate a daily activity report from the recorded logs.
+The system automatically records INSERT and UPDATE operations performed
+on database records and generates a daily activity report.
 
-This demonstrates how enterprise databases can automatically maintain audit records without requiring the application to manually create a log entry for every database operation.
+The project is implemented using HTML, CSS, JavaScript and Supabase
+PostgreSQL.
 
 ---
 
 ## 🎯 Objective
 
-The main objectives of this task are:
+The objective of this task is to:
 
-* Create a database table for application records
-* Create an audit log table
-* Create a trigger that automatically logs every `INSERT`
-* Create a trigger that automatically logs every `UPDATE`
-* Create a view for daily activity reports
-* Display the audit information through a web interface
+- Create database triggers for automated logging
+- Record INSERT operations
+- Record UPDATE operations
+- Store old and new record data
+- Generate a daily activity report using a database view
+- Display database activity through a web dashboard
 
 ---
 
 ## 🛠️ Technologies Used
 
-* HTML5
-* CSS3
-* JavaScript
-* Supabase
-* PostgreSQL
-* SQL Triggers
-* SQL Views
-
----
-
-## ⚙️ Key Features
-
-### 📝 Automated INSERT Logging
-
-Whenever a new record is inserted into the main table, the database trigger automatically creates an entry in the audit log.
-
-### 🔄 Automated UPDATE Logging
-
-Whenever an existing record is updated, the trigger automatically records the operation and stores the relevant information.
-
-### 📋 Audit Log
-
-The audit log stores information such as:
-
-* Record ID
-* Operation type
-* Old data
-* New data
-* Timestamp
-
-### 📊 Daily Activity Report
-
-A database view groups audit activities by date and operation type to provide a simple daily report.
-
-### ⚡ Automatic Logging
-
-The application does not need to manually insert audit records. The database trigger performs the logging automatically.
-
----
-
-## 🔄 System Flow
-
-```text
-User performs INSERT / UPDATE
-            ↓
-       Main Database
-            ↓
-        SQL Trigger
-            ↓
-        Audit Log
-            ↓
-       Database View
-            ↓
-    Daily Activity Report
-            ↓
-       Web Dashboard
-```
+- HTML5
+- CSS3
+- JavaScript
+- Supabase
+- PostgreSQL
+- Database Triggers
+- Database Views
+- Row Level Security (RLS)
 
 ---
 
 ## 🗄️ Database Structure
 
-### Main Table
+### Records Table
 
-The main table stores the application's primary records.
+The `records` table stores the main application records.
 
-| Column     | Description            |
-| ---------- | ---------------------- |
-| id         | Unique record ID       |
-| name       | Record name            |
-| department | Department information |
-| created_at | Record creation time   |
-| updated_at | Last update time       |
+Example fields:
 
-### Audit Log Table
-
-The audit table automatically stores database activities.
-
-| Column     | Description                |
-| ---------- | -------------------------- |
-| id         | Unique log ID              |
-| record_id  | ID of affected record      |
-| operation  | INSERT or UPDATE           |
-| old_data   | Previous record data       |
-| new_data   | New record data            |
-| changed_at | Date and time of operation |
+- `id`
+- `name`
+- `department`
+- `created_at`
+- `updated_at`
 
 ---
 
-## 🔥 SQL Trigger
+### Audit Logs Table
 
-A PostgreSQL trigger is used to automatically execute a function whenever an `INSERT` or `UPDATE` occurs.
+The `audit_logs` table stores automatically generated activity logs.
+
+Example fields:
+
+- `id`
+- `record_id`
+- `operation`
+- `old_data`
+- `new_data`
+- `changed_at`
+
+---
+
+### Database Trigger
+
+A PostgreSQL trigger automatically executes whenever a record is
+inserted or updated.
+
+Flow:
+
+    INSERT / UPDATE
+          ↓
+       Trigger
+          ↓
+      audit_logs
+
+This removes the need for manual logging from the application.
+
+---
+
+## 📊 Daily Activity Report
+
+The project uses a PostgreSQL view called:
+
+`daily_activity_report`
+
+The view summarizes database activity by date and operation.
 
 Example:
 
-```sql
-CREATE TRIGGER audit_trigger
-AFTER INSERT OR UPDATE
-ON records
-FOR EACH ROW
-EXECUTE FUNCTION log_activity();
-```
+| Activity Date | Operation | Total Operations |
+|---------------|-----------|------------------|
+| 2026-08-15 | INSERT | 5 |
+| 2026-08-15 | UPDATE | 2 |
 
-The trigger ensures that database activity is automatically captured.
-
----
-
-## 📊 Daily Activity View
-
-A database view is created to provide a summarized daily report.
-
-Example:
+The view is queried using:
 
 ```sql
-CREATE VIEW daily_activity_report AS
-SELECT
-    DATE(changed_at) AS activity_date,
-    operation,
-    COUNT(*) AS total_operations
-FROM audit_logs
-GROUP BY
-    DATE(changed_at),
-    operation
-ORDER BY
-    activity_date DESC;
-```
-
----
-
-## 🌐 Web Dashboard
-
-The frontend displays:
-
-* Total audit activities
-* INSERT operations
-* UPDATE operations
-* Recent audit logs
-* Daily activity reports
-
-The dashboard retrieves the information directly from the Supabase PostgreSQL database.
-
----
-
-## 🏢 Real-Time Usage
-
-Automated database logging is commonly used in:
-
-* Banking systems
-* Enterprise applications
-* Healthcare systems
-* E-commerce platforms
-* Financial applications
-* Employee management systems
-* Security and compliance systems
-
-Audit logging helps organizations track **who changed data, what operation occurred, and when it happened**.
-
----
-
-## 📂 Project Structure
-
-```text
-Task 6 - Automated Logging using Triggers & Views/
-│
-├── index.html
-├── style.css
-├── script.js
-├── README.md
-└── database/
-    └── audit_logging.sql
-```
-
----
-
-## 🎓 Learning Outcomes
-
-After completing this task, the following concepts are demonstrated:
-
-* SQL Triggers
-* PostgreSQL Trigger Functions
-* Automated Audit Logging
-* INSERT and UPDATE monitoring
-* Database Views
-* Aggregation using SQL
-* Daily activity reporting
-* Database-level automation
-* Enterprise audit systems
-
----
-
-## 🚀 Expected Result
-
-The application provides a dashboard where database activities can be monitored.
-
-When a record is inserted or updated:
-
-```text
-INSERT / UPDATE
-      ↓
-Trigger executes
-      ↓
-Audit record created
-      ↓
-Daily view updated
-      ↓
-Dashboard displays activity
-```
-
-No manual audit-log insertion is required from the frontend.
-
----
-
-## 👨‍💻 Project Information
-
-**Task:** 6 — Automated Logging using Triggers & Views
-**Domain:** Full Stack Development
-**Database:** Supabase PostgreSQL
-**Focus:** SQL Triggers, Audit Logging and Database Views
-
----
-
-## 📄 Conclusion
-
-This project demonstrates how database triggers can automate audit logging and how database views can simplify reporting.
-
-By moving logging logic into the database layer, enterprise applications can maintain reliable audit trails while reducing the amount of logging logic required in application code.
+SELECT *
+FROM public.daily_activity_report;
