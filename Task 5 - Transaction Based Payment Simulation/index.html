@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Payment Simulation | Task 5</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ============================================================
+         NAVBAR
+         ============================================================ -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <div class="logo">
+                <div class="logo-icon">₹</div>
+
+                <div>
+                    <h2>StudentHub</h2>
+                    <span>Task 05</span>
+                </div>
+            </div>
+
+            <div class="task-title">
+                Transaction-Based Payment Simulation
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ============================================================
+         MAIN CONTAINER
+         ============================================================ -->
+
+    <main class="container">
+
+        <!-- Page Header -->
+
+        <section class="page-header">
+
+            <div>
+                <span class="badge">DATABASE TRANSACTIONS</span>
+
+                <h1>Payment Simulation</h1>
+
+                <p>
+                    Simulate a secure digital payment using
+                    <strong>COMMIT</strong> and <strong>ROLLBACK</strong>.
+                </p>
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             ACCOUNT CARDS
+             ======================================================== -->
+
+        <section class="account-grid">
+
+            <!-- User Account -->
+
+            <div class="account-card">
+
+                <div class="card-top">
+
+                    <div class="account-icon user-icon">
+                        👤
+                    </div>
+
+                    <span class="account-label">
+                        USER ACCOUNT
+                    </span>
+
+                </div>
+
+                <h3 id="userName">
+                    Loading...
+                </h3>
+
+                <p class="balance-label">
+                    Available Balance
+                </p>
+
+                <div class="balance" id="userBalance">
+                    ₹0.00
+                </div>
+
+                <div class="account-status">
+                    <span class="status-dot"></span>
+                    Active Account
+                </div>
+
+            </div>
+
+
+            <!-- Transfer Arrow -->
+
+            <div class="transfer-arrow">
+                →
+            </div>
+
+
+            <!-- Merchant Account -->
+
+            <div class="account-card">
+
+                <div class="card-top">
+
+                    <div class="account-icon merchant-icon">
+                        🏪
+                    </div>
+
+                    <span class="account-label">
+                        MERCHANT ACCOUNT
+                    </span>
+
+                </div>
+
+                <h3 id="merchantName">
+                    Loading...
+                </h3>
+
+                <p class="balance-label">
+                    Current Balance
+                </p>
+
+                <div class="balance" id="merchantBalance">
+                    ₹0.00
+                </div>
+
+                <div class="account-status">
+                    <span class="status-dot"></span>
+                    Active Account
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             PAYMENT SECTION
+             ======================================================== -->
+
+        <section class="payment-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-tag">PAYMENT</span>
+
+                    <h2>Make a Payment</h2>
+
+                    <p>
+                        Enter an amount to transfer money from the user
+                        account to the merchant account.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="payment-form">
+
+                <label for="amount">
+                    Payment Amount
+                </label>
+
+                <div class="amount-wrapper">
+
+                    <span class="currency">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        placeholder="Enter payment amount"
+                        min="1"
+                        step="0.01"
+                    >
+
+                </div>
+
+
+                <button
+                    id="payButton"
+                    onclick="processPayment()"
+                >
+                    <span>💳</span>
+                    Process Payment
+                </button>
+
+            </div>
+
+
+            <!-- Transaction Status -->
+
+            <div
+                id="statusMessage"
+                class="status-message hidden"
+            >
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             TRANSACTION PROCESS
+             ======================================================== -->
+
+        <section class="process-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-tag">
+                        TRANSACTION FLOW
+                    </span>
+
+                    <h2>How the Payment Works</h2>
+
+                    <p>
+                        Every payment follows a controlled database
+                        transaction process.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="process-grid">
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        01
+                    </div>
+
+                    <div>
+                        <h3>Check Balance</h3>
+
+                        <p>
+                            Verify that the user has enough money
+                            to complete the payment.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        02
+                    </div>
+
+                    <div>
+                        <h3>Deduct Amount</h3>
+
+                        <p>
+                            Deduct the payment amount from the
+                            user's account.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        03
+                    </div>
+
+                    <div>
+                        <h3>Add to Merchant</h3>
+
+                        <p>
+                            Add the same amount to the merchant
+                            account.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        04
+                    </div>
+
+                    <div>
+                        <h3>COMMIT / ROLLBACK</h3>
+
+                        <p>
+                            Save the transaction on success or
+                            reverse all changes if it fails.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             TRANSACTION RESULT
+             ======================================================== -->
+
+        <section class="result-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-tag">
+                        TRANSACTION HISTORY
+                    </span>
+
+                    <h2>Recent Transactions</h2>
+                </div>
+
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="transactionTable">
+
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                No transactions available
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+
+    <footer>
+
+        <p>
+            Task 05 • Transaction-Based Payment Simulation
+        </p>
+
+        <span>
+            Full Stack Development
+        </span>
+
+    </footer>
+
+
+    <!-- JavaScript -->
+
+    <script src="script.js"></script>
+
+</body>
+</html>
