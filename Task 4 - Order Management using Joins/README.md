@@ -1,81 +1,131 @@
-# Task 4 - Order Management using Joins
+# Task 4 - Order Management Using Joins
 
-## Description
+## 📌 Description
 
-Create an Order Management system using relational database concepts such as JOINs, subqueries, and ORDER BY.
+This project implements an Order Management System using a relational database.
 
-The system manages customers, orders, and products and displays customer order history using JOIN queries.
+The application manages:
 
-## Features
-
-- Customer management
-- Product management
-- Order management
+- Customers
+- Products
+- Orders
 - Customer order history
-- JOIN queries
+- Highest-value order
+- Most-active customer
+
+The project demonstrates relational database concepts such as:
+
+- JOIN
 - Subqueries
-- ORDER BY sorting
-- Highest-value order identification
-- Most-active customer identification
-- Responsive CSS layout
+- ORDER BY
+- GROUP BY
+- Foreign Keys
+- Relational Database Queries
 
-## Database Tables
+---
 
-### Customers
+## 🎯 Objective
+
+To create a web-based order management dashboard that retrieves and displays customer order information using relational database queries.
+
+The system connects Customers, Orders, and Products using foreign-key relationships.
+
+---
+
+## ✨ Features
+
+### Customer Order History
+
+Displays:
+
+- Order ID
+- Customer Name
+- Product Name
+- Product Category
+- Quantity
+- Total Amount
+- Order Date
+
+### Highest Value Order
+
+Finds the order with the highest total amount using a subquery.
+
+### Most Active Customer
+
+Identifies the customer who has placed the highest number of orders.
+
+### Order Sorting
+
+Orders can be sorted by:
+
+- Newest Order
+- Oldest Order
+- Highest Amount
+- Lowest Amount
+- Customer Name
+
+### Dashboard Statistics
+
+The dashboard displays:
+
+- Total Orders
+- Total Customers
+- Highest Value Order
+- Most Active Customer
+
+---
+
+## 🗄️ Database Structure
+
+The project uses three main tables.
+
+### 1. Customers
 
 Stores customer information.
 
-### Products
+| Column | Description |
+|---|---|
+| id | Primary Key |
+| name | Customer Name |
+| email | Customer Email |
+
+### 2. Products
 
 Stores product information.
 
-### Orders
+| Column | Description |
+|---|---|
+| id | Primary Key |
+| name | Product Name |
+| category | Product Category |
+| price | Product Price |
 
-Stores order information and connects customers with products.
+### 3. Orders
 
-## SQL Concepts Used
+Stores order information.
 
-- INNER JOIN
-- LEFT JOIN
-- Subqueries
-- ORDER BY
-- Aggregate functions
-- GROUP BY
+| Column | Description |
+|---|---|
+| id | Primary Key |
+| customer_id | Foreign Key → Customers |
+| product_id | Foreign Key → Products |
+| quantity | Ordered Quantity |
+| order_date | Date of Order |
+| total_amount | Total Order Amount |
 
-## Requirements
+---
 
-The application should:
+## 🔗 Relationships
 
-1. Create Customers, Orders, and Products tables.
-2. Display customer order history using JOIN queries.
-3. Find the highest-value order using a subquery.
-4. Find the most active customer using a subquery.
-5. Sort order records using ORDER BY.
-6. Display the results using a CSS-based layout.
-
-## Real-Time Usage
-
-Order management systems using these concepts are commonly used in:
-
-- E-commerce websites
-- Retail management systems
-- Online shopping platforms
-- Inventory systems
-- Customer relationship systems
-
-## Technologies Used
-
-- HTML5
-- CSS3
-- JavaScript
-- Supabase
-- SQL
-
-## Project Structure
+The database follows this relationship:
 
 ```text
-Task 4 - Order Management using Joins/
-├── index.html
-├── style.css
-├── script.js
-└── README.md
+Customers
+    │
+    │ customer_id
+    ▼
+  Orders
+    │
+    │ product_id
+    ▼
+ Products

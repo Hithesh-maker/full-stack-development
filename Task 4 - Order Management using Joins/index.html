@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>StudentHub | Order Management</title>
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Supabase -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+
+    <!-- CSS -->
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+    <main class="page-container">
+
+
+        <!-- ==================================================
+             HEADER
+             ================================================== -->
+
+        <header class="page-header">
+
+            <div>
+
+                <p class="eyebrow">
+                    FULL STACK DEVELOPMENT • TASK 4
+                </p>
+
+                <h1>
+                    Order Management
+                </h1>
+
+                <p class="subtitle">
+                    Manage customers, products and order history
+                    using relational database queries.
+                </p>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- ==================================================
+             SUMMARY CARDS
+             ================================================== -->
+
+        <section class="summary-grid">
+
+
+            <!-- Highest Value Order -->
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    ₹
+                </div>
+
+                <div>
+
+                    <p class="summary-label">
+                        Highest Value Order
+                    </p>
+
+                    <h2 id="highestOrderAmount">
+                        ₹0
+                    </h2>
+
+                    <p
+                        class="summary-description"
+                        id="highestOrderProduct"
+                    >
+                        Loading...
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Most Active Customer -->
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    ★
+                </div>
+
+                <div>
+
+                    <p class="summary-label">
+                        Most Active Customer
+                    </p>
+
+                    <h2 id="activeCustomer">
+                        Loading...
+                    </h2>
+
+                    <p
+                        class="summary-description"
+                        id="activeCustomerOrders"
+                    >
+                        Checking orders...
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Total Orders -->
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    #
+                </div>
+
+                <div>
+
+                    <p class="summary-label">
+                        Total Orders
+                    </p>
+
+                    <h2 id="totalOrders">
+                        0
+                    </h2>
+
+                    <p class="summary-description">
+                        Orders in the system
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Total Customers -->
+
+            <div class="summary-card">
+
+                <div class="summary-icon">
+                    👥
+                </div>
+
+                <div>
+
+                    <p class="summary-label">
+                        Customers
+                    </p>
+
+                    <h2 id="totalCustomers">
+                        0
+                    </h2>
+
+                    <p class="summary-description">
+                        Registered customers
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             ORDER HISTORY
+             ================================================== -->
+
+        <section class="content-card">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <p class="section-label">
+                        ORDER DATABASE
+                    </p>
+
+                    <h2>
+                        Customer Order History
+                    </h2>
+
+                    <p>
+                        Customer, product and order information
+                        retrieved using relational queries.
+                    </p>
+
+                </div>
+
+
+                <!-- Sort -->
+
+                <div class="sort-container">
+
+                    <label for="sortOrders">
+                        Sort by
+                    </label>
+
+                    <select id="sortOrders">
+
+                        <option value="date-desc">
+                            Newest Order
+                        </option>
+
+                        <option value="date-asc">
+                            Oldest Order
+                        </option>
+
+                        <option value="amount-desc">
+                            Highest Amount
+                        </option>
+
+                        <option value="amount-asc">
+                            Lowest Amount
+                        </option>
+
+                        <option value="customer">
+                            Customer Name
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Loading -->
+
+            <div
+                id="loading"
+                class="loading"
+            >
+
+                <div class="loader"></div>
+
+                <p>
+                    Loading order history...
+                </p>
+
+            </div>
+
+
+
+            <!-- Error -->
+
+            <div
+                id="errorMessage"
+                class="error-message"
+            >
+            </div>
+
+
+
+            <!-- Table -->
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Order ID
+                            </th>
+
+                            <th>
+                                Customer
+                            </th>
+
+                            <th>
+                                Product
+                            </th>
+
+                            <th>
+                                Category
+                            </th>
+
+                            <th>
+                                Quantity
+                            </th>
+
+                            <th>
+                                Amount
+                            </th>
+
+                            <th>
+                                Order Date
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="orderTableBody">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- ==================================================
+             DATABASE CONCEPTS
+             ================================================== -->
+
+        <section class="concept-card">
+
+            <div>
+
+                <p class="section-label">
+                    SQL CONCEPTS
+                </p>
+
+                <h2>
+                    Concepts Used
+                </h2>
+
+            </div>
+
+
+            <div class="concept-grid">
+
+                <div class="concept-item">
+
+                    <strong>
+                        JOIN
+                    </strong>
+
+                    <span>
+                        Customers → Orders → Products
+                    </span>
+
+                </div>
+
+
+                <div class="concept-item">
+
+                    <strong>
+                        SUBQUERY
+                    </strong>
+
+                    <span>
+                        Highest-value order & most-active customer
+                    </span>
+
+                </div>
+
+
+                <div class="concept-item">
+
+                    <strong>
+                        ORDER BY
+                    </strong>
+
+                    <span>
+                        Sort orders by date, amount and customer
+                    </span>
+
+                </div>
+
+
+                <div class="concept-item">
+
+                    <strong>
+                        RELATIONAL DATABASE
+                    </strong>
+
+                    <span>
+                        Related tables connected using IDs
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             FOOTER
+             ================================================== -->
+
+        <footer class="page-footer">
+
+            <p>
+                StudentHub • Full Stack Development
+            </p>
+
+        </footer>
+
+
+    </main>
+
+
+    <!-- JavaScript -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
