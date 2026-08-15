@@ -1,6 +1,6 @@
 /* ============================================================
-   STUDENTHUB — TASK 06
-   AUTOMATED LOGGING USING TRIGGERS & VIEWS
+   STUDENTHUB — TASK 07
+   INTERACTIVE WEB FORM WITH EVENTS & FUNCTIONS
    ============================================================ */
 
 
@@ -290,7 +290,7 @@ body {
 
     font-size: 15px;
 
-    max-width: 650px;
+    max-width: 700px;
 }
 
 
@@ -419,13 +419,13 @@ body {
 
 .stat-card h2 {
 
-    font-size: 25px;
+    font-size: 17px;
 
     font-weight: 800;
 
     line-height: 1.2;
 
-    letter-spacing: -0.5px;
+    letter-spacing: -0.3px;
 }
 
 
@@ -436,9 +436,7 @@ body {
 .activity-section,
 .process-section,
 .records-section,
-.logs-section,
-.report-section,
-.info-section {
+.confirmation-section {
 
     background:
         var(--surface);
@@ -457,6 +455,10 @@ body {
         var(--shadow-sm);
 }
 
+
+/* ============================================================
+   SECTION HEADING
+   ============================================================ */
 
 .section-heading {
 
@@ -507,10 +509,10 @@ body {
 
 
 /* ============================================================
-   ACTIVITY FORM
+   FEEDBACK FORM
    ============================================================ */
 
-.activity-form {
+.feedback-form {
 
     max-width: 760px;
 }
@@ -518,7 +520,7 @@ body {
 
 .form-group {
 
-    margin-bottom: 17px;
+    margin-bottom: 18px;
 }
 
 
@@ -531,10 +533,19 @@ body {
     font-weight: 650;
 
     margin-bottom: 7px;
+
+    color:
+        var(--text-primary);
 }
 
 
-.form-group input {
+/* ============================================================
+   INPUTS / SELECT / TEXTAREA
+   ============================================================ */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
 
     width: 100%;
 
@@ -563,25 +574,65 @@ body {
 
     transition:
         border-color 0.2s ease,
-        box-shadow 0.2s ease;
+        box-shadow 0.2s ease,
+        transform 0.2s ease,
+        background 0.2s ease;
 }
 
 
-.form-group input::placeholder {
+.form-group input::placeholder,
+.form-group textarea::placeholder {
 
     color:
         var(--text-muted);
 }
 
 
-.form-group input:hover {
+/* ============================================================
+   JS MOUSE EVENT — FIELD HOVER
+   ============================================================ */
+
+.form-group input.field-hover,
+.form-group select.field-hover,
+.form-group textarea.field-hover {
 
     border-color:
-        var(--border-dark);
+        #a5b4fc;
+
+    background:
+        #fcfcff;
+
+    transform:
+        translateY(-1px);
 }
 
 
-.form-group input:focus {
+/* ============================================================
+   NORMAL CSS HOVER
+   ============================================================ */
+
+.form-group input:hover,
+.form-group select:hover,
+.form-group textarea:hover {
+
+    border-color:
+        #a5b4fc;
+
+    background:
+        #fcfcff;
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* ============================================================
+   FOCUS EFFECT
+   ============================================================ */
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
 
     border-color:
         var(--primary);
@@ -589,6 +640,161 @@ body {
     box-shadow:
         0 0 0 3px
         rgba(79, 70, 229, 0.10);
+
+    background:
+        #ffffff;
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* ============================================================
+   VALIDATION STATES
+   IMPORTANT:
+   JS USES .valid AND .invalid
+   ============================================================ */
+
+.form-group input.valid,
+.form-group select.valid,
+.form-group textarea.valid {
+
+    border-color:
+        var(--success) !important;
+
+    background:
+        var(--success-bg) !important;
+}
+
+
+.form-group input.invalid,
+.form-group select.invalid,
+.form-group textarea.invalid {
+
+    border-color:
+        var(--danger) !important;
+
+    background:
+        var(--danger-bg) !important;
+}
+
+
+/* ============================================================
+   SELECT
+   ============================================================ */
+
+.form-group select {
+
+    cursor:
+        pointer;
+
+    appearance:
+        auto;
+}
+
+
+/* ============================================================
+   TEXTAREA
+   ============================================================ */
+
+.form-group textarea {
+
+    resize:
+        vertical;
+
+    min-height:
+        135px;
+
+    line-height:
+        1.6;
+}
+
+
+/* ============================================================
+   FIELD VALIDATION MESSAGE
+   ============================================================ */
+
+.field-message {
+
+    display: block;
+
+    min-height:
+        18px;
+
+    margin-top:
+        5px;
+
+    font-size:
+        11px;
+
+    font-weight:
+        600;
+
+    line-height:
+        1.4;
+}
+
+
+.field-message.error {
+
+    color:
+        var(--danger);
+}
+
+
+.field-message.success {
+
+    color:
+        var(--success);
+}
+
+
+/* ============================================================
+   CHARACTER COUNTER
+   ============================================================ */
+
+.textarea-footer {
+
+    display: flex;
+
+    align-items:
+        flex-start;
+
+    justify-content:
+        space-between;
+
+    gap: 10px;
+}
+
+
+#characterCount {
+
+    color:
+        var(--text-secondary);
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+
+    white-space:
+        nowrap;
+
+    padding-top:
+        5px;
+
+    transition:
+        color 0.2s ease;
+}
+
+
+/* Near character limit */
+
+#characterCount.near-limit {
+
+    color:
+        var(--warning);
 }
 
 
@@ -598,17 +804,21 @@ body {
 
 .button-group {
 
-    display: flex;
+    display:
+        flex;
 
-    gap: 12px;
+    gap:
+        12px;
 
-    margin-top: 20px;
+    margin-top:
+        20px;
 }
 
 
 .button-group button {
 
-    border: none;
+    border:
+        none;
 
     padding:
         13px 19px;
@@ -634,9 +844,14 @@ body {
     transition:
         transform 0.2s ease,
         opacity 0.2s ease,
-        box-shadow 0.2s ease;
+        box-shadow 0.2s ease,
+        background 0.2s ease;
 }
 
+
+/* ============================================================
+   SUBMIT BUTTON
+   ============================================================ */
 
 .insert-button {
 
@@ -653,20 +868,28 @@ body {
 }
 
 
-.update-button {
+/* ============================================================
+   RESET BUTTON
+   ============================================================ */
+
+.reset-button {
 
     background:
         linear-gradient(
             135deg,
-            #2563eb,
-            #3b82f6
+            #64748b,
+            #94a3b8
         );
 
     box-shadow:
         0 5px 14px
-        rgba(37, 99, 235, 0.16);
+        rgba(100, 116, 139, 0.15);
 }
 
+
+/* ============================================================
+   BUTTON HOVER
+   ============================================================ */
 
 .button-group button:hover {
 
@@ -678,10 +901,37 @@ body {
 }
 
 
+/* ============================================================
+   BUTTON ACTIVE
+   ============================================================ */
+
 .button-group button:active {
 
     transform:
         translateY(0);
+
+    box-shadow:
+        none;
+}
+
+
+/* ============================================================
+   DISABLED SUBMIT BUTTON
+   ============================================================ */
+
+.button-group button:disabled {
+
+    cursor:
+        not-allowed;
+
+    opacity:
+        0.65;
+
+    transform:
+        none;
+
+    box-shadow:
+        none;
 }
 
 
@@ -691,7 +941,8 @@ body {
 
 .status-message {
 
-    margin-top: 18px;
+    margin-top:
+        18px;
 
     padding:
         14px 16px;
@@ -707,6 +958,29 @@ body {
 
     line-height:
         1.5;
+
+    animation:
+        statusSlide 0.25s ease;
+}
+
+
+@keyframes statusSlide {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(-5px);
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
 }
 
 
@@ -755,12 +1029,12 @@ body {
 .hidden {
 
     display:
-        none;
+        none !important;
 }
 
 
 /* ============================================================
-   AUTOMATION PROCESS
+   EVENT PROCESS GRID
    ============================================================ */
 
 .process-grid {
@@ -770,7 +1044,8 @@ body {
     grid-template-columns:
         repeat(4, 1fr);
 
-    gap: 15px;
+    gap:
+        15px;
 }
 
 
@@ -798,7 +1073,7 @@ body {
 .process-card:hover {
 
     transform:
-        translateY(-2px);
+        translateY(-3px);
 
     border-color:
         #d9ddf0;
@@ -810,17 +1085,23 @@ body {
 
 .process-number {
 
-    width: 36px;
+    width:
+        36px;
 
-    height: 36px;
+    height:
+        36px;
 
-    border-radius: 10px;
+    border-radius:
+        10px;
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    justify-content: center;
+    justify-content:
+        center;
 
     background:
         var(--primary-light);
@@ -828,11 +1109,14 @@ body {
     color:
         var(--primary);
 
-    font-size: 10px;
+    font-size:
+        10px;
 
-    font-weight: 800;
+    font-weight:
+        800;
 
-    margin-bottom: 14px;
+    margin-bottom:
+        14px;
 }
 
 
@@ -863,196 +1147,66 @@ body {
 
 
 /* ============================================================
-   DATABASE ARCHITECTURE
+   VALIDATION GRID
    ============================================================ */
 
-.info-section {
+.validation-grid {
 
-    background:
-        linear-gradient(
-            135deg,
-            #ffffff,
-            #fafbff
-        );
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap:
+        15px;
 }
 
 
-.info-section .process-card {
-
-    background:
-        #ffffff;
-}
-
-
-.info-section .process-number {
-
-    font-size:
-        10px;
-
-    letter-spacing:
-        0.3px;
-}
-
-
-/* ============================================================
-   TABLE WRAPPER
-   ============================================================ */
-
-.table-wrapper {
-
-    width:
-        100%;
-
-    overflow-x:
-        auto;
+.validation-card {
 
     border:
         1px solid var(--border);
 
     border-radius:
-        12px;
-
-    scrollbar-width:
-        thin;
-}
-
-
-.table-wrapper::-webkit-scrollbar {
-
-    height:
-        7px;
-}
-
-
-.table-wrapper::-webkit-scrollbar-track {
-
-    background:
-        #f8fafc;
-}
-
-
-.table-wrapper::-webkit-scrollbar-thumb {
-
-    background:
-        #d1d5db;
-
-    border-radius:
-        10px;
-}
-
-
-/* ============================================================
-   TABLE
-   ============================================================ */
-
-table {
-
-    width:
-        100%;
-
-    border-collapse:
-        collapse;
-
-    min-width:
-        700px;
-}
-
-
-th {
-
-    text-align:
-        left;
-
-    padding:
-        14px 15px;
-
-    background:
-        #f8fafc;
-
-    color:
-        var(--text-secondary);
-
-    font-size:
-        10px;
-
-    font-weight:
-        800;
-
-    text-transform:
-        uppercase;
-
-    letter-spacing:
-        0.6px;
-
-    white-space:
-        nowrap;
-}
-
-
-td {
-
-    padding:
-        14px 15px;
-
-    border-top:
-        1px solid var(--border);
-
-    font-size:
         13px;
 
-    color:
-        var(--text-primary);
+    padding:
+        20px;
 
-    vertical-align:
-        middle;
-}
-
-
-tbody tr {
+    background:
+        var(--surface-soft);
 
     transition:
-        background 0.15s ease;
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
 }
 
 
-tbody tr:hover {
+.validation-card:hover {
 
-    background:
-        #fafbff;
+    transform:
+        translateY(-3px);
+
+    border-color:
+        #d9ddf0;
+
+    box-shadow:
+        var(--shadow-sm);
 }
 
 
-tbody td:first-child {
+.validation-icon {
 
-    font-weight:
-        650;
-}
+    width:
+        40px;
 
-
-.empty-state {
-
-    text-align:
-        center;
-
-    color:
-        var(--text-secondary);
-
-    padding:
-        32px !important;
-
-    font-size:
-        13px;
-}
-
-
-/* ============================================================
-   OPERATION BADGES
-   ============================================================ */
-
-.operation-badge {
+    height:
+        40px;
 
     display:
-        inline-flex;
+        flex;
 
     align-items:
         center;
@@ -1060,94 +1214,166 @@ tbody td:first-child {
     justify-content:
         center;
 
-    min-width:
-        68px;
-
-    padding:
-        5px 10px;
-
-    border-radius:
-        20px;
-
-    font-size:
-        9px;
-
-    font-weight:
-        800;
-
-    letter-spacing:
-        0.4px;
-}
-
-
-.operation-insert {
-
     background:
-        var(--success-bg);
-
-    color:
-        var(--success);
-
-    border:
-        1px solid
-        #bbf7d0;
-}
-
-
-.operation-update {
-
-    background:
-        var(--info-bg);
-
-    color:
-        var(--info);
-
-    border:
-        1px solid
-        #bfdbfe;
-}
-
-
-/* ============================================================
-   JSON DATA CELLS
-   ============================================================ */
-
-#logsTable td:nth-child(4),
-#logsTable td:nth-child(5) {
-
-    max-width:
-        260px;
-
-    font-family:
-        "Consolas",
-        "Courier New",
-        monospace;
-
-    font-size:
-        11px;
-
-    color:
-        #4b5563;
-
-    white-space:
-        normal;
-
-    word-break:
-        break-word;
-}
-
-
-/* ============================================================
-   DAILY REPORT
-   ============================================================ */
-
-#reportTable td:last-child {
-
-    font-weight:
-        800;
+        var(--primary-light);
 
     color:
         var(--primary);
+
+    border-radius:
+        10px;
+
+    margin-bottom:
+        12px;
+
+    font-size:
+        18px;
+}
+
+
+.validation-card h3 {
+
+    font-size:
+        14px;
+
+    font-weight:
+        700;
+
+    margin-bottom:
+        6px;
+}
+
+
+.validation-card p {
+
+    color:
+        var(--text-secondary);
+
+    font-size:
+        12px;
+
+    line-height:
+        1.5;
+}
+
+
+/* ============================================================
+   CONFIRMATION SECTION
+   ============================================================ */
+
+.confirmation-section {
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #f0fdf4
+        );
+
+    border:
+        1px solid
+        var(--success-border);
+
+    text-align:
+        center;
+
+    padding:
+        35px;
+}
+
+
+.confirmation-icon {
+
+    width:
+        58px;
+
+    height:
+        58px;
+
+    margin:
+        0 auto 15px;
+
+    border-radius:
+        50%;
+
+    background:
+        var(--success);
+
+    color:
+        white;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    font-size:
+        25px;
+
+    font-weight:
+        800;
+
+    box-shadow:
+        0 8px 20px
+        rgba(22, 163, 74, 0.18);
+
+    animation:
+        confirmationPop 0.4s ease;
+}
+
+
+@keyframes confirmationPop {
+
+    0% {
+
+        transform:
+            scale(0.7);
+
+        opacity:
+            0;
+    }
+
+    70% {
+
+        transform:
+            scale(1.08);
+    }
+
+    100% {
+
+        transform:
+            scale(1);
+
+        opacity:
+            1;
+    }
+}
+
+
+.confirmation-section h2 {
+
+    font-size:
+        21px;
+
+    font-weight:
+        750;
+
+    margin-bottom:
+        6px;
+}
+
+
+.confirmation-section p {
+
+    color:
+        var(--text-secondary);
+
+    font-size:
+        13px;
 }
 
 
@@ -1201,7 +1427,7 @@ footer span {
 
 
 /* ============================================================
-   SELECTION
+   TEXT SELECTION
    ============================================================ */
 
 ::selection {
@@ -1228,6 +1454,13 @@ footer span {
 
 
     .process-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .validation-grid {
 
         grid-template-columns:
             repeat(2, 1fr);
@@ -1297,9 +1530,7 @@ footer span {
     .activity-section,
     .process-section,
     .records-section,
-    .logs-section,
-    .report-section,
-    .info-section {
+    .confirmation-section {
 
         padding:
             20px;
@@ -1337,10 +1568,10 @@ footer span {
     }
 
 
-    table {
+    .textarea-footer {
 
-        min-width:
-            680px;
+        align-items:
+            flex-start;
     }
 
 }
@@ -1360,6 +1591,13 @@ footer span {
 
 
     .process-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .validation-grid {
 
         grid-template-columns:
             1fr;
@@ -1402,9 +1640,7 @@ footer span {
     .activity-section,
     .process-section,
     .records-section,
-    .logs-section,
-    .report-section,
-    .info-section {
+    .confirmation-section {
 
         padding:
             17px;
@@ -1417,11 +1653,30 @@ footer span {
             18px;
     }
 
+
+    .page-header h1 {
+
+        font-size:
+            27px;
+    }
+
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+
+        font-size:
+            13px;
+
+        padding:
+            13px 14px;
+    }
+
 }
 
 
 /* ============================================================
-   REDUCED MOTION
+   ACCESSIBILITY — REDUCED MOTION
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {

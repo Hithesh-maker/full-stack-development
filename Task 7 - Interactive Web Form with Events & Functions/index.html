@@ -10,8 +10,13 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="description"
+        content="StudentHub Task 07 - Interactive Feedback Form with JavaScript Events, Functions and Supabase"
+    >
+
     <title>
-        Interactive Feedback | Task 7
+        StudentHub | Task 07 - Interactive Feedback Form
     </title>
 
 
@@ -26,7 +31,7 @@
 
     <link
         rel="preconnect"
-        href="https://fonts.googleapis.com"
+        href="https://fonts.gstatic.com"
         crossorigin
     >
 
@@ -37,16 +42,7 @@
 
 
     <!-- ============================================================
-         SUPABASE
-         ============================================================ -->
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
-
-
-    <!-- ============================================================
-         CSS
+         STYLESHEET
          ============================================================ -->
 
     <link
@@ -74,7 +70,7 @@
             <div class="logo">
 
                 <div class="logo-icon">
-                    ⚡
+                    S
                 </div>
 
                 <div>
@@ -84,7 +80,7 @@
                     </h2>
 
                     <span>
-                        Task 07
+                        Full Stack Development
                     </span>
 
                 </div>
@@ -96,9 +92,10 @@
 
             <div class="task-title">
 
-                Interactive Web Form with Events & Functions
+                Task 07 · Interactive Web Form
 
             </div>
+
 
         </div>
 
@@ -120,19 +117,19 @@
         <section class="page-header">
 
             <span class="badge">
-                INTERACTIVE FEEDBACK SYSTEM
+                TASK 07 · JAVASCRIPT EVENTS
             </span>
 
             <h1>
-                Share Your Experience
+                Interactive Feedback Form
             </h1>
 
             <p>
-                Submit customer feedback using
-                <strong>JavaScript Events</strong>,
-                <strong>Reusable Functions</strong>,
-                real-time validation and
-                <strong>Supabase Database Storage</strong>.
+                Build an interactive customer feedback system using
+                <strong>
+                    JavaScript events, reusable functions,
+                    validation and Supabase storage.
+                </strong>
             </p>
 
         </section>
@@ -146,22 +143,22 @@
         <section class="stats-grid">
 
 
-            <!-- KEYBOARD EVENTS -->
+            <!-- TOTAL FEEDBACK -->
 
             <div class="stat-card">
 
                 <div class="stat-icon">
-                    ⌨️
+                    📝
                 </div>
 
                 <div>
 
                     <p>
-                        Keyboard Events
+                        TOTAL FEEDBACK
                     </p>
 
-                    <h2>
-                        Active
+                    <h2 id="totalFeedback">
+                        0
                     </h2>
 
                 </div>
@@ -170,22 +167,22 @@
 
 
 
-            <!-- MOUSE EVENTS -->
+            <!-- AVERAGE RATING -->
 
             <div class="stat-card">
 
                 <div class="stat-icon insert-icon">
-                    🖱️
+                    ⭐
                 </div>
 
                 <div>
 
                     <p>
-                        Mouse Events
+                        AVERAGE RATING
                     </p>
 
-                    <h2>
-                        Active
+                    <h2 id="averageRating">
+                        0.0
                     </h2>
 
                 </div>
@@ -205,11 +202,11 @@
                 <div>
 
                     <p>
-                        Live Validation
+                        LIVE VALIDATION
                     </p>
 
                     <h2>
-                        Enabled
+                        Active
                     </h2>
 
                 </div>
@@ -218,7 +215,7 @@
 
 
 
-            <!-- DATABASE -->
+            <!-- STORAGE -->
 
             <div class="stat-card">
 
@@ -229,16 +226,17 @@
                 <div>
 
                     <p>
-                        Database
+                        DATABASE
                     </p>
 
                     <h2>
-                        Connected
+                        Supabase
                     </h2>
 
                 </div>
 
             </div>
+
 
         </section>
 
@@ -251,6 +249,8 @@
         <section class="activity-section">
 
 
+            <!-- SECTION HEADER -->
+
             <div class="section-heading">
 
                 <span class="section-tag">
@@ -258,18 +258,20 @@
                 </span>
 
                 <h2>
-                    Feedback Form
+                    Share Your Experience
                 </h2>
 
                 <p>
                     Complete the form below. Fields are validated
-                    while you type and the feedback is stored
-                    securely in the Supabase database.
+                    while you type and the submit action uses a
+                    double-click event.
                 </p>
 
             </div>
 
 
+
+            <!-- FORM -->
 
             <form
                 id="feedbackForm"
@@ -294,6 +296,7 @@
                         name="name"
                         placeholder="Enter your full name"
                         autocomplete="name"
+                        maxlength="80"
                     >
 
                     <small
@@ -321,6 +324,7 @@
                         name="email"
                         placeholder="student@example.com"
                         autocomplete="email"
+                        maxlength="120"
                     >
 
                     <small
@@ -367,6 +371,10 @@
                             Overall Experience
                         </option>
 
+                        <option value="Suggestion">
+                            Suggestion
+                        </option>
+
                     </select>
 
                     <small
@@ -385,7 +393,7 @@
                 <div class="form-group">
 
                     <label for="rating">
-                        Overall Rating
+                        Feedback Rating
                     </label>
 
                     <select
@@ -398,23 +406,23 @@
                         </option>
 
                         <option value="5">
-                            ⭐ 5 — Excellent
+                            5 — Excellent
                         </option>
 
                         <option value="4">
-                            ⭐ 4 — Very Good
+                            4 — Very Good
                         </option>
 
                         <option value="3">
-                            ⭐ 3 — Good
+                            3 — Good
                         </option>
 
                         <option value="2">
-                            ⭐ 2 — Needs Improvement
+                            2 — Needs Improvement
                         </option>
 
                         <option value="1">
-                            ⭐ 1 — Poor
+                            1 — Poor
                         </option>
 
                     </select>
@@ -446,6 +454,7 @@
                         placeholder="Tell us about your experience..."
                     ></textarea>
 
+
                     <div class="textarea-footer">
 
                         <small
@@ -469,18 +478,14 @@
 
                 <div class="button-group">
 
-                    <!-- SINGLE CLICK SUBMIT -->
-
                     <button
                         type="button"
                         id="submitButton"
                         class="insert-button"
                     >
-                        ✓ Submit Feedback
+                        ✓ Double-Click to Submit
                     </button>
 
-
-                    <!-- RESET -->
 
                     <button
                         type="button"
@@ -501,7 +506,10 @@
                 <div
                     id="statusMessage"
                     class="status-message hidden"
+                    role="status"
+                    aria-live="polite"
                 ></div>
+
 
             </form>
 
@@ -523,12 +531,12 @@
                 </span>
 
                 <h2>
-                    Interactive Event Flow
+                    How Interaction Works
                 </h2>
 
                 <p>
-                    The application uses JavaScript events and
-                    reusable functions to control user interaction.
+                    The form combines browser events with reusable
+                    JavaScript functions.
                 </p>
 
             </div>
@@ -538,7 +546,7 @@
             <div class="process-grid">
 
 
-                <!-- 01 -->
+                <!-- EVENT 01 -->
 
                 <div class="process-card">
 
@@ -547,19 +555,19 @@
                     </div>
 
                     <h3>
-                        Keyboard Validation
+                        Keyboard Input
                     </h3>
 
                     <p>
-                        Input fields are validated as the user
-                        types using keyboard and input events.
+                        Input events validate the user's data
+                        while they type into the form.
                     </p>
 
                 </div>
 
 
 
-                <!-- 02 -->
+                <!-- EVENT 02 -->
 
                 <div class="process-card">
 
@@ -568,19 +576,19 @@
                     </div>
 
                     <h3>
-                        Mouse Events
+                        Mouse Hover
                     </h3>
 
                     <p>
-                        Form fields visually respond when the
-                        mouse pointer moves over them.
+                        Hovering over form fields highlights
+                        the active input area.
                     </p>
 
                 </div>
 
 
 
-                <!-- 03 -->
+                <!-- EVENT 03 -->
 
                 <div class="process-card">
 
@@ -589,19 +597,19 @@
                     </div>
 
                     <h3>
-                        Single Click
+                        Double Click
                     </h3>
 
                     <p>
-                        The feedback submission is triggered
-                        using a single-click event.
+                        Double-clicking the submit button
+                        starts the final validation process.
                     </p>
 
                 </div>
 
 
 
-                <!-- 04 -->
+                <!-- EVENT 04 -->
 
                 <div class="process-card">
 
@@ -614,11 +622,12 @@
                     </h3>
 
                     <p>
-                        Common validation logic is handled through
-                        reusable JavaScript functions.
+                        Common validation logic is handled
+                        through reusable JavaScript functions.
                     </p>
 
                 </div>
+
 
             </div>
 
@@ -640,12 +649,12 @@
                 </span>
 
                 <h2>
-                    Validation Rules
+                    Form Validation Rules
                 </h2>
 
                 <p>
-                    Every field is checked before the feedback
-                    is stored in the database.
+                    Every required field is checked before the
+                    feedback is stored in Supabase.
                 </p>
 
             </div>
@@ -695,26 +704,6 @@
 
 
 
-                <!-- CATEGORY -->
-
-                <div class="validation-card">
-
-                    <div class="validation-icon">
-                        🏷️
-                    </div>
-
-                    <h3>
-                        Category
-                    </h3>
-
-                    <p>
-                        A feedback category must be selected.
-                    </p>
-
-                </div>
-
-
-
                 <!-- RATING -->
 
                 <div class="validation-card">
@@ -754,6 +743,7 @@
 
                 </div>
 
+
             </div>
 
         </section>
@@ -761,115 +751,83 @@
 
 
         <!-- ========================================================
-             DATABASE STORAGE
+             STORED FEEDBACK
              ======================================================== -->
 
-        <section class="info-section">
+        <section class="records-section">
 
 
             <div class="section-heading">
 
                 <span class="section-tag">
-                    SUPABASE DATABASE
+                    SUPABASE RECORDS
                 </span>
 
                 <h2>
-                    Feedback Storage Architecture
+                    Recent Feedback
                 </h2>
 
                 <p>
-                    Submitted feedback is stored in the
-                    <strong>feedback</strong> table in Supabase.
+                    The latest feedback entries stored in the
+                    Supabase database.
                 </p>
 
             </div>
 
 
+            <div class="table-wrapper">
 
-            <div class="process-grid">
+                <table>
 
+                    <thead>
 
-                <!-- TABLE -->
+                        <tr>
 
-                <div class="process-card">
+                            <th>
+                                ID
+                            </th>
 
-                    <div class="process-number">
-                        DB
-                    </div>
+                            <th>
+                                Name
+                            </th>
 
-                    <h3>
-                        Feedback Table
-                    </h3>
+                            <th>
+                                Category
+                            </th>
 
-                    <p>
-                        Stores name, email, category, rating,
-                        feedback and submission timestamp.
-                    </p>
+                            <th>
+                                Rating
+                            </th>
 
-                </div>
+                            <th>
+                                Feedback
+                            </th>
 
+                            <th>
+                                Submitted
+                            </th>
 
+                        </tr>
 
-                <!-- VALIDATION -->
-
-                <div class="process-card">
-
-                    <div class="process-number">
-                        JS
-                    </div>
-
-                    <h3>
-                        JavaScript Validation
-                    </h3>
-
-                    <p>
-                        Validates user input before sending
-                        information to the database.
-                    </p>
-
-                </div>
+                    </thead>
 
 
+                    <tbody id="feedbackTable">
 
-                <!-- SUPABASE -->
+                        <tr>
 
-                <div class="process-card">
+                            <td
+                                colspan="6"
+                                class="empty-state"
+                            >
+                                Loading feedback...
+                            </td>
 
-                    <div class="process-number">
-                        SB
-                    </div>
+                        </tr>
 
-                    <h3>
-                        Supabase
-                    </h3>
+                    </tbody>
 
-                    <p>
-                        Receives and stores the submitted
-                        feedback records.
-                    </p>
-
-                </div>
-
-
-
-                <!-- TIMESTAMP -->
-
-                <div class="process-card">
-
-                    <div class="process-number">
-                        TM
-                    </div>
-
-                    <h3>
-                        Created At
-                    </h3>
-
-                    <p>
-                        Each feedback record automatically receives
-                        a submission timestamp.
-                    </p>
-
-                </div>
+                </table>
 
             </div>
 
@@ -895,8 +853,8 @@
             </h2>
 
             <p>
-                Your feedback has been validated and stored
-                successfully in the StudentHub database.
+                Thank you for sharing your experience.
+                Your feedback has been stored securely.
             </p>
 
         </section>
@@ -913,11 +871,13 @@
     <footer>
 
         <p>
-            Task 07 • Interactive Web Form with Events & Functions
+            StudentHub • Task 07
+            <br>
+            Interactive Web Form with Events & Functions
         </p>
 
         <span>
-            Full Stack Development • StudentHub
+            HTML5 · CSS3 · JavaScript · Supabase
         </span>
 
     </footer>
@@ -925,7 +885,16 @@
 
 
     <!-- ============================================================
-         JAVASCRIPT
+         SUPABASE JAVASCRIPT LIBRARY
+         ============================================================ -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+
+    <!-- ============================================================
+         TASK 07 JAVASCRIPT
          ============================================================ -->
 
     <script
