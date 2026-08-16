@@ -3,9 +3,9 @@
 
 <head>
 
-    <!-- ==========================================
+    <!-- ============================================================
          DOCUMENT SETUP
-    =========================================== -->
+    ============================================================ -->
 
     <meta charset="UTF-8">
 
@@ -16,7 +16,7 @@
 
     <meta
         name="description"
-        content="StudentHub — Secure student registration and data storage portal."
+        content="StudentHub — Secure student registration and MySQL data storage portal."
     >
 
     <meta
@@ -24,9 +24,33 @@
         content="#0b0d12"
     >
 
-    <title>
-        StudentHub — Student Registration
-    </title>
+    <title>StudentHub — Student Registration</title>
+
+
+    <!-- ============================================================
+         GOOGLE FONT
+    ============================================================ -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- ============================================================
+         STYLESHEET
+    ============================================================ -->
 
     <link
         rel="stylesheet"
@@ -39,9 +63,20 @@
 <body>
 
 
-    <!-- ==========================================
+    <!-- ============================================================
+         BACKGROUND
+    ============================================================ -->
+
+    <div
+        class="page-background"
+        aria-hidden="true"
+    ></div>
+
+
+
+    <!-- ============================================================
          HEADER
-    =========================================== -->
+    ============================================================ -->
 
     <header class="site-header">
 
@@ -50,15 +85,16 @@
             aria-label="Main navigation"
         >
 
-            <!-- BRAND -->
-
             <a
                 href="index.html"
                 class="brand"
                 aria-label="StudentHub Home"
             >
 
-                <span class="brand-logo">
+                <span
+                    class="brand-logo"
+                    aria-hidden="true"
+                >
                     S
                 </span>
 
@@ -76,8 +112,6 @@
 
             </a>
 
-
-            <!-- SYSTEM STATUS -->
 
             <div
                 class="system-status"
@@ -101,16 +135,16 @@
 
 
 
-    <!-- ==========================================
+    <!-- ============================================================
          MAIN CONTENT
-    =========================================== -->
+    ============================================================ -->
 
     <main>
 
 
-        <!-- ==========================================
+        <!-- ========================================================
              HERO SECTION
-        =========================================== -->
+        ========================================================= -->
 
         <section class="hero">
 
@@ -120,42 +154,70 @@
                 <div class="hero-content">
 
                     <p class="eyebrow">
+
                         FULL STACK DEVELOPMENT
-                        <span>·</span>
+
+                        <span aria-hidden="true">
+                            ·
+                        </span>
+
                         TASK 01
+
                     </p>
 
 
                     <h1>
+
                         Student
-                        <span>Registration.</span>
+
+                        <span>
+                            Registration.
+                        </span>
+
                     </h1>
 
 
                     <p class="hero-description">
+
                         Register student information and securely
-                        store records in a cloud-powered
-                        PostgreSQL database.
+                        store records in a MySQL database through
+                        a Node.js and Express backend.
+
                     </p>
 
-
-                    <!-- TRUST FEATURES -->
 
                     <div class="trust-list">
 
                         <span class="trust-item">
-                            <b>✓</b>
+
+                            <b aria-hidden="true">
+                                ✓
+                            </b>
+
                             Secure storage
+
                         </span>
 
-                        <span class="trust-item">
-                            <b>✓</b>
-                            PostgreSQL
-                        </span>
 
                         <span class="trust-item">
-                            <b>✓</b>
-                            RLS protected
+
+                            <b aria-hidden="true">
+                                ✓
+                            </b>
+
+                            MySQL
+
+                        </span>
+
+
+                        <span class="trust-item">
+
+                            <b aria-hidden="true">
+                                ✓
+                            </b>
+
+                            Express API
+
                         </span>
 
                     </div>
@@ -163,7 +225,10 @@
                 </div>
 
 
-                <!-- HERO STATUS -->
+
+                <!-- ==================================================
+                     DATABASE STATUS
+                ================================================== -->
 
                 <div class="hero-status">
 
@@ -172,10 +237,15 @@
                     </span>
 
                     <strong>
-                        Supabase
+                        MySQL
                     </strong>
 
-                    <span class="status-line"></span>
+
+                    <span
+                        class="status-line"
+                        aria-hidden="true"
+                    ></span>
+
 
                     <span class="status-label">
                         STATUS
@@ -193,9 +263,9 @@
 
 
 
-        <!-- ==========================================
+        <!-- ========================================================
              REGISTRATION SECTION
-        =========================================== -->
+        ========================================================= -->
 
         <section
             class="registration-section"
@@ -205,9 +275,9 @@
             <div class="registration-container">
 
 
-                <!-- ==================================
-                     LEFT INFORMATION PANEL
-                =================================== -->
+                <!-- ==================================================
+                     INFORMATION PANEL
+                ================================================== -->
 
                 <aside class="registration-info">
 
@@ -215,27 +285,39 @@
                         01
                     </span>
 
+
                     <p class="section-eyebrow">
                         STUDENT INFORMATION
                     </p>
 
 
                     <h2 id="registration-title">
+
                         Create a
-                        <span>student record.</span>
+
+                        <span>
+                            student record.
+                        </span>
+
                     </h2>
 
 
                     <p class="info-description">
+
                         Enter the required information to create
                         a new student record. The data is validated
-                        before being securely stored.
+                        before being stored in MySQL.
+
                     </p>
 
 
-                    <!-- PROCESS -->
+
+                    <!-- ==================================================
+                         PROCESS STEPS
+                    ================================================== -->
 
                     <div class="process">
+
 
                         <div class="process-step active">
 
@@ -292,7 +374,7 @@
                                 </strong>
 
                                 <small>
-                                    Save to PostgreSQL
+                                    Save to MySQL
                                 </small>
 
                             </div>
@@ -305,14 +387,16 @@
 
 
 
-                <!-- ==================================
-                     FORM CARD
-                =================================== -->
+                <!-- ==================================================
+                     REGISTRATION CARD
+                ================================================== -->
 
                 <div class="registration-card">
 
 
-                    <!-- CARD HEADER -->
+                    <!-- ==================================================
+                         CARD HEADER
+                    ================================================== -->
 
                     <div class="card-header">
 
@@ -330,34 +414,47 @@
 
 
                         <span class="required-label">
-                            <b>*</b> Required
+
+                            <b>
+                                *
+                            </b>
+
+                            Required
+
                         </span>
 
                     </div>
 
 
 
-                    <!-- ==================================
+                    <!-- ==================================================
                          REGISTRATION FORM
-                    =================================== -->
+                    ================================================== -->
 
                     <form
                         id="studentForm"
                         novalidate
                     >
 
-
                         <div class="form-grid">
 
 
-                            <!-- FULL NAME -->
+                            <!-- ==================================================
+                                 FULL NAME
+                            ================================================== -->
 
                             <div class="form-group full-width">
 
                                 <label for="name">
+
                                     Full Name
-                                    <span>*</span>
+
+                                    <span>
+                                        *
+                                    </span>
+
                                 </label>
+
 
                                 <input
                                     type="text"
@@ -369,6 +466,7 @@
                                     required
                                 >
 
+
                                 <small class="field-hint">
                                     Enter the student's full name.
                                 </small>
@@ -377,14 +475,22 @@
 
 
 
-                            <!-- EMAIL -->
+                            <!-- ==================================================
+                                 EMAIL
+                            ================================================== -->
 
                             <div class="form-group">
 
                                 <label for="email">
+
                                     Email Address
-                                    <span>*</span>
+
+                                    <span>
+                                        *
+                                    </span>
+
                                 </label>
+
 
                                 <input
                                     type="email"
@@ -400,14 +506,59 @@
 
 
 
-                            <!-- DATE OF BIRTH -->
+                            <!-- ==================================================
+                                 PASSWORD
+                            ================================================== -->
+
+                            <div class="form-group">
+
+                                <label for="password">
+
+                                    Password
+
+                                    <span>
+                                        *
+                                    </span>
+
+                                </label>
+
+
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    placeholder="Create a password"
+                                    autocomplete="new-password"
+                                    minlength="6"
+                                    maxlength="255"
+                                    required
+                                >
+
+
+                                <small class="field-hint">
+                                    Minimum 6 characters.
+                                </small>
+
+                            </div>
+
+
+
+                            <!-- ==================================================
+                                 DATE OF BIRTH
+                            ================================================== -->
 
                             <div class="form-group">
 
                                 <label for="dob">
+
                                     Date of Birth
-                                    <span>*</span>
+
+                                    <span>
+                                        *
+                                    </span>
+
                                 </label>
+
 
                                 <input
                                     type="date"
@@ -420,14 +571,22 @@
 
 
 
-                            <!-- DEPARTMENT -->
+                            <!-- ==================================================
+                                 DEPARTMENT
+                            ================================================== -->
 
                             <div class="form-group">
 
                                 <label for="department">
+
                                     Department
-                                    <span>*</span>
+
+                                    <span>
+                                        *
+                                    </span>
+
                                 </label>
+
 
                                 <select
                                     id="department"
@@ -469,14 +628,71 @@
 
 
 
-                            <!-- PHONE -->
+                            <!-- ==================================================
+                                 ACADEMIC YEAR
+                            ================================================== -->
+
+                            <div class="form-group">
+
+                                <label for="year">
+
+                                    Academic Year
+
+                                    <span>
+                                        *
+                                    </span>
+
+                                </label>
+
+
+                                <select
+                                    id="year"
+                                    name="year"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select year
+                                    </option>
+
+                                    <option value="1">
+                                        1st Year
+                                    </option>
+
+                                    <option value="2">
+                                        2nd Year
+                                    </option>
+
+                                    <option value="3">
+                                        3rd Year
+                                    </option>
+
+                                    <option value="4">
+                                        4th Year
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+
+                            <!-- ==================================================
+                                 PHONE
+                            ================================================== -->
 
                             <div class="form-group">
 
                                 <label for="phone">
+
                                     Phone Number
-                                    <span>*</span>
+
+                                    <span>
+                                        *
+                                    </span>
+
                                 </label>
+
 
                                 <input
                                     type="tel"
@@ -496,14 +712,16 @@
 
 
 
-                        <!-- ==================================
+                        <!-- ==================================================
                              FORM FOOTER
-                        =================================== -->
+                        ================================================== -->
 
                         <div class="form-footer">
 
 
-                            <!-- PRIVACY -->
+                            <!-- ==================================================
+                                 PRIVACY NOTE
+                            ================================================== -->
 
                             <div class="privacy-note">
 
@@ -514,15 +732,18 @@
                                     🔒
                                 </span>
 
+
                                 <div>
 
                                     <strong>
-                                        Privacy protected
+                                        Database protected
                                     </strong>
 
                                     <small>
+
                                         Your information is securely
-                                        stored using Supabase RLS.
+                                        stored in the MySQL database.
+
                                     </small>
 
                                 </div>
@@ -531,7 +752,9 @@
 
 
 
-                            <!-- SUBMIT -->
+                            <!-- ==================================================
+                                 SUBMIT BUTTON
+                            ================================================== -->
 
                             <button
                                 type="submit"
@@ -542,6 +765,7 @@
                                 <span>
                                     Register Student
                                 </span>
+
 
                                 <span
                                     class="button-arrow"
@@ -558,9 +782,9 @@
 
 
 
-                    <!-- ==================================
+                    <!-- ==================================================
                          STATUS MESSAGE
-                    =================================== -->
+                    ================================================== -->
 
                     <div
                         id="message"
@@ -577,9 +801,9 @@
 
 
 
-        <!-- ==========================================
+        <!-- ========================================================
              TECHNOLOGY SECTION
-        =========================================== -->
+        ========================================================= -->
 
         <section
             class="technology-section"
@@ -587,20 +811,25 @@
         >
 
 
+            <!-- MYSQL -->
+
             <div class="technology-item">
 
-                <span class="technology-icon">
+                <span
+                    class="technology-icon"
+                    aria-hidden="true"
+                >
                     DB
                 </span>
 
                 <div>
 
                     <strong>
-                        PostgreSQL
+                        MySQL
                     </strong>
 
                     <small>
-                        Cloud database
+                        Relational database
                     </small>
 
                 </div>
@@ -609,20 +838,25 @@
 
 
 
+            <!-- NODE.JS -->
+
             <div class="technology-item">
 
-                <span class="technology-icon">
+                <span
+                    class="technology-icon"
+                    aria-hidden="true"
+                >
                     JS
                 </span>
 
                 <div>
 
                     <strong>
-                        JavaScript
+                        Node.js
                     </strong>
 
                     <small>
-                        Application logic
+                        Backend runtime
                     </small>
 
                 </div>
@@ -631,20 +865,25 @@
 
 
 
+            <!-- EXPRESS -->
+
             <div class="technology-item">
 
-                <span class="technology-icon">
-                    RLS
+                <span
+                    class="technology-icon"
+                    aria-hidden="true"
+                >
+                    API
                 </span>
 
                 <div>
 
                     <strong>
-                        Row Level Security
+                        Express
                     </strong>
 
                     <small>
-                        Database protection
+                        REST API
                     </small>
 
                 </div>
@@ -653,9 +892,14 @@
 
 
 
+            <!-- RESPONSIVE -->
+
             <div class="technology-item">
 
-                <span class="technology-icon">
+                <span
+                    class="technology-icon"
+                    aria-hidden="true"
+                >
                     ✓
                 </span>
 
@@ -679,17 +923,21 @@
 
 
 
-    <!-- ==========================================
+    <!-- ============================================================
          FOOTER
-    =========================================== -->
+    ============================================================ -->
 
     <footer class="site-footer">
 
         <div class="footer-container">
 
+
             <div class="footer-brand">
 
-                <span class="brand-logo small">
+                <span
+                    class="brand-logo small"
+                    aria-hidden="true"
+                >
                     S
                 </span>
 
@@ -715,21 +963,11 @@
 
 
 
-    <!-- ==========================================
-         SUPABASE CLIENT
-    =========================================== -->
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
-
-
-    <!-- ==========================================
-         APPLICATION JAVASCRIPT
-    =========================================== -->
+    <!-- ============================================================
+         JAVASCRIPT
+    ============================================================ -->
 
     <script src="script.js"></script>
-
 
 </body>
 

@@ -1,299 +1,129 @@
 // ============================================================
-// STUDENTHUB — TASK 07
-// INTERACTIVE WEB FORM WITH EVENTS & FUNCTIONS
+// STUDENTHUB — TASK 06
+// AUTOMATED LOGGING USING TRIGGERS & VIEWS
+// script.js
 // ============================================================
 
 
 // ============================================================
-// SUPABASE CONFIGURATION
+// 1. API CONFIGURATION
 // ============================================================
 
-const SUPABASE_URL =
-    "https://cppjrfaftlwlzmwgicxj.supabase.co";
-
-const SUPABASE_KEY =
-    "sb_publishable_-uuWKMVV61MAgUIdP21cQg_BDwtyIcb";
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+const API_BASE_URL = "http://localhost:5000/api";
 
 
 // ============================================================
-// PAGE LOAD
+// 2. DOM ELEMENTS
 // ============================================================
 
-document.addEventListener(
-    "DOMContentLoaded",
-    async function () {
+// Statistics
 
-        console.log(
-            "StudentHub Task 07 loaded."
-        );
+const totalLogsElement =
+    document.getElementById("totalLogs");
 
-        initializeEvents();
+const insertOperationsElement =
+    document.getElementById("insertOperations");
 
-        updateCharacterCount();
+const updateOperationsElement =
+    document.getElementById("updateOperations");
 
-        hideConfirmation();
+const todayActivityElement =
+    document.getElementById("todayActivity");
 
-        await testSupabaseConnection();
 
-    }
-);
+// Tables
+
+const auditTableBody =
+    document.getElementById("auditTableBody");
+
+const activityTableBody =
+    document.getElementById("activityTableBody");
+
+
+// Refresh button
+
+const refreshButton =
+    document.getElementById("refreshLogs");
+
+
+// Loading / error elements
+
+const loadingElement =
+    document.getElementById("loading");
+
+const errorMessageElement =
+    document.getElementById("errorMessage");
+
+const statusMessageElement =
+    document.getElementById("statusMessage");
 
 
 // ============================================================
-// INITIALIZE EVENTS
+// 3. HELPER — SHOW ERROR
 // ============================================================
 
-function initializeEvents() {
+function showError(message) {
 
-    const form =
-        document.getElementById(
-            "feedbackForm"
-        );
+    if (errorMessageElement) {
 
-    const submitButton =
-        document.getElementById(
-            "submitButton"
-        );
+        errorMessageElement.textContent =
+            message;
 
-    const resetButton =
-        document.getElementById(
-            "resetButton"
-        );
+        errorMessageElement.style.display =
+            "block";
 
-    const nameInput =
-        document.getElementById(
-            "name"
-        );
+    }
 
-    const emailInput =
-        document.getElementById(
-            "email"
-        );
-
-    const categoryInput =
-        document.getElementById(
-            "category"
-        );
-
-    const ratingInput =
-        document.getElementById(
-            "rating"
-        );
-
-    const feedbackInput =
-        document.getElementById(
-            "feedback"
-        );
+}
 
 
-    // ========================================================
-    // FORM SUBMIT EVENT
-    // ========================================================
+// ============================================================
+// 4. HELPER — HIDE ERROR
+// ============================================================
 
-    if (form) {
+function hideError() {
 
-        form.addEventListener(
-            "submit",
-            function (event) {
+    if (errorMessageElement) {
 
-                event.preventDefault();
+        errorMessageElement.textContent =
+            "";
 
-                submitFeedback();
+        errorMessageElement.style.display =
+            "none";
 
-            }
+    }
+
+}
+
+
+// ============================================================
+// 5. HELPER — FORMAT DATE
+// ============================================================
+
+function formatDate(dateValue) {
+
+    if (!dateValue) {
+
+        return "—";
+
+    }
+
+    const date =
+        new Date(dateValue);
+
+    if (isNaN(date.getTime())) {
+
+        return escapeHTML(
+            String(dateValue)
         );
 
     }
 
-
-    // ========================================================
-    // SUBMIT BUTTON CLICK EVENT
-    // ========================================================
-
-    if (submitButton) {
-
-        submitButton.addEventListener(
-            "click",
-            function () {
-
-                if (form) {
-
-                    form.requestSubmit();
-
-                }
-                else {
-
-                    submitFeedback();
-
-                }
-
-            }
-        );
-
-    }
-
-
-    // ========================================================
-    // RESET BUTTON CLICK EVENT
-    // ========================================================
-
-    if (resetButton) {
-
-        resetButton.addEventListener(
-            "click",
-            function () {
-
-                resetForm();
-
-            }
-        );
-
-    }
-
-
-    // ========================================================
-    // NAME EVENTS
-    // ========================================================
-
-    if (nameInput) {
-
-        nameInput.addEventListener(
-            "input",
-            validateName
-        );
-
-        nameInput.addEventListener(
-            "blur",
-            validateName
-        );
-
-    }
-
-
-    // ========================================================
-    // EMAIL EVENTS
-    // ========================================================
-
-    if (emailInput) {
-
-        emailInput.addEventListener(
-            "input",
-            validateEmail
-        );
-
-        emailInput.addEventListener(
-            "blur",
-            validateEmail
-        );
-
-    }
-
-
-    // ========================================================
-    // CATEGORY EVENT
-    // ========================================================
-
-    if (categoryInput) {
-
-        categoryInput.addEventListener(
-            "change",
-            validateCategory
-        );
-
-    }
-
-
-    // ========================================================
-    // RATING EVENT
-    // ========================================================
-
-    if (ratingInput) {
-
-        ratingInput.addEventListener(
-            "change",
-            validateRating
-        );
-
-    }
-
-
-    // ========================================================
-    // FEEDBACK EVENTS
-    // ========================================================
-
-    if (feedbackInput) {
-
-        feedbackInput.addEventListener(
-            "input",
-            function () {
-
-                validateFeedback();
-
-                updateCharacterCount();
-
-            }
-        );
-
-        feedbackInput.addEventListener(
-            "blur",
-            validateFeedback
-        );
-
-        feedbackInput.addEventListener(
-            "keydown",
-            function (event) {
-
-                console.log(
-                    "Keyboard event:",
-                    event.key
-                );
-
-            }
-        );
-
-    }
-
-
-    // ========================================================
-    // MOUSE EVENTS
-    // ========================================================
-
-    const inputs =
-        document.querySelectorAll(
-            "#feedbackForm input, #feedbackForm select, #feedbackForm textarea"
-        );
-
-    inputs.forEach(
-        function (input) {
-
-            input.addEventListener(
-                "mouseenter",
-                function () {
-
-                    input.classList.add(
-                        "field-hover"
-                    );
-
-                }
-            );
-
-            input.addEventListener(
-                "mouseleave",
-                function () {
-
-                    input.classList.remove(
-                        "field-hover"
-                    );
-
-                }
-            );
-
+    return date.toLocaleString(
+        "en-IN",
+        {
+            dateStyle: "medium",
+            timeStyle: "short"
         }
     );
 
@@ -301,1015 +131,1016 @@ function initializeEvents() {
 
 
 // ============================================================
-// SUBMIT FEEDBACK
+// 6. HELPER — FORMAT ACTIVITY DATE
 // ============================================================
 
-async function submitFeedback() {
+function formatActivityDate(dateValue) {
 
-    const submitButton =
-        document.getElementById(
-            "submitButton"
-        );
+    if (!dateValue) {
 
-
-    // ========================================================
-    // PREVENT DOUBLE SUBMISSION
-    // ========================================================
-
-    if (
-        submitButton &&
-        submitButton.disabled
-    ) {
-
-        return;
+        return "—";
 
     }
 
+    const date =
+        new Date(dateValue);
 
-    console.log(
-        "Validating feedback form..."
+    if (isNaN(date.getTime())) {
+
+        return escapeHTML(
+            String(dateValue)
+        );
+
+    }
+
+    return date.toLocaleDateString(
+        "en-IN"
     );
 
-
-    // ========================================================
-    // VALIDATE ALL FIELDS
-    // ========================================================
-
-    const nameValid =
-        validateName();
-
-    const emailValid =
-        validateEmail();
-
-    const categoryValid =
-        validateCategory();
-
-    const ratingValid =
-        validateRating();
-
-    const feedbackValid =
-        validateFeedback();
+}
 
 
-    if (
-        !nameValid ||
-        !emailValid ||
-        !categoryValid ||
-        !ratingValid ||
-        !feedbackValid
-    ) {
+// ============================================================
+// 7. LOAD AUDIT LOGS
+// ============================================================
 
-        showStatus(
-            "Please correct the highlighted fields before submitting.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    // ========================================================
-    // GET FORM VALUES
-    // ========================================================
-
-    const name =
-        document
-            .getElementById("name")
-            .value
-            .trim();
-
-    const email =
-        document
-            .getElementById("email")
-            .value
-            .trim();
-
-    const category =
-        document
-            .getElementById("category")
-            .value;
-
-    const rating =
-        Number(
-            document
-                .getElementById("rating")
-                .value
-        );
-
-    const feedback =
-        document
-            .getElementById("feedback")
-            .value
-            .trim();
-
-
-    // ========================================================
-    // DISABLE SUBMIT BUTTON
-    // ========================================================
-
-    if (submitButton) {
-
-        submitButton.disabled = true;
-
-        submitButton.textContent =
-            "Submitting...";
-
-    }
-
+async function loadAuditLogs() {
 
     try {
 
+        if (auditTableBody) {
+
+            auditTableBody.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        Loading audit activity...
+                    </td>
+                </tr>
+            `;
+
+        }
+
+        hideError();
+
+
         console.log(
-            "Sending feedback to Supabase..."
+            "Loading audit logs from:",
+            `${API_BASE_URL}/audit-logs`
         );
 
 
-        // ====================================================
-        // INSERT INTO SUPABASE
-        // ====================================================
-        //
-        // IMPORTANT:
-        // Database column is "message"
-        // NOT "feedback"
-        //
-        // ====================================================
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .from("feedback")
-                .insert([
-                    {
-                        name: name,
-                        email: email,
-                        category: category,
-                        rating: rating,
-
-                        // FIXED DATABASE COLUMN
-                        message: feedback
-                    }
-                ])
-                .select();
-
-
-        // ====================================================
-        // HANDLE DATABASE ERROR
-        // ====================================================
-
-        if (error) {
-
-            console.error(
-                "Supabase feedback error:",
-                error
+        const response =
+            await fetch(
+                `${API_BASE_URL}/audit-logs`
             );
 
-            showStatus(
-                `Submission failed: ${error.message}`,
-                "error"
-            );
 
-            return;
+        if (!response.ok) {
+
+            throw new Error(
+                `Server returned ${response.status}`
+            );
 
         }
 
 
-        // ====================================================
-        // SUCCESS
-        // ====================================================
+        const result =
+            await response.json();
+
 
         console.log(
-            "Feedback submitted successfully:",
-            data
-        );
-
-
-        showStatus(
-            "Feedback submitted successfully!",
-            "success"
+            "Audit logs response:",
+            result
         );
 
 
         // ====================================================
-        // SHOW CONFIRMATION
+        // IMPORTANT
+        // API RESPONSE:
+        //
+        // {
+        //     success: true,
+        //     data: [...]
+        // }
         // ====================================================
 
-        showConfirmation();
+        let logs = [];
 
 
-        // ====================================================
-        // RESET FORM AFTER SUCCESS
-        // ====================================================
+        if (Array.isArray(result)) {
 
-        setTimeout(
-            function () {
+            // Supports direct array response
 
-                resetForm(false);
+            logs = result;
 
-            },
-            1500
+        }
+
+        else if (
+            result &&
+            Array.isArray(result.data)
+        ) {
+
+            // Supports { success: true, data: [...] }
+
+            logs = result.data;
+
+        }
+
+        else {
+
+            throw new Error(
+                result?.message ||
+                "Invalid audit log data received from server"
+            );
+
+        }
+
+
+        console.log(
+            "Processed audit logs:",
+            logs
         );
+
+
+        displayAuditLogs(logs);
+
+        updateStatistics(logs);
+
 
     }
+
     catch (error) {
 
         console.error(
-            "Unexpected submission error:",
+            "Audit log error:",
             error
         );
 
-        showStatus(
-            `Unexpected error: ${error.message}`,
-            "error"
-        );
 
-    }
-    finally {
+        if (auditTableBody) {
 
-        // ====================================================
-        // RESTORE BUTTON
-        // ====================================================
-
-        if (submitButton) {
-
-            submitButton.disabled = false;
-
-            submitButton.textContent =
-                "✓ Submit Feedback";
+            auditTableBody.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        Unable to load audit logs.
+                    </td>
+                </tr>
+            `;
 
         }
 
+
+        updateStatistics([]);
+
+
+        showError(
+            "Unable to connect to the StudentHub API. Make sure the Node.js server is running on port 5000."
+        );
+
     }
 
 }
 
 
 // ============================================================
-// VALIDATE NAME
+// 8. DISPLAY AUDIT LOGS
 // ============================================================
 
-function validateName() {
+function displayAuditLogs(logs) {
 
-    const input =
-        document.getElementById(
-            "name"
-        );
+    if (!auditTableBody) {
 
-    const message =
-        document.getElementById(
-            "nameMessage"
-        );
-
-
-    if (!input || !message) {
-
-        return false;
+        return;
 
     }
 
 
-    const value =
-        input.value.trim();
-
-
-    if (!value) {
-
-        setFieldError(
-            input,
-            message,
-            "Full name is required."
-        );
-
-        return false;
-
-    }
-
-
-    if (value.length < 3) {
-
-        setFieldError(
-            input,
-            message,
-            "Name must contain at least 3 characters."
-        );
-
-        return false;
-
-    }
-
-
-    if (!/^[a-zA-Z\s.'-]+$/.test(value)) {
-
-        setFieldError(
-            input,
-            message,
-            "Name contains invalid characters."
-        );
-
-        return false;
-
-    }
-
-
-    setFieldSuccess(
-        input,
-        message,
-        "✓ Name looks good."
-    );
-
-    return true;
-
-}
-
-
-// ============================================================
-// VALIDATE EMAIL
-// ============================================================
-
-function validateEmail() {
-
-    const input =
-        document.getElementById(
-            "email"
-        );
-
-    const message =
-        document.getElementById(
-            "emailMessage"
-        );
-
-
-    if (!input || !message) {
-
-        return false;
-
-    }
-
-
-    const value =
-        input.value.trim();
-
-
-    if (!value) {
-
-        setFieldError(
-            input,
-            message,
-            "Email address is required."
-        );
-
-        return false;
-
-    }
-
-
-    const emailPattern =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-
-    if (!emailPattern.test(value)) {
-
-        setFieldError(
-            input,
-            message,
-            "Please enter a valid email address."
-        );
-
-        return false;
-
-    }
-
-
-    setFieldSuccess(
-        input,
-        message,
-        "✓ Valid email address."
-    );
-
-    return true;
-
-}
-
-
-// ============================================================
-// VALIDATE CATEGORY
-// ============================================================
-
-function validateCategory() {
-
-    const input =
-        document.getElementById(
-            "category"
-        );
-
-    const message =
-        document.getElementById(
-            "categoryMessage"
-        );
-
-
-    if (!input || !message) {
-
-        return false;
-
-    }
-
-
-    if (!input.value) {
-
-        setFieldError(
-            input,
-            message,
-            "Please select a feedback category."
-        );
-
-        return false;
-
-    }
-
-
-    setFieldSuccess(
-        input,
-        message,
-        "✓ Category selected."
-    );
-
-    return true;
-
-}
-
-
-// ============================================================
-// VALIDATE RATING
-// ============================================================
-
-function validateRating() {
-
-    const input =
-        document.getElementById(
-            "rating"
-        );
-
-    const message =
-        document.getElementById(
-            "ratingMessage"
-        );
-
-
-    if (!input || !message) {
-
-        return false;
-
-    }
-
-
-    if (!input.value) {
-
-        setFieldError(
-            input,
-            message,
-            "Please select a rating."
-        );
-
-        return false;
-
-    }
-
-
-    const rating =
-        Number(input.value);
+    auditTableBody.innerHTML =
+        "";
 
 
     if (
-        !Number.isInteger(rating) ||
-        rating < 1 ||
-        rating > 5
+        !logs ||
+        logs.length === 0
     ) {
 
-        setFieldError(
-            input,
-            message,
-            "Rating must be between 1 and 5."
-        );
-
-        return false;
-
-    }
-
-
-    setFieldSuccess(
-        input,
-        message,
-        "✓ Rating selected."
-    );
-
-    return true;
-
-}
-
-
-// ============================================================
-// VALIDATE FEEDBACK
-// ============================================================
-
-function validateFeedback() {
-
-    const input =
-        document.getElementById(
-            "feedback"
-        );
-
-    const message =
-        document.getElementById(
-            "feedbackMessage"
-        );
-
-
-    if (!input || !message) {
-
-        return false;
-
-    }
-
-
-    const value =
-        input.value.trim();
-
-
-    if (!value) {
-
-        setFieldError(
-            input,
-            message,
-            "Please enter your feedback."
-        );
-
-        return false;
-
-    }
-
-
-    if (value.length < 10) {
-
-        setFieldError(
-            input,
-            message,
-            "Feedback must contain at least 10 characters."
-        );
-
-        return false;
-
-    }
-
-
-    if (value.length > 250) {
-
-        setFieldError(
-            input,
-            message,
-            "Feedback cannot exceed 250 characters."
-        );
-
-        return false;
-
-    }
-
-
-    setFieldSuccess(
-        input,
-        message,
-        "✓ Feedback is valid."
-    );
-
-    return true;
-
-}
-
-
-// ============================================================
-// SET FIELD ERROR
-// ============================================================
-
-function setFieldError(
-    input,
-    message,
-    text
-) {
-
-    input.classList.remove(
-        "input-valid"
-    );
-
-    input.classList.add(
-        "input-invalid"
-    );
-
-    message.textContent =
-        text;
-
-    message.className =
-        "field-message error";
-
-}
-
-
-// ============================================================
-// SET FIELD SUCCESS
-// ============================================================
-
-function setFieldSuccess(
-    input,
-    message,
-    text
-) {
-
-    input.classList.remove(
-        "input-invalid"
-    );
-
-    input.classList.add(
-        "input-valid"
-    );
-
-    message.textContent =
-        text;
-
-    message.className =
-        "field-message success";
-
-}
-
-
-// ============================================================
-// CHARACTER COUNTER
-// ============================================================
-
-function updateCharacterCount() {
-
-    const feedback =
-        document.getElementById(
-            "feedback"
-        );
-
-    const counter =
-        document.getElementById(
-            "characterCount"
-        );
-
-
-    if (!feedback || !counter) {
+        auditTableBody.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    No audit records found.
+                </td>
+            </tr>
+        `;
 
         return;
 
     }
 
 
-    const length =
-        feedback.value.length;
+    logs.forEach(log => {
 
+        const row =
+            document.createElement("tr");
 
-    counter.textContent =
-        `${length} / 250`;
 
+        // ----------------------------------------------------
+        // LOG ID
+        // ----------------------------------------------------
 
-    // ========================================================
-    // NEAR LIMIT
-    // ========================================================
+        const logId =
+            log.log_id ??
+            log.id ??
+            "-";
 
-    if (length >= 225) {
 
-        counter.classList.add(
-            "near-limit"
-        );
+        // ----------------------------------------------------
+        // TABLE NAME
+        // ----------------------------------------------------
 
-    }
-    else {
+        const tableName =
+            log.table_name ??
+            log.table ??
+            "students";
 
-        counter.classList.remove(
-            "near-limit"
-        );
 
-    }
+        // ----------------------------------------------------
+        // OPERATION
+        // ----------------------------------------------------
 
+        const operation =
+            String(
+                log.action_type ??
+                log.operation ??
+                "UNKNOWN"
+            ).toUpperCase();
 
-    // ========================================================
-    // LIMIT REACHED
-    // ========================================================
 
-    if (length >= 250) {
+        const operationClass =
+            operation === "INSERT"
+                ? "insert"
+                : operation === "UPDATE"
+                    ? "update"
+                    : "";
 
-        counter.classList.add(
-            "limit-reached"
-        );
 
-    }
-    else {
+        // ----------------------------------------------------
+        // RECORD ID
+        // ----------------------------------------------------
 
-        counter.classList.remove(
-            "limit-reached"
-        );
+        const recordId =
+            log.record_id ??
+            "-";
 
-    }
 
-}
+        // ----------------------------------------------------
+        // DESCRIPTION
+        // ----------------------------------------------------
 
+        const description =
+            log.description ??
+            "Database activity";
 
-// ============================================================
-// RESET FORM
-// ============================================================
 
-function resetForm(
-    showMessage = true
-) {
+        // ----------------------------------------------------
+        // TIMESTAMP
+        // ----------------------------------------------------
 
-    console.log(
-        "Resetting feedback form..."
-    );
+        const actionTime =
+            log.action_time ??
+            log.created_at ??
+            log.timestamp;
 
 
-    const form =
-        document.getElementById(
-            "feedbackForm"
-        );
+        // ----------------------------------------------------
+        // CREATE ROW
+        // ----------------------------------------------------
 
+        row.innerHTML = `
 
-    if (form) {
+            <td>
+                ${escapeHTML(logId)}
+            </td>
 
-        form.reset();
+            <td>
+                ${escapeHTML(tableName)}
+            </td>
 
-    }
+            <td>
 
+                <span
+                    class="operation-badge ${operationClass}"
+                >
+                    ${escapeHTML(operation)}
+                </span>
 
-    // ========================================================
-    // CLEAR VALIDATION STATES
-    // ========================================================
+            </td>
 
-    const fields =
-        document.querySelectorAll(
-            "#feedbackForm input, #feedbackForm select, #feedbackForm textarea"
-        );
+            <td>
+                ${escapeHTML(recordId)}
+            </td>
 
+            <td>
 
-    fields.forEach(
-        function (field) {
+                ${escapeHTML(description)}
 
-            field.classList.remove(
-                "input-valid",
-                "input-invalid",
-                "field-hover"
-            );
+                <br>
 
-        }
-    );
+                <small>
+                    ${formatDate(actionTime)}
+                </small>
 
+            </td>
 
-    // ========================================================
-    // CLEAR FIELD MESSAGES
-    // ========================================================
+        `;
 
-    const messages =
-        document.querySelectorAll(
-            "#feedbackForm .field-message"
-        );
 
+        auditTableBody.appendChild(row);
 
-    messages.forEach(
-        function (message) {
-
-            message.textContent =
-                "";
-
-            message.className =
-                "field-message";
-
-        }
-    );
-
-
-    // ========================================================
-    // RESET CHARACTER COUNTER
-    // ========================================================
-
-    updateCharacterCount();
-
-
-    // ========================================================
-    // HIDE CONFIRMATION
-    // ========================================================
-
-    hideConfirmation();
-
-
-    // ========================================================
-    // SHOW RESET MESSAGE
-    // ========================================================
-
-    if (showMessage) {
-
-        showStatus(
-            "Form has been reset successfully.",
-            "success"
-        );
-
-    }
-
-
-    console.log(
-        "Form reset complete."
-    );
-
-}
-
-
-// ============================================================
-// SHOW STATUS
-// ============================================================
-
-function showStatus(
-    message,
-    type
-) {
-
-    const status =
-        document.getElementById(
-            "statusMessage"
-        );
-
-
-    if (!status) {
-
-        console.error(
-            "statusMessage element not found."
-        );
-
-        return;
-
-    }
-
-
-    status.textContent =
-        message;
-
-
-    status.className =
-        `status-message ${type}`;
-
-
-    status.classList.remove(
-        "hidden"
-    );
-
-
-    // ========================================================
-    // CLEAR PREVIOUS TIMER
-    // ========================================================
-
-    clearTimeout(
-        window.statusTimeout
-    );
-
-
-    window.statusTimeout =
-        setTimeout(
-            function () {
-
-                status.classList.add(
-                    "hidden"
-                );
-
-            },
-            5000
-        );
-
-}
-
-
-// ============================================================
-// SHOW CONFIRMATION
-// ============================================================
-
-function showConfirmation() {
-
-    const section =
-        document.getElementById(
-            "confirmationSection"
-        );
-
-
-    if (!section) {
-
-        return;
-
-    }
-
-
-    section.classList.remove(
-        "hidden"
-    );
-
-
-    section.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
     });
 
 }
 
 
 // ============================================================
-// HIDE CONFIRMATION
+// 9. UPDATE DASHBOARD STATISTICS
 // ============================================================
 
-function hideConfirmation() {
+function updateStatistics(logs) {
 
-    const section =
-        document.getElementById(
-            "confirmationSection"
-        );
+    if (!Array.isArray(logs)) {
+
+        logs = [];
+
+    }
 
 
-    if (!section) {
+    // --------------------------------------------------------
+    // TOTAL LOGS
+    // --------------------------------------------------------
+
+    const totalLogs =
+        logs.length;
+
+
+    // --------------------------------------------------------
+    // INSERT COUNT
+    // --------------------------------------------------------
+
+    const insertCount =
+        logs.filter(
+            log =>
+                String(
+                    log.action_type ??
+                    log.operation ??
+                    ""
+                ).toUpperCase() === "INSERT"
+        ).length;
+
+
+    // --------------------------------------------------------
+    // UPDATE COUNT
+    // --------------------------------------------------------
+
+    const updateCount =
+        logs.filter(
+            log =>
+                String(
+                    log.action_type ??
+                    log.operation ??
+                    ""
+                ).toUpperCase() === "UPDATE"
+        ).length;
+
+
+    // --------------------------------------------------------
+    // UPDATE UI
+    // --------------------------------------------------------
+
+    if (totalLogsElement) {
+
+        totalLogsElement.textContent =
+            totalLogs;
+
+    }
+
+
+    if (insertOperationsElement) {
+
+        insertOperationsElement.textContent =
+            insertCount;
+
+    }
+
+
+    if (updateOperationsElement) {
+
+        updateOperationsElement.textContent =
+            updateCount;
+
+    }
+
+
+    // --------------------------------------------------------
+    // TODAY'S ACTIVITY
+    // --------------------------------------------------------
+
+    updateTodayActivityFromLogs(logs);
+
+}
+
+
+// ============================================================
+// 10. UPDATE TODAY'S ACTIVITY FROM AUDIT LOGS
+// ============================================================
+
+function updateTodayActivityFromLogs(logs) {
+
+    if (!todayActivityElement) {
 
         return;
 
     }
 
 
-    section.classList.add(
-        "hidden"
-    );
+    if (
+        !Array.isArray(logs) ||
+        logs.length === 0
+    ) {
+
+        todayActivityElement.textContent =
+            "0";
+
+        return;
+
+    }
+
+
+    const now =
+        new Date();
+
+
+    const todayYear =
+        now.getFullYear();
+
+    const todayMonth =
+        now.getMonth();
+
+    const todayDate =
+        now.getDate();
+
+
+    let todayCount = 0;
+
+
+    logs.forEach(log => {
+
+        const timeValue =
+            log.action_time ??
+            log.created_at ??
+            log.timestamp;
+
+
+        if (!timeValue) {
+
+            return;
+
+        }
+
+
+        const logDate =
+            new Date(timeValue);
+
+
+        if (
+            isNaN(
+                logDate.getTime()
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            logDate.getFullYear() === todayYear &&
+            logDate.getMonth() === todayMonth &&
+            logDate.getDate() === todayDate
+        ) {
+
+            todayCount++;
+
+        }
+
+    });
+
+
+    todayActivityElement.textContent =
+        todayCount;
 
 }
 
 
 // ============================================================
-// TEST SUPABASE CONNECTION
+// 11. LOAD DAILY ACTIVITY REPORT
 // ============================================================
 
-async function testSupabaseConnection() {
-
-    console.log(
-        "Testing Supabase connection..."
-    );
-
+async function loadDailyActivityReport() {
 
     try {
 
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .from("feedback")
-                .select("id")
-                .limit(1);
+        if (activityTableBody) {
 
-
-        if (error) {
-
-            console.error(
-                "Supabase connection failed:",
-                error
-            );
-
-            showStatus(
-                `Database connection failed: ${error.message}`,
-                "error"
-            );
-
-            return false;
+            activityTableBody.innerHTML = `
+                <tr>
+                    <td colspan="3">
+                        Loading daily report...
+                    </td>
+                </tr>
+            `;
 
         }
 
 
         console.log(
-            "Supabase connection successful."
+            "Loading daily report from:",
+            `${API_BASE_URL}/daily-activity`
         );
+
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/daily-activity`
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Server returned ${response.status}`
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
 
         console.log(
-            "Feedback table is accessible."
+            "Daily report response:",
+            result
         );
 
 
-        return true;
+        // ====================================================
+        // SUPPORT BOTH:
+        //
+        // [...]
+        //
+        // AND:
+        //
+        // {
+        //     success: true,
+        //     data: [...]
+        // }
+        // ====================================================
+
+        let report = [];
+
+
+        if (Array.isArray(result)) {
+
+            report = result;
+
+        }
+
+        else if (
+            result &&
+            Array.isArray(result.data)
+        ) {
+
+            report = result.data;
+
+        }
+
+        else {
+
+            throw new Error(
+                result?.message ||
+                "Invalid daily activity data received"
+            );
+
+        }
+
+
+        console.log(
+            "Processed daily report:",
+            report
+        );
+
+
+        displayDailyActivity(report);
+
+
+        updateTodayActivityFromReport(
+            report
+        );
+
 
     }
+
     catch (error) {
 
         console.error(
-            "Connection exception:",
+            "Daily report error:",
             error
         );
 
-        showStatus(
-            "Unable to connect to the database.",
-            "error"
-        );
 
-        return false;
+        if (activityTableBody) {
+
+            activityTableBody.innerHTML = `
+                <tr>
+                    <td colspan="3">
+                        Unable to load daily report.
+                    </td>
+                </tr>
+            `;
+
+        }
 
     }
 
 }
+
+
+// ============================================================
+// 12. DISPLAY DAILY ACTIVITY REPORT
+// ============================================================
+
+function displayDailyActivity(report) {
+
+    if (!activityTableBody) {
+
+        return;
+
+    }
+
+
+    activityTableBody.innerHTML =
+        "";
+
+
+    if (
+        !report ||
+        report.length === 0
+    ) {
+
+        activityTableBody.innerHTML = `
+            <tr>
+                <td colspan="3">
+                    No daily activity found.
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    report.forEach(item => {
+
+        const row =
+            document.createElement("tr");
+
+
+        // ----------------------------------------------------
+        // OPERATION
+        // ----------------------------------------------------
+
+        const operation =
+            String(
+                item.action_type ??
+                item.operation ??
+                "UNKNOWN"
+            ).toUpperCase();
+
+
+        const operationClass =
+            operation === "INSERT"
+                ? "insert"
+                : operation === "UPDATE"
+                    ? "update"
+                    : "";
+
+
+        // ----------------------------------------------------
+        // TOTAL ACTIONS
+        // ----------------------------------------------------
+
+        const totalActions =
+            Number(
+                item.total_actions ??
+                item.total_operations ??
+                item.count ??
+                0
+            );
+
+
+        // ----------------------------------------------------
+        // ACTIVITY DATE
+        // ----------------------------------------------------
+
+        const activityDate =
+            item.activity_date ??
+            item.date ??
+            item.action_date;
+
+
+        // ----------------------------------------------------
+        // CREATE ROW
+        // ----------------------------------------------------
+
+        row.innerHTML = `
+
+            <td>
+                ${formatActivityDate(
+                    activityDate
+                )}
+            </td>
+
+            <td>
+
+                <span
+                    class="operation-badge ${operationClass}"
+                >
+                    ${escapeHTML(operation)}
+                </span>
+
+            </td>
+
+            <td>
+                ${totalActions}
+            </td>
+
+        `;
+
+
+        activityTableBody.appendChild(row);
+
+    });
+
+}
+
+
+// ============================================================
+// 13. UPDATE TODAY ACTIVITY FROM SQL VIEW
+// ============================================================
+
+function updateTodayActivityFromReport(report) {
+
+    if (!todayActivityElement) {
+
+        return;
+
+    }
+
+
+    if (
+        !Array.isArray(report) ||
+        report.length === 0
+    ) {
+
+        todayActivityElement.textContent =
+            "0";
+
+        return;
+
+    }
+
+
+    const now =
+        new Date();
+
+
+    let todayTotal = 0;
+
+
+    report.forEach(item => {
+
+        const dateValue =
+            item.activity_date ??
+            item.date ??
+            item.action_date;
+
+
+        if (!dateValue) {
+
+            return;
+
+        }
+
+
+        const activityDate =
+            new Date(dateValue);
+
+
+        if (
+            isNaN(
+                activityDate.getTime()
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            activityDate.getFullYear() ===
+                now.getFullYear() &&
+
+            activityDate.getMonth() ===
+                now.getMonth() &&
+
+            activityDate.getDate() ===
+                now.getDate()
+        ) {
+
+            todayTotal +=
+                Number(
+                    item.total_actions ??
+                    item.total_operations ??
+                    item.count ??
+                    0
+                );
+
+        }
+
+    });
+
+
+    todayActivityElement.textContent =
+        todayTotal;
+
+}
+
+
+// ============================================================
+// 14. ESCAPE HTML
+// ============================================================
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+// ============================================================
+// 15. REFRESH DASHBOARD
+// ============================================================
+
+async function refreshDashboard() {
+
+    console.log(
+        "Refreshing Task 06 dashboard..."
+    );
+
+
+    await Promise.all([
+        loadAuditLogs(),
+        loadDailyActivityReport()
+    ]);
+
+}
+
+
+// ============================================================
+// 16. REFRESH BUTTON
+// ============================================================
+
+if (refreshButton) {
+
+    refreshButton.addEventListener(
+        "click",
+        async function () {
+
+            refreshButton.disabled =
+                true;
+
+
+            const originalText =
+                refreshButton.innerHTML;
+
+
+            refreshButton.innerHTML =
+                "↻ Refreshing...";
+
+
+            try {
+
+                await refreshDashboard();
+
+            }
+
+            finally {
+
+                refreshButton.disabled =
+                    false;
+
+                refreshButton.innerHTML =
+                    originalText;
+
+            }
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// 17. AUTOMATIC REFRESH
+// ============================================================
+
+// Refresh every 10 seconds
+
+setInterval(
+    refreshDashboard,
+    10000
+);
+
+
+// ============================================================
+// 18. INITIAL LOAD
+// ============================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        console.log(
+            "========================================"
+        );
+
+        console.log(
+            "StudentHub Task 06 loaded"
+        );
+
+        console.log(
+            "API:",
+            API_BASE_URL
+        );
+
+        console.log(
+            "========================================"
+        );
+
+
+        refreshDashboard();
+
+    }
+);
+
+
+// ============================================================
+// TASK 06 COMPLETE
+// ============================================================

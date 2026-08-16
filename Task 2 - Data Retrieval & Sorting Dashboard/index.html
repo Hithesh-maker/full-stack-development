@@ -3,6 +3,10 @@
 
 <head>
 
+    <!-- ============================================================
+         DOCUMENT SETUP
+    ============================================================ -->
+
     <meta charset="UTF-8">
 
     <meta
@@ -12,21 +16,31 @@
 
     <meta
         name="description"
-        content="StudentHub student data retrieval and sorting dashboard"
+        content="StudentHub student data retrieval and sorting dashboard using MySQL"
     >
 
-    <title>StudentHub — Student Data Dashboard</title>
+    <meta
+        name="theme-color"
+        content="#0b0d12"
+    >
+
+    <title>
+        StudentHub — Student Data Dashboard
+    </title>
 
 
-    <!-- =====================================================
-         GOOGLE FONTS
-    ====================================================== -->
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- ============================================================
+         GOOGLE FONT
+    ============================================================ -->
 
     <link
         rel="preconnect"
-        href="https://fonts.gstatic.com"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
         crossorigin
     >
 
@@ -36,23 +50,14 @@
     >
 
 
-    <!-- =====================================================
+    <!-- ============================================================
          STYLESHEET
-    ====================================================== -->
+    ============================================================ -->
 
     <link
         rel="stylesheet"
         href="style.css"
     >
-
-
-    <!-- =====================================================
-         SUPABASE
-    ====================================================== -->
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
 
 </head>
 
@@ -60,23 +65,27 @@
 <body>
 
 
-    <!-- =====================================================
-         BACKGROUND
-    ====================================================== -->
+    <!-- ============================================================
+         BACKGROUND DECORATION
+    ============================================================ -->
 
-    <div class="page-background"></div>
+    <div
+        class="page-background"
+        aria-hidden="true"
+    ></div>
 
 
-    <!-- =====================================================
-         MAIN APPLICATION
-    ====================================================== -->
+
+    <!-- ============================================================
+         MAIN DASHBOARD
+    ============================================================ -->
 
     <main class="dashboard-shell">
 
 
-        <!-- =================================================
-             TOP NAVIGATION
-        ================================================== -->
+        <!-- ========================================================
+             TOP BAR
+        ========================================================= -->
 
         <nav class="topbar">
 
@@ -85,8 +94,13 @@
             <div class="brand">
 
                 <div class="brand-mark">
-                    <span>SH</span>
+
+                    <span>
+                        S
+                    </span>
+
                 </div>
+
 
                 <div class="brand-text">
 
@@ -103,7 +117,7 @@
             </div>
 
 
-            <!-- NAVIGATION STATUS -->
+            <!-- STATUS -->
 
             <div class="topbar-right">
 
@@ -111,7 +125,7 @@
 
                     <span class="task-dot"></span>
 
-                    FULL STACK • TASK 02
+                    Task 02
 
                 </div>
 
@@ -123,7 +137,7 @@
 
                     <span class="status-dot"></span>
 
-                    Connecting...
+                    Connecting to MySQL...
 
                 </div>
 
@@ -133,9 +147,9 @@
 
 
 
-        <!-- =================================================
+        <!-- ========================================================
              HERO
-        ================================================== -->
+        ========================================================= -->
 
         <section class="hero">
 
@@ -163,15 +177,16 @@
 
                 <p class="hero-description">
 
-                    Retrieve live student records from your
-                    Supabase database, explore department
-                    statistics, and instantly sort or filter
-                    your data.
+                    Retrieve live student records from the
+                    MySQL database, explore department statistics,
+                    and instantly sort or filter your data.
 
                 </p>
 
             </div>
 
+
+            <!-- REFRESH -->
 
             <button
                 id="refreshBtn"
@@ -179,13 +194,14 @@
                 type="button"
             >
 
-                <span class="refresh-icon">
+                <span
+                    class="refresh-icon"
+                    aria-hidden="true"
+                >
                     ↻
                 </span>
 
-                <span>
-                    Refresh Data
-                </span>
+                Refresh Data
 
             </button>
 
@@ -193,9 +209,9 @@
 
 
 
-        <!-- =================================================
+        <!-- ========================================================
              STATISTICS
-        ================================================== -->
+        ========================================================= -->
 
         <section
             class="stats-grid"
@@ -203,7 +219,9 @@
         >
 
 
-            <!-- TOTAL -->
+            <!-- ====================================================
+                 TOTAL STUDENTS
+            ===================================================== -->
 
             <article class="stat-card">
 
@@ -240,7 +258,9 @@
 
 
 
-            <!-- CSE -->
+            <!-- ====================================================
+                 CSE
+            ===================================================== -->
 
             <article class="stat-card">
 
@@ -277,7 +297,9 @@
 
 
 
-            <!-- ECE -->
+            <!-- ====================================================
+                 ECE
+            ===================================================== -->
 
             <article class="stat-card">
 
@@ -314,7 +336,9 @@
 
 
 
-            <!-- EEE -->
+            <!-- ====================================================
+                 EEE
+            ===================================================== -->
 
             <article class="stat-card">
 
@@ -353,12 +377,14 @@
 
 
 
-        <!-- =================================================
-             DATA CONTROLS
-        ================================================== -->
+        <!-- ========================================================
+             CONTROLS
+        ========================================================= -->
 
         <section class="controls-card">
 
+
+            <!-- CONTROLS HEADER -->
 
             <div class="controls-heading">
 
@@ -396,15 +422,21 @@
 
 
 
+            <!-- CONTROLS -->
+
             <div class="controls-row">
 
 
-                <!-- DEPARTMENT FILTER -->
+                <!-- =================================================
+                     DEPARTMENT FILTER
+                ================================================== -->
 
                 <div class="control">
 
                     <label for="departmentFilter">
+
                         Department
+
                     </label>
 
 
@@ -435,12 +467,16 @@
 
 
 
-                <!-- SORT -->
+                <!-- =================================================
+                     SORT
+                ================================================== -->
 
                 <div class="control">
 
                     <label for="sortOption">
+
                         Sort By
+
                     </label>
 
 
@@ -468,11 +504,11 @@
                             </option>
 
                             <option value="dateAsc">
-                                Date Oldest → Newest
+                                Created Oldest → Newest
                             </option>
 
                             <option value="dateDesc">
-                                Date Newest → Oldest
+                                Created Newest → Oldest
                             </option>
 
                         </select>
@@ -487,22 +523,23 @@
 
 
 
-        <!-- =================================================
-             STUDENT RECORDS
-        ================================================== -->
+        <!-- ========================================================
+             RECORDS
+        ========================================================= -->
 
         <section class="records-card">
 
 
-            <!-- RECORD HEADER -->
+            <!-- =====================================================
+                 RECORD HEADER
+            ====================================================== -->
 
             <div class="records-header">
-
 
                 <div class="records-title">
 
                     <div class="records-icon">
-                        <span>≡</span>
+                        ≡
                     </div>
 
 
@@ -521,15 +558,17 @@
                 </div>
 
 
+                <!-- DATABASE STATUS -->
+
                 <div class="records-meta">
 
                     <span>
-                        Supabase Database
+                        MySQL Database
                     </span>
 
                     <span
                         class="database-indicator"
-                        aria-label="Database connected"
+                        aria-label="MySQL connected"
                     >
                         ●
                     </span>
@@ -540,7 +579,9 @@
 
 
 
-            <!-- TABLE -->
+            <!-- =====================================================
+                 TABLE
+            ====================================================== -->
 
             <div class="table-container">
 
@@ -550,27 +591,27 @@
 
                         <tr>
 
-                            <th scope="col">
+                            <th>
                                 #
                             </th>
 
-                            <th scope="col">
+                            <th>
                                 STUDENT
                             </th>
 
-                            <th scope="col">
+                            <th>
                                 EMAIL
                             </th>
 
-                            <th scope="col">
+                            <th>
                                 DATE OF BIRTH
                             </th>
 
-                            <th scope="col">
+                            <th>
                                 DEPARTMENT
                             </th>
 
-                            <th scope="col">
+                            <th>
                                 PHONE
                             </th>
 
@@ -587,7 +628,9 @@
                                 colspan="6"
                                 class="message"
                             >
+
                                 Loading student records...
+
                             </td>
 
                         </tr>
@@ -600,7 +643,9 @@
 
 
 
-            <!-- TABLE FOOTER -->
+            <!-- =====================================================
+                 RECORD FOOTER
+            ====================================================== -->
 
             <div class="records-footer">
 
@@ -611,9 +656,11 @@
 
                 <span>
 
-                    Secure database connection
+                    Secure MySQL connection
 
-                    <strong>•</strong>
+                    <strong>
+                        •
+                    </strong>
 
                     Live
 
@@ -625,21 +672,26 @@
 
 
 
-        <!-- =================================================
+        <!-- ========================================================
              FOOTER
-        ================================================== -->
+        ========================================================= -->
 
         <footer class="dashboard-footer">
 
             <div>
+
                 © 2026 StudentHub
+
             </div>
+
 
             <div>
 
                 Full Stack Development
 
-                <span>•</span>
+                <span>
+                    •
+                </span>
 
                 Task 02
 
@@ -651,11 +703,13 @@
     </main>
 
 
-    <!-- =====================================================
+
+    <!-- ============================================================
          JAVASCRIPT
-    ====================================================== -->
+    ============================================================ -->
 
     <script src="script.js"></script>
+
 
 </body>
 

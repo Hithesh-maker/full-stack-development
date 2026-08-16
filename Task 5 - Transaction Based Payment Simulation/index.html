@@ -1,48 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
+    <!-- ============================================================
+         BASIC DOCUMENT CONFIGURATION
+         ============================================================ -->
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Payment Simulation | Task 5</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <!-- Google Font -->
+    <meta
+        name="description"
+        content="StudentHub Task 5 - Transaction-Based Payment Simulation using MySQL and Node.js"
+    >
+
+    <title>StudentHub | Payment Simulation</title>
+
+
+    <!-- ============================================================
+         GOOGLE FONT
+         ============================================================ -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
 
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
     >
 
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
+    <!-- ============================================================
+         STYLESHEET
+         ============================================================ -->
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
+
 
 <body>
 
+
     <!-- ============================================================
-         NAVBAR
+         NAVIGATION BAR
          ============================================================ -->
 
-    <nav class="navbar">
+    <nav
+        class="navbar"
+        aria-label="Main navigation"
+    >
 
         <div class="nav-container">
 
+
+            <!-- LOGO -->
+
             <div class="logo">
-                <div class="logo-icon">₹</div>
+
+                <div
+                    class="logo-icon"
+                    aria-hidden="true"
+                >
+                    ₹
+                </div>
+
 
                 <div>
-                    <h2>StudentHub</h2>
-                    <span>Task 05</span>
+
+                    <h2>
+                        StudentHub
+                    </h2>
+
+                    <span>
+                        Task 05
+                    </span>
+
                 </div>
+
             </div>
 
+
+            <!-- TASK TITLE -->
+
             <div class="task-title">
+
                 Transaction-Based Payment Simulation
+
             </div>
 
         </div>
@@ -50,45 +107,92 @@
     </nav>
 
 
+
     <!-- ============================================================
-         MAIN CONTAINER
+         MAIN CONTENT
          ============================================================ -->
 
     <main class="container">
 
-        <!-- Page Header -->
+
+        <!-- ========================================================
+             PAGE HEADER
+             ======================================================== -->
 
         <section class="page-header">
 
             <div>
-                <span class="badge">DATABASE TRANSACTIONS</span>
 
-                <h1>Payment Simulation</h1>
+                <span class="badge">
+                    MYSQL • NODE.JS • EXPRESS
+                </span>
+
+
+                <h1>
+                    Payment Simulation
+                </h1>
+
 
                 <p>
+
                     Simulate a secure digital payment using
-                    <strong>COMMIT</strong> and <strong>ROLLBACK</strong>.
+                    <strong>COMMIT</strong> and
+                    <strong>ROLLBACK</strong>
+                    with a MySQL transaction.
+
                 </p>
+
+            </div>
+
+
+            <!-- DATABASE STATUS -->
+
+            <div
+                class="database-status"
+                aria-label="Database architecture"
+            >
+
+                <span
+                    class="status-dot"
+                    aria-hidden="true"
+                ></span>
+
+                <span>
+                    MySQL Transaction System
+                </span>
+
             </div>
 
         </section>
+
 
 
         <!-- ========================================================
              ACCOUNT CARDS
              ======================================================== -->
 
-        <section class="account-grid">
+        <section
+            class="account-grid"
+            aria-label="Payment accounts"
+        >
 
-            <!-- User Account -->
 
-            <div class="account-card">
+            <!-- ====================================================
+                 USER ACCOUNT
+                 ==================================================== -->
+
+            <article class="account-card">
 
                 <div class="card-top">
 
-                    <div class="account-icon user-icon">
+
+                    <div
+                        class="account-icon user-icon"
+                        aria-hidden="true"
+                    >
                         👤
                     </div>
+
 
                     <span class="account-label">
                         USER ACCOUNT
@@ -96,42 +200,69 @@
 
                 </div>
 
+
                 <h3 id="userName">
                     Loading...
                 </h3>
+
 
                 <p class="balance-label">
                     Available Balance
                 </p>
 
-                <div class="balance" id="userBalance">
+
+                <div
+                    class="balance"
+                    id="userBalance"
+                >
                     ₹0.00
                 </div>
 
+
                 <div class="account-status">
-                    <span class="status-dot"></span>
+
+                    <span
+                        class="status-dot"
+                        aria-hidden="true"
+                    ></span>
+
                     Active Account
+
                 </div>
 
-            </div>
+            </article>
 
 
-            <!-- Transfer Arrow -->
 
-            <div class="transfer-arrow">
+            <!-- ====================================================
+                 TRANSFER INDICATOR
+                 ==================================================== -->
+
+            <div
+                class="transfer-arrow"
+                aria-label="Money transfer direction"
+            >
                 →
             </div>
 
 
-            <!-- Merchant Account -->
 
-            <div class="account-card">
+            <!-- ====================================================
+                 MERCHANT ACCOUNT
+                 ==================================================== -->
+
+            <article class="account-card">
 
                 <div class="card-top">
 
-                    <div class="account-icon merchant-icon">
+
+                    <div
+                        class="account-icon merchant-icon"
+                        aria-hidden="true"
+                    >
                         🏪
                     </div>
+
 
                     <span class="account-label">
                         MERCHANT ACCOUNT
@@ -139,26 +270,40 @@
 
                 </div>
 
+
                 <h3 id="merchantName">
                     Loading...
                 </h3>
+
 
                 <p class="balance-label">
                     Current Balance
                 </p>
 
-                <div class="balance" id="merchantBalance">
+
+                <div
+                    class="balance"
+                    id="merchantBalance"
+                >
                     ₹0.00
                 </div>
 
+
                 <div class="account-status">
-                    <span class="status-dot"></span>
+
+                    <span
+                        class="status-dot"
+                        aria-hidden="true"
+                    ></span>
+
                     Active Account
+
                 </div>
 
-            </div>
+            </article>
 
         </section>
+
 
 
         <!-- ========================================================
@@ -167,65 +312,123 @@
 
         <section class="payment-section">
 
+
+            <!-- SECTION HEADER -->
+
             <div class="section-heading">
 
                 <div>
-                    <span class="section-tag">PAYMENT</span>
 
-                    <h2>Make a Payment</h2>
-
-                    <p>
-                        Enter an amount to transfer money from the user
-                        account to the merchant account.
-                    </p>
-                </div>
-
-            </div>
-
-
-            <div class="payment-form">
-
-                <label for="amount">
-                    Payment Amount
-                </label>
-
-                <div class="amount-wrapper">
-
-                    <span class="currency">
-                        ₹
+                    <span class="section-tag">
+                        PAYMENT
                     </span>
 
-                    <input
-                        type="number"
-                        id="amount"
-                        placeholder="Enter payment amount"
-                        min="1"
-                        step="0.01"
-                    >
+
+                    <h2>
+                        Make a Payment
+                    </h2>
+
+
+                    <p>
+
+                        Transfer money from the user account
+                        to the merchant account through the
+                        MySQL transaction system.
+
+                    </p>
 
                 </div>
-
-
-                <button
-                    id="payButton"
-                    onclick="processPayment()"
-                >
-                    <span>💳</span>
-                    Process Payment
-                </button>
 
             </div>
 
 
-            <!-- Transaction Status -->
+
+            <!-- PAYMENT FORM -->
+
+            <form
+                id="paymentForm"
+                class="payment-form"
+            >
+
+
+                <div class="form-group">
+
+                    <label for="amount">
+                        Payment Amount
+                    </label>
+
+
+                    <div class="amount-wrapper">
+
+                        <span
+                            class="currency"
+                            aria-hidden="true"
+                        >
+                            ₹
+                        </span>
+
+
+                        <input
+                            type="number"
+                            id="amount"
+                            name="amount"
+                            placeholder="Enter payment amount"
+                            min="1"
+                            step="0.01"
+                            inputmode="decimal"
+                            autocomplete="off"
+                            required
+                            aria-describedby="amountHelp"
+                        >
+
+                    </div>
+
+
+                    <p
+                        id="amountHelp"
+                        class="input-help"
+                    >
+                        Enter an amount greater than ₹0.
+                    </p>
+
+                </div>
+
+
+
+                <!-- PAYMENT BUTTON -->
+
+                <button
+                    type="submit"
+                    id="payButton"
+                >
+
+                    <span aria-hidden="true">
+                        💳
+                    </span>
+
+                    <span>
+                        Process Payment
+                    </span>
+
+                </button>
+
+            </form>
+
+
+
+            <!-- ====================================================
+                 TRANSACTION STATUS
+                 ==================================================== -->
 
             <div
                 id="statusMessage"
                 class="status-message hidden"
-            >
-            </div>
+                role="status"
+                aria-live="polite"
+            ></div>
 
         </section>
+
 
 
         <!-- ========================================================
@@ -234,141 +437,243 @@
 
         <section class="process-section">
 
+
             <div class="section-heading">
 
                 <div>
+
                     <span class="section-tag">
                         TRANSACTION FLOW
                     </span>
 
-                    <h2>How the Payment Works</h2>
+
+                    <h2>
+                        How the Payment Works
+                    </h2>
+
 
                     <p>
-                        Every payment follows a controlled database
-                        transaction process.
+
+                        Every payment follows a controlled
+                        database transaction process.
+
                     </p>
+
                 </div>
 
             </div>
 
 
+
+            <!-- PROCESS CARDS -->
+
             <div class="process-grid">
 
-                <div class="process-card">
+
+                <!-- STEP 01 -->
+
+                <article class="process-card">
 
                     <div class="process-number">
                         01
                     </div>
 
+
                     <div>
-                        <h3>Check Balance</h3>
+
+                        <h3>
+                            Check Balance
+                        </h3>
+
 
                         <p>
-                            Verify that the user has enough money
-                            to complete the payment.
+
+                            Verify that the user has sufficient
+                            funds before processing the payment.
+
                         </p>
+
                     </div>
 
-                </div>
+                </article>
 
 
-                <div class="process-card">
+
+                <!-- STEP 02 -->
+
+                <article class="process-card">
 
                     <div class="process-number">
                         02
                     </div>
 
+
                     <div>
-                        <h3>Deduct Amount</h3>
+
+                        <h3>
+                            Deduct Amount
+                        </h3>
+
 
                         <p>
+
                             Deduct the payment amount from the
-                            user's account.
+                            user's MySQL account balance.
+
                         </p>
+
                     </div>
 
-                </div>
+                </article>
 
 
-                <div class="process-card">
+
+                <!-- STEP 03 -->
+
+                <article class="process-card">
 
                     <div class="process-number">
                         03
                     </div>
 
+
                     <div>
-                        <h3>Add to Merchant</h3>
+
+                        <h3>
+                            Add to Merchant
+                        </h3>
+
 
                         <p>
+
                             Add the same amount to the merchant
-                            account.
+                            account within the same transaction.
+
                         </p>
+
                     </div>
 
-                </div>
+                </article>
 
 
-                <div class="process-card">
+
+                <!-- STEP 04 -->
+
+                <article class="process-card">
 
                     <div class="process-number">
                         04
                     </div>
 
+
                     <div>
-                        <h3>COMMIT / ROLLBACK</h3>
+
+                        <h3>
+                            COMMIT / ROLLBACK
+                        </h3>
+
 
                         <p>
-                            Save the transaction on success or
-                            reverse all changes if it fails.
+
+                            COMMIT saves successful changes.
+                            ROLLBACK reverses all changes if
+                            an error occurs.
+
                         </p>
+
                     </div>
 
-                </div>
+                </article>
 
             </div>
 
         </section>
 
 
+
         <!-- ========================================================
-             TRANSACTION RESULT
+             TRANSACTION HISTORY
              ======================================================== -->
 
         <section class="result-section">
 
+
             <div class="section-heading">
 
                 <div>
+
                     <span class="section-tag">
                         TRANSACTION HISTORY
                     </span>
 
-                    <h2>Recent Transactions</h2>
+
+                    <h2>
+                        Recent Transactions
+                    </h2>
+
+
+                    <p>
+
+                        Latest payment transactions retrieved
+                        from the MySQL database.
+
+                    </p>
+
                 </div>
 
             </div>
+
+
+
+            <!-- TABLE -->
 
             <div class="table-wrapper">
 
                 <table>
 
+                    <caption class="sr-only">
+                        Recent payment transactions
+                    </caption>
+
+
                     <thead>
 
                         <tr>
-                            <th>Transaction ID</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Date</th>
+
+                            <th scope="col">
+                                Transaction ID
+                            </th>
+
+                            <th scope="col">
+                                Amount
+                            </th>
+
+                            <th scope="col">
+                                Status
+                            </th>
+
+                            <th scope="col">
+                                Date
+                            </th>
+
                         </tr>
 
                     </thead>
 
+
                     <tbody id="transactionTable">
 
                         <tr>
-                            <td colspan="4" class="empty-state">
-                                No transactions available
+
+                            <td
+                                colspan="4"
+                                class="empty-state"
+                            >
+
+                                Loading transactions...
+
                             </td>
+
                         </tr>
 
                     </tbody>
@@ -379,7 +684,126 @@
 
         </section>
 
+
+
+        <!-- ========================================================
+             DATABASE CONCEPTS
+             ======================================================== -->
+
+        <section class="concept-section">
+
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="section-tag">
+                        DATABASE CONCEPTS
+                    </span>
+
+
+                    <h2>
+                        SQL Concepts Used
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="concept-grid">
+
+
+                <article class="concept-card">
+
+                    <strong>
+                        TRANSACTION
+                    </strong>
+
+                    <span>
+                        Groups multiple database operations
+                        into one atomic operation.
+                    </span>
+
+                </article>
+
+
+                <article class="concept-card">
+
+                    <strong>
+                        COMMIT
+                    </strong>
+
+                    <span>
+                        Permanently saves successful payment
+                        changes to MySQL.
+                    </span>
+
+                </article>
+
+
+                <article class="concept-card">
+
+                    <strong>
+                        ROLLBACK
+                    </strong>
+
+                    <span>
+                        Reverses database changes when a
+                        payment fails.
+                    </span>
+
+                </article>
+
+
+                <article class="concept-card">
+
+                    <strong>
+                        UPDATE
+                    </strong>
+
+                    <span>
+                        Updates user and merchant account
+                        balances.
+                    </span>
+
+                </article>
+
+
+                <article class="concept-card">
+
+                    <strong>
+                        INSERT
+                    </strong>
+
+                    <span>
+                        Stores successful payment information
+                        in the transaction history.
+                    </span>
+
+                </article>
+
+
+                <article class="concept-card">
+
+                    <strong>
+                        NODE.JS + EXPRESS
+                    </strong>
+
+                    <span>
+                        Provides the backend API connecting
+                        the frontend to MySQL.
+                    </span>
+
+                </article>
+
+            </div>
+
+        </section>
+
     </main>
+
 
 
     <!-- ============================================================
@@ -392,16 +816,21 @@
             Task 05 • Transaction-Based Payment Simulation
         </p>
 
+
         <span>
-            Full Stack Development
+            StudentHub • Full Stack Development
         </span>
 
     </footer>
 
 
-    <!-- JavaScript -->
+
+    <!-- ============================================================
+         JAVASCRIPT
+         ============================================================ -->
 
     <script src="script.js"></script>
 
 </body>
+
 </html>

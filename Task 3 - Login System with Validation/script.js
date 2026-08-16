@@ -1,92 +1,79 @@
 // ============================================================
-// STUDENTHUB — TASK 3
+// STUDENTHUB — TASK 03
 // LOGIN SYSTEM WITH VALIDATION
+// Node.js + Express + MySQL
 // ============================================================
 
 
 // ============================================================
-// SUPABASE CONFIGURATION
+// 1. API CONFIGURATION
 // ============================================================
 
-const SUPABASE_URL =
-    "https://cppjrfaftlwlzmwgicxj.supabase.co";
-
-const SUPABASE_KEY =
-    "sb_publishable_-uuWKMVV61MAgUIdP21cQg_BDwtyIcb";
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+const LOGIN_API_URL = "http://localhost:5000/api/login";
 
 
 // ============================================================
-// DOM ELEMENTS
+// 2. DOM ELEMENTS
 // ============================================================
 
-const loginForm =
-    document.getElementById("loginForm");
+const loginForm = document.getElementById("loginForm");
 
-const emailInput =
-    document.getElementById("email");
+const emailInput = document.getElementById("email");
 
-const passwordInput =
-    document.getElementById("password");
+const passwordInput = document.getElementById("password");
 
-const emailError =
-    document.getElementById("emailError");
+const emailError = document.getElementById("emailError");
 
-const passwordError =
-    document.getElementById("passwordError");
+const passwordError = document.getElementById("passwordError");
 
-const loginMessage =
-    document.getElementById("loginMessage");
+const loginMessage = document.getElementById("loginMessage");
 
-const loginButton =
-    document.getElementById("loginButton");
+const loginButton = document.getElementById("loginButton");
 
-const buttonText =
-    document.getElementById("buttonText");
+const buttonText = document.getElementById("buttonText");
 
-const togglePassword =
-    document.getElementById("togglePassword");
+const togglePassword = document.getElementById("togglePassword");
 
 
 // ============================================================
-// SHOW / HIDE PASSWORD
+// 3. SHOW / HIDE PASSWORD
 // ============================================================
 
-togglePassword.addEventListener("click", () => {
+if (togglePassword && passwordInput) {
 
-    if (passwordInput.type === "password") {
+    togglePassword.addEventListener("click", function () {
 
-        passwordInput.type = "text";
+        if (passwordInput.type === "password") {
 
-        togglePassword.textContent = "Hide";
+            passwordInput.type = "text";
 
-        togglePassword.setAttribute(
-            "aria-label",
-            "Hide password"
-        );
+            togglePassword.textContent = "Hide";
 
-    } else {
+            togglePassword.setAttribute(
+                "aria-label",
+                "Hide password"
+            );
 
-        passwordInput.type = "password";
+        } else {
 
-        togglePassword.textContent = "Show";
+            passwordInput.type = "password";
 
-        togglePassword.setAttribute(
-            "aria-label",
-            "Show password"
-        );
-    }
+            togglePassword.textContent = "Show";
 
-});
+            togglePassword.setAttribute(
+                "aria-label",
+                "Show password"
+            );
+
+        }
+
+    });
+
+}
 
 
 // ============================================================
-// EMAIL VALIDATION
+// 4. EMAIL VALIDATION
 // ============================================================
 
 function isValidEmail(email) {
@@ -95,44 +82,87 @@ function isValidEmail(email) {
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     return emailPattern.test(email);
+
 }
 
 
 // ============================================================
-// CLEAR ERRORS
+// 5. CLEAR FORM ERRORS
 // ============================================================
 
 function clearErrors() {
 
-    emailError.textContent = "";
+    if (emailError) {
 
-    passwordError.textContent = "";
+        emailError.textContent = "";
 
-    emailInput.classList.remove("input-error");
+    }
 
-    passwordInput.classList.remove("input-error");
+    if (passwordError) {
+
+        passwordError.textContent = "";
+
+    }
+
+    if (emailInput) {
+
+        emailInput.classList.remove("input-error");
+
+    }
+
+    if (passwordInput) {
+
+        passwordInput.classList.remove("input-error");
+
+    }
+
+    clearMessage();
+
+}
+
+
+// ============================================================
+// 6. CLEAR LOGIN MESSAGE
+// ============================================================
+
+function clearMessage() {
+
+    if (!loginMessage) {
+
+        return;
+
+    }
 
     loginMessage.textContent = "";
 
     loginMessage.className = "message";
+
 }
 
 
 // ============================================================
-// SHOW MESSAGE
+// 7. SHOW LOGIN MESSAGE
 // ============================================================
 
 function showMessage(message, type) {
 
+    if (!loginMessage) {
+
+        return;
+
+    }
+
     loginMessage.textContent = message;
 
-    loginMessage.className =
-        `message ${type}`;
+    loginMessage.className = "message";
+
+    loginMessage.classList.add(type);
+
 }
 
 
 // ============================================================
-// VALIDATE FORM
+// 8. VALIDATE FORM
 // ============================================================
 
 function validateForm() {
@@ -140,15 +170,17 @@ function validateForm() {
     let valid = true;
 
     const email =
-        emailInput.value.trim();
+        emailInput.value
+            .trim()
+            .toLowerCase();
 
     const password =
-        passwordInput.value.trim();
+        passwordInput.value;
 
 
-    // --------------------------------------------------------
+    // ========================================================
     // EMAIL VALIDATION
-    // --------------------------------------------------------
+    // ========================================================
 
     if (email === "") {
 
@@ -161,7 +193,9 @@ function validateForm() {
 
         valid = false;
 
-    } else if (!isValidEmail(email)) {
+    }
+
+    else if (!isValidEmail(email)) {
 
         emailError.textContent =
             "Please enter a valid email address.";
@@ -171,12 +205,13 @@ function validateForm() {
         );
 
         valid = false;
+
     }
 
 
-    // --------------------------------------------------------
+    // ========================================================
     // PASSWORD VALIDATION
-    // --------------------------------------------------------
+    // ========================================================
 
     if (password === "") {
 
@@ -189,7 +224,9 @@ function validateForm() {
 
         valid = false;
 
-    } else if (password.length < 6) {
+    }
+
+    else if (password.length < 6) {
 
         passwordError.textContent =
             "Password must contain at least 6 characters.";
@@ -199,187 +236,366 @@ function validateForm() {
         );
 
         valid = false;
+
     }
 
 
     return valid;
+
 }
 
 
 // ============================================================
-// REMOVE ERROR WHILE TYPING
+// 9. CLEAR EMAIL ERROR WHILE TYPING
 // ============================================================
 
-emailInput.addEventListener("input", () => {
+if (emailInput) {
 
-    emailError.textContent = "";
+    emailInput.addEventListener(
+        "input",
+        function () {
 
-    emailInput.classList.remove(
-        "input-error"
-    );
+            if (emailError) {
 
-});
+                emailError.textContent = "";
 
+            }
 
-passwordInput.addEventListener("input", () => {
+            emailInput.classList.remove(
+                "input-error"
+            );
 
-    passwordError.textContent = "";
+            clearMessage();
 
-    passwordInput.classList.remove(
-        "input-error"
-    );
-
-});
-
-
-// ============================================================
-// LOGIN FORM SUBMISSION
-// ============================================================
-
-loginForm.addEventListener(
-    "submit",
-    async (event) => {
-
-        event.preventDefault();
-
-        clearErrors();
-
-
-        // ----------------------------------------------------
-        // STEP 1: JAVASCRIPT VALIDATION
-        // ----------------------------------------------------
-
-        if (!validateForm()) {
-
-            return;
         }
+    );
+
+}
 
 
-        const email =
-            emailInput.value.trim();
+// ============================================================
+// 10. CLEAR PASSWORD ERROR WHILE TYPING
+// ============================================================
 
-        const password =
-            passwordInput.value.trim();
+if (passwordInput) {
 
+    passwordInput.addEventListener(
+        "input",
+        function () {
 
-        // ----------------------------------------------------
-        // LOADING STATE
-        // ----------------------------------------------------
+            if (passwordError) {
 
-        loginButton.disabled = true;
+                passwordError.textContent = "";
 
-        buttonText.textContent =
-            "Checking...";
+            }
 
+            passwordInput.classList.remove(
+                "input-error"
+            );
 
-        try {
+            clearMessage();
 
-            // ------------------------------------------------
-            // STEP 2: CHECK DATABASE CREDENTIALS
-            // ------------------------------------------------
+        }
+    );
 
-            const { data, error } =
-                await supabaseClient
-                    .from("students")
-                    .select(
-                        "id, name, email, department"
-                    )
-                    .eq("email", email)
-                    .eq("password", password)
-                    .maybeSingle();
+}
 
 
-            // ------------------------------------------------
-            // DATABASE ERROR
-            // ------------------------------------------------
+// ============================================================
+// 11. LOGIN FORM SUBMISSION
+// ============================================================
 
-            if (error) {
+if (loginForm) {
+
+    loginForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            // ==================================================
+            // STEP 1 — CLEAR PREVIOUS ERRORS
+            // ==================================================
+
+            clearErrors();
+
+
+            // ==================================================
+            // STEP 2 — VALIDATE FORM
+            // ==================================================
+
+            if (!validateForm()) {
+
+                return;
+
+            }
+
+
+            // ==================================================
+            // STEP 3 — GET LOGIN VALUES
+            // ==================================================
+
+            const email =
+                emailInput.value
+                    .trim()
+                    .toLowerCase();
+
+            const password =
+                passwordInput.value;
+
+
+            // ==================================================
+            // STEP 4 — LOADING STATE
+            // ==================================================
+
+            loginButton.disabled = true;
+
+            buttonText.textContent =
+                "Checking...";
+
+            showMessage(
+                "Verifying your credentials...",
+                "loading"
+            );
+
+
+            try {
+
+
+                // ==================================================
+                // STEP 5 — SEND REQUEST TO NODE.JS
+                // ==================================================
+
+                const response =
+                    await fetch(
+                        LOGIN_API_URL,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                email: email,
+
+                                password: password
+
+                            })
+
+                        }
+                    );
+
+
+                // ==================================================
+                // STEP 6 — READ SERVER RESPONSE
+                // ==================================================
+
+                let result;
+
+                try {
+
+                    result =
+                        await response.json();
+
+                }
+
+                catch {
+
+                    throw new Error(
+                        "Server returned an invalid response."
+                    );
+
+                }
+
+
+                console.log(
+                    "StudentHub Login Response:",
+                    result
+                );
+
+
+                // ==================================================
+                // STEP 7 — SERVER ERROR
+                // ==================================================
+
+                if (!response.ok) {
+
+                    showMessage(
+                        result.message ||
+                        "Invalid email or password.",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                // ==================================================
+                // STEP 8 — CHECK LOGIN SUCCESS
+                // ==================================================
+
+                if (
+                    result.success !== true ||
+                    !result.data
+                ) {
+
+                    showMessage(
+                        result.message ||
+                        "Invalid email or password.",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                // ==================================================
+                // STEP 9 — GET USER DATA
+                // ==================================================
+
+                const user =
+                    result.data;
+
+
+                const username =
+                    user.username ||
+                    user.name ||
+                    user.email ||
+                    email;
+
+
+                // ==================================================
+                // STEP 10 — SUCCESS MESSAGE
+                // ==================================================
+
+                showMessage(
+                    `Login successful! Welcome, ${username}.`,
+                    "success"
+                );
+
+
+                console.log(
+                    "LOGIN SUCCESS:",
+                    user
+                );
+
+
+                // ==================================================
+                // STEP 11 — STORE SESSION INFORMATION
+                // ==================================================
+
+                sessionStorage.setItem(
+                    "userId",
+                    user.id || ""
+                );
+
+                sessionStorage.setItem(
+                    "username",
+                    username
+                );
+
+                sessionStorage.setItem(
+                    "email",
+                    user.email ||
+                    email
+                );
+
+                sessionStorage.setItem(
+                    "department",
+                    user.department || ""
+                );
+
+                sessionStorage.setItem(
+                    "loggedIn",
+                    "true"
+                );
+
+
+                // ==================================================
+                // STEP 12 — CLEAR PASSWORD
+                // ==================================================
+
+                passwordInput.value = "";
+
+
+                // ==================================================
+                // STEP 13 — SUCCESS BUTTON STATE
+                // ==================================================
+
+                buttonText.textContent =
+                    "Login Successful";
+
+
+            }
+
+            catch (error) {
+
+
+                // ==================================================
+                // STEP 14 — CONNECTION ERROR
+                // ==================================================
 
                 console.error(
-                    "Supabase error:",
+                    "StudentHub Login Error:",
                     error
                 );
 
+
                 showMessage(
-                    "Unable to connect to the database. Please try again.",
+                    "Unable to connect to the StudentHub server. Make sure Node.js is running on port 5000.",
                     "error"
                 );
 
-                return;
             }
 
 
-            // ------------------------------------------------
-            // INVALID CREDENTIALS
-            // ------------------------------------------------
+            finally {
 
-            if (!data) {
 
-                showMessage(
-                    "Invalid email or password.",
-                    "error"
+                // ==================================================
+                // STEP 15 — RESTORE BUTTON
+                // ==================================================
+
+                setTimeout(
+                    function () {
+
+                        loginButton.disabled =
+                            false;
+
+                        buttonText.textContent =
+                            "Login";
+
+                    },
+                    1500
                 );
 
-                return;
             }
 
-
-            // ------------------------------------------------
-            // LOGIN SUCCESS
-            // ------------------------------------------------
-
-            showMessage(
-                `Login successful! Welcome, ${data.name}.`,
-                "success"
-            );
-
-
-            // ------------------------------------------------
-            // STORE BASIC SESSION INFORMATION
-            // ------------------------------------------------
-
-            sessionStorage.setItem(
-                "studentName",
-                data.name
-            );
-
-            sessionStorage.setItem(
-                "studentEmail",
-                data.email
-            );
-
-            sessionStorage.setItem(
-                "studentDepartment",
-                data.department || ""
-            );
-
-
-            // ------------------------------------------------
-            // CLEAR PASSWORD FIELD
-            // ------------------------------------------------
-
-            passwordInput.value = "";
-
-
-        } catch (error) {
-
-            console.error(
-                "Login error:",
-                error
-            );
-
-            showMessage(
-                "Something went wrong. Please try again.",
-                "error"
-            );
-
-        } finally {
-
-            loginButton.disabled = false;
-
-            buttonText.textContent =
-                "Login";
         }
+    );
 
-    }
+}
+
+
+// ============================================================
+// 16. PAGE LOAD
+// ============================================================
+
+console.log(
+    "StudentHub Task 03 Login System loaded."
+);
+
+console.log(
+    "Login API:",
+    LOGIN_API_URL
+);
+
+console.log(
+    "Authentication: Node.js + Express + MySQL"
 );

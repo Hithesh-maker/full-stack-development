@@ -3,6 +3,10 @@
 
 <head>
 
+    <!-- ============================================================
+         BASIC DOCUMENT SETTINGS
+         ============================================================ -->
+
     <meta charset="UTF-8">
 
     <meta
@@ -12,7 +16,7 @@
 
     <meta
         name="description"
-        content="StudentHub Task 07 - Interactive Feedback Form with JavaScript Events, Functions and Supabase"
+        content="StudentHub Task 07 - Interactive Web Form with JavaScript Events, Functions and MySQL"
     >
 
     <title>
@@ -31,7 +35,7 @@
 
     <link
         rel="preconnect"
-        href="https://fonts.gstatic.com"
+        href="https://fonts.googleapis.com"
         crossorigin
     >
 
@@ -65,8 +69,6 @@
         <div class="nav-container">
 
 
-            <!-- LOGO -->
-
             <div class="logo">
 
                 <div class="logo-icon">
@@ -88,8 +90,6 @@
             </div>
 
 
-            <!-- TASK TITLE -->
-
             <div class="task-title">
 
                 Task 07 · Interactive Web Form
@@ -104,7 +104,7 @@
 
 
     <!-- ============================================================
-         MAIN CONTAINER
+         MAIN CONTENT
          ============================================================ -->
 
     <main class="container">
@@ -125,11 +125,14 @@
             </h1>
 
             <p>
+
                 Build an interactive customer feedback system using
+
                 <strong>
                     JavaScript events, reusable functions,
-                    validation and Supabase storage.
+                    validation and MySQL database storage.
                 </strong>
+
             </p>
 
         </section>
@@ -191,7 +194,7 @@
 
 
 
-            <!-- VALIDATION -->
+            <!-- LIVE VALIDATION -->
 
             <div class="stat-card">
 
@@ -215,12 +218,12 @@
 
 
 
-            <!-- STORAGE -->
+            <!-- DATABASE -->
 
             <div class="stat-card">
 
                 <div class="stat-icon today-icon">
-                    ☁️
+                    🗄️
                 </div>
 
                 <div>
@@ -230,7 +233,7 @@
                     </p>
 
                     <h2>
-                        Supabase
+                        MySQL
                     </h2>
 
                 </div>
@@ -249,8 +252,6 @@
         <section class="activity-section">
 
 
-            <!-- SECTION HEADER -->
-
             <div class="section-heading">
 
                 <span class="section-tag">
@@ -262,16 +263,20 @@
                 </h2>
 
                 <p>
+
                     Complete the form below. Fields are validated
                     while you type and the submit action uses a
                     double-click event.
+
                 </p>
 
             </div>
 
 
 
-            <!-- FORM -->
+            <!-- ==================================================
+                 FORM
+                 ================================================== -->
 
             <form
                 id="feedbackForm"
@@ -535,8 +540,10 @@
                 </h2>
 
                 <p>
+
                     The form combines browser events with reusable
-                    JavaScript functions.
+                    JavaScript functions and a Node.js API.
+
                 </p>
 
             </div>
@@ -559,8 +566,10 @@
                     </h3>
 
                     <p>
+
                         Input events validate the user's data
                         while they type into the form.
+
                     </p>
 
                 </div>
@@ -580,8 +589,10 @@
                     </h3>
 
                     <p>
+
                         Hovering over form fields highlights
                         the active input area.
+
                     </p>
 
                 </div>
@@ -601,8 +612,10 @@
                     </h3>
 
                     <p>
+
                         Double-clicking the submit button
                         starts the final validation process.
+
                     </p>
 
                 </div>
@@ -622,8 +635,10 @@
                     </h3>
 
                     <p>
+
                         Common validation logic is handled
                         through reusable JavaScript functions.
+
                     </p>
 
                 </div>
@@ -653,8 +668,10 @@
                 </h2>
 
                 <p>
+
                     Every required field is checked before the
-                    feedback is stored in Supabase.
+                    feedback is stored in the MySQL database.
+
                 </p>
 
             </div>
@@ -737,8 +754,10 @@
                     </h3>
 
                     <p>
+
                         Feedback must contain at least
                         10 characters.
+
                     </p>
 
                 </div>
@@ -760,7 +779,7 @@
             <div class="section-heading">
 
                 <span class="section-tag">
-                    SUPABASE RECORDS
+                    MYSQL RECORDS
                 </span>
 
                 <h2>
@@ -768,11 +787,14 @@
                 </h2>
 
                 <p>
+
                     The latest feedback entries stored in the
-                    Supabase database.
+                    MySQL database through the Node.js API.
+
                 </p>
 
             </div>
+
 
 
             <div class="table-wrapper">
@@ -820,7 +842,9 @@
                                 colspan="6"
                                 class="empty-state"
                             >
+
                                 Loading feedback...
+
                             </td>
 
                         </tr>
@@ -853,8 +877,10 @@
             </h2>
 
             <p>
+
                 Thank you for sharing your experience.
-                Your feedback has been stored securely.
+                Your feedback has been stored in the MySQL database.
+
             </p>
 
         </section>
@@ -871,26 +897,19 @@
     <footer>
 
         <p>
+
             StudentHub • Task 07
             <br>
             Interactive Web Form with Events & Functions
+
         </p>
 
         <span>
-            HTML5 · CSS3 · JavaScript · Supabase
+            HTML5 · CSS3 · JavaScript · Node.js · Express · MySQL
         </span>
 
     </footer>
 
-
-
-    <!-- ============================================================
-         SUPABASE JAVASCRIPT LIBRARY
-         ============================================================ -->
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
 
 
     <!-- ============================================================

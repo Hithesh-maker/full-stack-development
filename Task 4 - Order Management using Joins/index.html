@@ -10,10 +10,22 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>StudentHub | Order Management</title>
+    <meta
+        name="description"
+        content="StudentHub Task 04 - Order Management using MySQL JOIN queries"
+    >
 
-    <!-- Inter Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <title>StudentHub | Task 04 - Order Management</title>
+
+
+    <!-- ============================================================
+         GOOGLE FONT
+    ============================================================ -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
 
     <link
         rel="preconnect"
@@ -26,12 +38,11 @@
         rel="stylesheet"
     >
 
-    <!-- Supabase -->
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
 
-    <!-- CSS -->
+    <!-- ============================================================
+         CSS
+    ============================================================ -->
+
     <link
         rel="stylesheet"
         href="style.css"
@@ -42,19 +53,24 @@
 
 <body>
 
+
+    <!-- ============================================================
+         MAIN PAGE
+    ============================================================ -->
+
     <main class="page-container">
 
 
-        <!-- ==================================================
+        <!-- ========================================================
              HEADER
-             ================================================== -->
+        ======================================================== -->
 
         <header class="page-header">
 
-            <div>
+            <div class="header-content">
 
                 <p class="eyebrow">
-                    FULL STACK DEVELOPMENT • TASK 4
+                    FULL STACK DEVELOPMENT • TASK 04
                 </p>
 
                 <h1>
@@ -63,93 +79,118 @@
 
                 <p class="subtitle">
                     Manage customers, products and order history
-                    using relational database queries.
+                    using MySQL relational database queries.
                 </p>
+
+            </div>
+
+
+            <!-- DATABASE STATUS -->
+
+            <div class="database-status">
+
+                <span
+                    class="status-dot"
+                    aria-hidden="true"
+                ></span>
+
+                <span>
+                    MySQL Database
+                </span>
 
             </div>
 
         </header>
 
 
+        <!-- ========================================================
+             SUMMARY DASHBOARD
+        ======================================================== -->
 
-        <!-- ==================================================
-             SUMMARY CARDS
-             ================================================== -->
+        <section
+            class="summary-grid"
+            aria-label="Order statistics"
+        >
 
-        <section class="summary-grid">
 
+            <!-- HIGHEST VALUE ORDER -->
 
-            <!-- Highest Value Order -->
+            <article class="summary-card">
 
-            <div class="summary-card">
-
-                <div class="summary-icon">
+                <div
+                    class="summary-icon"
+                    aria-hidden="true"
+                >
                     ₹
                 </div>
 
-                <div>
+                <div class="summary-content">
 
                     <p class="summary-label">
                         Highest Value Order
                     </p>
 
                     <h2 id="highestOrderAmount">
-                        ₹0
+                        ₹0.00
                     </h2>
 
                     <p
                         class="summary-description"
                         id="highestOrderProduct"
                     >
-                        Loading...
+                        No data available
                     </p>
 
                 </div>
 
-            </div>
+            </article>
 
 
+            <!-- MOST ACTIVE CUSTOMER -->
 
-            <!-- Most Active Customer -->
+            <article class="summary-card">
 
-            <div class="summary-card">
-
-                <div class="summary-icon">
+                <div
+                    class="summary-icon"
+                    aria-hidden="true"
+                >
                     ★
                 </div>
 
-                <div>
+                <div class="summary-content">
 
                     <p class="summary-label">
                         Most Active Customer
                     </p>
 
                     <h2 id="activeCustomer">
-                        Loading...
+                        None
                     </h2>
 
                     <p
                         class="summary-description"
                         id="activeCustomerOrders"
                     >
-                        Checking orders...
+                        No data available
                     </p>
 
                 </div>
 
-            </div>
+            </article>
 
 
+            <!-- TOTAL ORDERS -->
 
-            <!-- Total Orders -->
+            <article class="summary-card">
 
-            <div class="summary-card">
-
-                <div class="summary-icon">
+                <div
+                    class="summary-icon"
+                    aria-hidden="true"
+                >
                     #
                 </div>
 
-                <div>
+                <div class="summary-content">
 
                     <p class="summary-label">
                         Total Orders
@@ -165,22 +206,24 @@
 
                 </div>
 
-            </div>
+            </article>
 
 
+            <!-- TOTAL CUSTOMERS -->
 
-            <!-- Total Customers -->
+            <article class="summary-card">
 
-            <div class="summary-card">
-
-                <div class="summary-icon">
+                <div
+                    class="summary-icon"
+                    aria-hidden="true"
+                >
                     👥
                 </div>
 
-                <div>
+                <div class="summary-content">
 
                     <p class="summary-label">
-                        Customers
+                        Total Customers
                     </p>
 
                     <h2 id="totalCustomers">
@@ -188,27 +231,28 @@
                     </h2>
 
                     <p class="summary-description">
-                        Registered customers
+                        Customers with orders
                     </p>
 
                 </div>
 
-            </div>
+            </article>
 
         </section>
 
 
-
-        <!-- ==================================================
-             ORDER HISTORY
-             ================================================== -->
+        <!-- ========================================================
+             ORDER DATABASE
+        ======================================================== -->
 
         <section class="content-card">
 
 
+            <!-- SECTION HEADER -->
+
             <div class="section-header">
 
-                <div>
+                <div class="section-heading">
 
                     <p class="section-label">
                         ORDER DATABASE
@@ -220,13 +264,14 @@
 
                     <p>
                         Customer, product and order information
-                        retrieved using relational queries.
+                        retrieved through the Node.js API
+                        and MySQL relational database.
                     </p>
 
                 </div>
 
 
-                <!-- Sort -->
+                <!-- SORT -->
 
                 <div class="sort-container">
 
@@ -234,7 +279,10 @@
                         Sort by
                     </label>
 
-                    <select id="sortOrders">
+                    <select
+                        id="sortOrders"
+                        name="sortOrders"
+                    >
 
                         <option value="date-desc">
                             Newest Order
@@ -263,15 +311,33 @@
             </div>
 
 
+            <!-- ====================================================
+                 ERROR MESSAGE
+            ==================================================== -->
 
-            <!-- Loading -->
+            <div
+                id="errorMessage"
+                class="error-message"
+                role="alert"
+                aria-live="assertive"
+            ></div>
+
+
+            <!-- ====================================================
+                 LOADING
+            ==================================================== -->
 
             <div
                 id="loading"
                 class="loading"
+                role="status"
+                aria-live="polite"
             >
 
-                <div class="loader"></div>
+                <div
+                    class="loader"
+                    aria-hidden="true"
+                ></div>
 
                 <p>
                     Loading order history...
@@ -280,52 +346,54 @@
             </div>
 
 
-
-            <!-- Error -->
-
-            <div
-                id="errorMessage"
-                class="error-message"
-            >
-            </div>
-
-
-
-            <!-- Table -->
+            <!-- ====================================================
+                 TABLE
+            ==================================================== -->
 
             <div class="table-container">
 
                 <table>
 
+                    <!--
+                        Accessibility caption.
+                        It is visually hidden by CSS and therefore
+                        will NOT appear above the table.
+                    -->
+
+                    <caption class="sr-only">
+                        StudentHub customer order history
+                    </caption>
+
+
                     <thead>
 
                         <tr>
 
-                            <th>
+                            <th scope="col">
                                 Order ID
                             </th>
 
-                            <th>
+                            <th scope="col">
                                 Customer
                             </th>
 
-                            <th>
+                            <th scope="col">
                                 Product
                             </th>
 
-                            <th>
-                                Category
-                            </th>
-
-                            <th>
+                            <th scope="col">
                                 Quantity
                             </th>
 
-                            <th>
-                                Amount
+                            <th scope="col">
+                                Unit Price
                             </th>
 
-                            <th>
+                            <th scope="col">
+                                Total Amount
+                            </th>
+
+                            <th scope="col">
                                 Order Date
                             </th>
 
@@ -336,24 +404,33 @@
 
                     <tbody id="orderTableBody">
 
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="empty-row"
+                            >
+                                Loading order data...
+                            </td>
+
+                        </tr>
+
                     </tbody>
 
                 </table>
 
             </div>
 
-
         </section>
 
 
-
-        <!-- ==================================================
-             DATABASE CONCEPTS
-             ================================================== -->
+        <!-- ========================================================
+             SQL CONCEPTS
+        ======================================================== -->
 
         <section class="concept-card">
 
-            <div>
+            <div class="concept-header">
 
                 <p class="section-label">
                     SQL CONCEPTS
@@ -363,10 +440,16 @@
                     Concepts Used
                 </h2>
 
+                <p>
+                    Task 04 demonstrates how relational database
+                    queries are used in an order management system.
+                </p>
+
             </div>
 
 
             <div class="concept-grid">
+
 
                 <div class="concept-item">
 
@@ -375,7 +458,7 @@
                     </strong>
 
                     <span>
-                        Customers → Orders → Products
+                        Customers → Orders → Order Items → Products
                     </span>
 
                 </div>
@@ -388,7 +471,20 @@
                     </strong>
 
                     <span>
-                        Highest-value order & most-active customer
+                        Find the highest-value order
+                    </span>
+
+                </div>
+
+
+                <div class="concept-item">
+
+                    <strong>
+                        GROUP BY
+                    </strong>
+
+                    <span>
+                        Count orders for each customer
                     </span>
 
                 </div>
@@ -401,7 +497,7 @@
                     </strong>
 
                     <span>
-                        Sort orders by date, amount and customer
+                        Sort orders by date and amount
                     </span>
 
                 </div>
@@ -410,11 +506,24 @@
                 <div class="concept-item">
 
                     <strong>
-                        RELATIONAL DATABASE
+                        FOREIGN KEY
                     </strong>
 
                     <span>
-                        Related tables connected using IDs
+                        Connect customers, orders and products
+                    </span>
+
+                </div>
+
+
+                <div class="concept-item">
+
+                    <strong>
+                        REST API
+                    </strong>
+
+                    <span>
+                        Node.js and Express provide order data
                     </span>
 
                 </div>
@@ -424,15 +533,224 @@
         </section>
 
 
+        <!-- ========================================================
+             DATABASE RELATIONSHIP
+        ======================================================== -->
 
-        <!-- ==================================================
+        <section class="concept-card">
+
+            <div class="concept-header">
+
+                <p class="section-label">
+                    DATABASE RELATIONSHIP
+                </p>
+
+                <h2>
+                    Order Data Flow
+                </h2>
+
+                <p>
+                    MySQL uses foreign keys to connect related
+                    records across the order management tables.
+                </p>
+
+            </div>
+
+
+            <div class="relationship-flow">
+
+
+                <div class="relationship-box">
+
+                    <span class="relationship-number">
+                        01
+                    </span>
+
+                    <strong>
+                        Customers
+                    </strong>
+
+                    <small>
+                        customer_id
+                    </small>
+
+                </div>
+
+
+                <div
+                    class="relationship-arrow"
+                    aria-hidden="true"
+                >
+                    →
+                </div>
+
+
+                <div class="relationship-box">
+
+                    <span class="relationship-number">
+                        02
+                    </span>
+
+                    <strong>
+                        Orders
+                    </strong>
+
+                    <small>
+                        order_id
+                    </small>
+
+                </div>
+
+
+                <div
+                    class="relationship-arrow"
+                    aria-hidden="true"
+                >
+                    →
+                </div>
+
+
+                <div class="relationship-box">
+
+                    <span class="relationship-number">
+                        03
+                    </span>
+
+                    <strong>
+                        Order Items
+                    </strong>
+
+                    <small>
+                        order_item_id
+                    </small>
+
+                </div>
+
+
+                <div
+                    class="relationship-arrow"
+                    aria-hidden="true"
+                >
+                    →
+                </div>
+
+
+                <div class="relationship-box">
+
+                    <span class="relationship-number">
+                        04
+                    </span>
+
+                    <strong>
+                        Products
+                    </strong>
+
+                    <small>
+                        product_id
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             APPLICATION STACK
+        ======================================================== -->
+
+        <section class="concept-card">
+
+            <div class="concept-header">
+
+                <p class="section-label">
+                    APPLICATION STACK
+                </p>
+
+                <h2>
+                    Task 04 Architecture
+                </h2>
+
+                <p>
+                    Full-stack communication between the browser,
+                    Node.js server and MySQL database.
+                </p>
+
+            </div>
+
+
+            <div class="concept-grid">
+
+
+                <div class="concept-item">
+
+                    <strong>
+                        FRONTEND
+                    </strong>
+
+                    <span>
+                        HTML • CSS • JavaScript
+                    </span>
+
+                </div>
+
+
+                <div class="concept-item">
+
+                    <strong>
+                        BACKEND
+                    </strong>
+
+                    <span>
+                        Node.js • Express.js
+                    </span>
+
+                </div>
+
+
+                <div class="concept-item">
+
+                    <strong>
+                        DATABASE
+                    </strong>
+
+                    <span>
+                        MySQL
+                    </span>
+
+                </div>
+
+
+                <div class="concept-item">
+
+                    <strong>
+                        API
+                    </strong>
+
+                    <span>
+                        GET /api/orders
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
              FOOTER
-             ================================================== -->
+        ======================================================== -->
 
         <footer class="page-footer">
 
             <p>
                 StudentHub • Full Stack Development
+            </p>
+
+            <p>
+                Task 04 • Order Management • MySQL
             </p>
 
         </footer>
@@ -441,7 +759,9 @@
     </main>
 
 
-    <!-- JavaScript -->
+    <!-- ============================================================
+         JAVASCRIPT
+    ============================================================ -->
 
     <script src="script.js"></script>
 

@@ -1,11 +1,19 @@
 // ============================================================
 // STUDENTHUB — TASK 07
 // INTERACTIVE WEB FORM WITH EVENTS & FUNCTIONS
+// MySQL + Node.js + Express
 // ============================================================
 
 
 // ============================================================
-// GET ELEMENTS
+// 1. API CONFIGURATION
+// ============================================================
+
+const API_BASE_URL = "http://localhost:5000/api";
+
+
+// ============================================================
+// 2. GET FORM ELEMENTS
 // ============================================================
 
 const feedbackForm =
@@ -43,7 +51,21 @@ const characterCount =
 
 
 // ============================================================
-// PAGE LOAD
+// 3. DATABASE DISPLAY ELEMENTS
+// ============================================================
+
+const totalFeedbackElement =
+    document.getElementById("totalFeedback");
+
+const averageRatingElement =
+    document.getElementById("averageRating");
+
+const feedbackTableBody =
+    document.getElementById("feedbackTableBody");
+
+
+// ============================================================
+// 4. PAGE LOAD
 // ============================================================
 
 document.addEventListener(
@@ -60,87 +82,118 @@ document.addEventListener(
 
         setupResetEvent();
 
+        setupKeyboardEvents();
+
+        loadFeedback();
+
     }
 );
 
 
 // ============================================================
-// SETUP INPUT EVENTS
+// 5. INPUT EVENTS
 // ============================================================
 
 function setupInputEvents() {
 
-    nameInput.addEventListener(
-        "input",
-        function () {
+    if (nameInput) {
 
-            validateName();
+        nameInput.addEventListener(
+            "input",
+            function () {
 
-        }
-    );
+                validateName();
 
+            }
+        );
 
-    emailInput.addEventListener(
-        "input",
-        function () {
-
-            validateEmail();
-
-        }
-    );
+    }
 
 
-    categoryInput.addEventListener(
-        "change",
-        function () {
+    if (emailInput) {
 
-            validateCategory();
+        emailInput.addEventListener(
+            "input",
+            function () {
 
-        }
-    );
+                validateEmail();
 
+            }
+        );
 
-    ratingInput.addEventListener(
-        "change",
-        function () {
-
-            validateRating();
-
-        }
-    );
+    }
 
 
-    feedbackInput.addEventListener(
-        "input",
-        function () {
+    if (categoryInput) {
 
-            validateFeedback();
+        categoryInput.addEventListener(
+            "change",
+            function () {
 
-            updateCharacterCount();
+                validateCategory();
 
-        }
-    );
+            }
+        );
+
+    }
+
+
+    if (ratingInput) {
+
+        ratingInput.addEventListener(
+            "change",
+            function () {
+
+                validateRating();
+
+            }
+        );
+
+    }
+
+
+    if (feedbackInput) {
+
+        feedbackInput.addEventListener(
+            "input",
+            function () {
+
+                validateFeedback();
+
+                updateCharacterCount();
+
+            }
+        );
+
+    }
 
 }
 
 
 // ============================================================
-// SETUP MOUSE EVENTS
+// 6. MOUSE EVENTS
 // ============================================================
 
 function setupMouseEvents() {
 
     const fields = [
+
         nameInput,
         emailInput,
         categoryInput,
         ratingInput,
         feedbackInput
+
     ];
 
 
     fields.forEach(
         function (field) {
+
+            if (!field) {
+                return;
+            }
+
 
             field.addEventListener(
                 "mouseenter",
@@ -172,10 +225,15 @@ function setupMouseEvents() {
 
 
 // ============================================================
-// NAME VALIDATION
+// 7. NAME VALIDATION
 // ============================================================
 
 function validateName() {
+
+    if (!nameInput) {
+        return false;
+    }
+
 
     const value =
         nameInput.value.trim();
@@ -224,10 +282,15 @@ function validateName() {
 
 
 // ============================================================
-// EMAIL VALIDATION
+// 8. EMAIL VALIDATION
 // ============================================================
 
 function validateEmail() {
+
+    if (!emailInput) {
+        return false;
+    }
+
 
     const value =
         emailInput.value.trim();
@@ -280,10 +343,15 @@ function validateEmail() {
 
 
 // ============================================================
-// CATEGORY VALIDATION
+// 9. CATEGORY VALIDATION
 // ============================================================
 
 function validateCategory() {
+
+    if (!categoryInput) {
+        return false;
+    }
+
 
     const value =
         categoryInput.value;
@@ -319,10 +387,15 @@ function validateCategory() {
 
 
 // ============================================================
-// RATING VALIDATION
+// 10. RATING VALIDATION
 // ============================================================
 
 function validateRating() {
+
+    if (!ratingInput) {
+        return false;
+    }
+
 
     const value =
         ratingInput.value;
@@ -346,6 +419,26 @@ function validateRating() {
     }
 
 
+    const rating =
+        Number(value);
+
+
+    if (
+        rating < 1 ||
+        rating > 5
+    ) {
+
+        setInvalid(
+            ratingInput,
+            message,
+            "Rating must be between 1 and 5."
+        );
+
+        return false;
+
+    }
+
+
     setValid(
         ratingInput,
         message,
@@ -358,10 +451,15 @@ function validateRating() {
 
 
 // ============================================================
-// FEEDBACK VALIDATION
+// 11. FEEDBACK VALIDATION
 // ============================================================
 
 function validateFeedback() {
+
+    if (!feedbackInput) {
+        return false;
+    }
+
 
     const value =
         feedbackInput.value.trim();
@@ -398,6 +496,19 @@ function validateFeedback() {
     }
 
 
+    if (value.length > 250) {
+
+        setInvalid(
+            feedbackInput,
+            message,
+            "Feedback cannot exceed 250 characters."
+        );
+
+        return false;
+
+    }
+
+
     setValid(
         feedbackInput,
         message,
@@ -410,7 +521,7 @@ function validateFeedback() {
 
 
 // ============================================================
-// SET VALID STATE
+// 12. SET VALID STATE
 // ============================================================
 
 function setValid(
@@ -419,6 +530,11 @@ function setValid(
     message
 ) {
 
+    if (!field) {
+        return;
+    }
+
+
     field.classList.remove(
         "input-invalid"
     );
@@ -428,17 +544,21 @@ function setValid(
     );
 
 
-    messageElement.textContent =
-        message;
+    if (messageElement) {
 
-    messageElement.className =
-        "field-message success";
+        messageElement.textContent =
+            message;
+
+        messageElement.className =
+            "field-message success";
+
+    }
 
 }
 
 
 // ============================================================
-// SET INVALID STATE
+// 13. SET INVALID STATE
 // ============================================================
 
 function setInvalid(
@@ -447,6 +567,11 @@ function setInvalid(
     message
 ) {
 
+    if (!field) {
+        return;
+    }
+
+
     field.classList.remove(
         "input-valid"
     );
@@ -456,17 +581,21 @@ function setInvalid(
     );
 
 
-    messageElement.textContent =
-        message;
+    if (messageElement) {
 
-    messageElement.className =
-        "field-message error";
+        messageElement.textContent =
+            message;
+
+        messageElement.className =
+            "field-message error";
+
+    }
 
 }
 
 
 // ============================================================
-// VALIDATE COMPLETE FORM
+// 14. COMPLETE FORM VALIDATION
 // ============================================================
 
 function validateForm() {
@@ -488,25 +617,34 @@ function validateForm() {
 
 
     return (
+
         nameValid &&
         emailValid &&
         categoryValid &&
         ratingValid &&
         feedbackValid
+
     );
 
 }
 
 
 // ============================================================
-// SETUP DOUBLE CLICK SUBMIT
+// 15. DOUBLE-CLICK SUBMIT EVENT
 // ============================================================
 
 function setupSubmitEvent() {
 
+    if (!submitButton) {
+        return;
+    }
+
+
     submitButton.addEventListener(
         "dblclick",
-        function () {
+        function (event) {
+
+            event.preventDefault();
 
             handleSubmit();
 
@@ -517,10 +655,10 @@ function setupSubmitEvent() {
 
 
 // ============================================================
-// HANDLE SUBMIT
+// 16. HANDLE SUBMIT
 // ============================================================
 
-function handleSubmit() {
+async function handleSubmit() {
 
     const isValid =
         validateForm();
@@ -538,34 +676,555 @@ function handleSubmit() {
     }
 
 
-    showStatus(
-        "Feedback submitted successfully!",
-        "success"
-    );
+    if (!submitButton) {
+        return;
+    }
 
 
-    confirmationSection.classList.remove(
-        "hidden"
-    );
+    submitButton.disabled = true;
+
+    submitButton.textContent =
+        "Submitting...";
 
 
-    confirmationSection.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-    });
+    try {
+
+        const feedbackData = {
+
+            name:
+                nameInput.value.trim(),
+
+            email:
+                emailInput.value
+                    .trim()
+                    .toLowerCase(),
+
+            category:
+                categoryInput.value,
+
+            rating:
+                Number(
+                    ratingInput.value
+                ),
+
+            message:
+                feedbackInput.value.trim()
+
+        };
+
+
+        console.log(
+            "Sending feedback:",
+            feedbackData
+        );
+
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/feedback`,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            feedbackData
+                        )
+
+                }
+            );
+
+
+        let result;
+
+        try {
+
+            result =
+                await response.json();
+
+        }
+
+        catch {
+
+            result = {};
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message ||
+                `Server returned status ${response.status}`
+            );
+
+        }
+
+
+        // ----------------------------------------------------
+        // SUCCESS
+        // ----------------------------------------------------
+
+        showStatus(
+            "Feedback submitted successfully!",
+            "success"
+        );
+
+
+        if (confirmationSection) {
+
+            confirmationSection.classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        console.log(
+            "Feedback stored in MySQL:",
+            result
+        );
+
+
+        // ----------------------------------------------------
+        // REFRESH DATABASE DATA
+        // ----------------------------------------------------
+
+        await loadFeedback();
+
+
+        if (confirmationSection) {
+
+            confirmationSection.scrollIntoView({
+
+                behavior: "smooth",
+
+                block: "center"
+
+            });
+
+        }
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "Feedback submission error:",
+            error
+        );
+
+
+        showStatus(
+            error.message ||
+            "Unable to submit feedback. Make sure the Node.js server is running on port 5000.",
+            "error"
+        );
+
+    }
+
+
+    finally {
+
+        submitButton.disabled = false;
+
+        submitButton.textContent =
+            "Submit Feedback";
+
+    }
 
 }
 
 
 // ============================================================
-// RESET EVENT
+// 17. LOAD FEEDBACK FROM MYSQL
+// ============================================================
+
+async function loadFeedback() {
+
+    try {
+
+        console.log(
+            "Loading feedback from MySQL..."
+        );
+
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/feedback`
+            );
+
+
+        let result;
+
+        try {
+
+            result =
+                await response.json();
+
+        }
+
+        catch {
+
+            result = {};
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message ||
+                `Server returned status ${response.status}`
+            );
+
+        }
+
+
+        const feedback =
+            Array.isArray(result.data)
+                ? result.data
+                : [];
+
+
+        // ----------------------------------------------------
+        // UPDATE STATISTICS
+        // ----------------------------------------------------
+
+        updateStatistics(
+            feedback
+        );
+
+
+        // ----------------------------------------------------
+        // UPDATE TABLE
+        // ----------------------------------------------------
+
+        displayFeedback(
+            feedback
+        );
+
+
+        console.log(
+            `Loaded ${feedback.length} feedback records`
+        );
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "Feedback loading error:",
+            error
+        );
+
+
+        if (feedbackTableBody) {
+
+            feedbackTableBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="6">
+
+                        Unable to load feedback.
+                        Make sure the Node.js server is running.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    }
+
+}
+
+
+// ============================================================
+// 18. UPDATE STATISTICS
+// ============================================================
+
+function updateStatistics(
+    feedback
+) {
+
+    const total =
+        feedback.length;
+
+
+    let average =
+        0;
+
+
+    if (total > 0) {
+
+        const totalRating =
+            feedback.reduce(
+                function (sum, item) {
+
+                    return (
+                        sum +
+                        Number(
+                            item.rating || 0
+                        )
+                    );
+
+                },
+                0
+            );
+
+
+        average =
+            totalRating / total;
+
+    }
+
+
+    if (totalFeedbackElement) {
+
+        totalFeedbackElement.textContent =
+            total;
+
+    }
+
+
+    if (averageRatingElement) {
+
+        averageRatingElement.textContent =
+            average.toFixed(1);
+
+    }
+
+}
+
+
+// ============================================================
+// 19. DISPLAY FEEDBACK TABLE
+// ============================================================
+
+function displayFeedback(
+    feedback
+) {
+
+    if (!feedbackTableBody) {
+        return;
+    }
+
+
+    if (
+        !Array.isArray(feedback) ||
+        feedback.length === 0
+    ) {
+
+        feedbackTableBody.innerHTML = `
+
+            <tr>
+
+                <td colspan="6">
+
+                    No feedback records found.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    feedbackTableBody.innerHTML =
+        feedback.map(
+            function (item) {
+
+                const date =
+                    formatDate(
+                        item.submitted_at ||
+                        item.created_at ||
+                        item.feedback_date
+                    );
+
+
+                const id =
+                    item.feedback_id ||
+                    item.id ||
+                    "";
+
+
+                const name =
+                    item.name ||
+                    "";
+
+
+                const category =
+                    item.category ||
+                    "";
+
+
+                const rating =
+                    item.rating ||
+                    "";
+
+
+                const message =
+                    item.message ||
+                    item.feedback ||
+                    "";
+
+
+                return `
+
+                    <tr>
+
+                        <td>
+                            ${escapeHTML(id)}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(name)}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(category)}
+                        </td>
+
+                        <td>
+                            ⭐ ${escapeHTML(rating)}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(message)}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(date)}
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+        ).join("");
+
+}
+
+
+// ============================================================
+// 20. FORMAT DATE
+// ============================================================
+
+function formatDate(
+    dateValue
+) {
+
+    if (!dateValue) {
+
+        return "—";
+
+    }
+
+
+    const date =
+        new Date(dateValue);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return String(
+            dateValue
+        );
+
+    }
+
+
+    return date.toLocaleString(
+        "en-IN",
+        {
+
+            day: "2-digit",
+
+            month: "short",
+
+            year: "numeric",
+
+            hour: "2-digit",
+
+            minute: "2-digit"
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// 21. HTML SECURITY FUNCTION
+// ============================================================
+
+function escapeHTML(
+    value
+) {
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+// ============================================================
+// 22. RESET EVENT
 // ============================================================
 
 function setupResetEvent() {
 
+    if (!resetButton) {
+        return;
+    }
+
+
     resetButton.addEventListener(
         "click",
-        function () {
+        function (event) {
+
+            event.preventDefault();
 
             resetForm();
 
@@ -576,29 +1235,43 @@ function setupResetEvent() {
 
 
 // ============================================================
-// RESET FORM
+// 23. RESET FORM
 // ============================================================
 
 function resetForm() {
 
-    feedbackForm.reset();
+    if (feedbackForm) {
+
+        feedbackForm.reset();
+
+    }
 
 
     const fields = [
+
         nameInput,
         emailInput,
         categoryInput,
         ratingInput,
         feedbackInput
+
     ];
 
 
     fields.forEach(
         function (field) {
 
+            if (!field) {
+                return;
+            }
+
+
             field.classList.remove(
+
                 "input-valid",
+
                 "input-invalid"
+
             );
 
         }
@@ -606,11 +1279,13 @@ function resetForm() {
 
 
     const messages = [
+
         "nameMessage",
         "emailMessage",
         "categoryMessage",
         "ratingMessage",
         "feedbackMessage"
+
     ];
 
 
@@ -620,10 +1295,16 @@ function resetForm() {
             const element =
                 document.getElementById(id);
 
-            element.textContent = "";
 
-            element.className =
-                "field-message";
+            if (element) {
+
+                element.textContent =
+                    "";
+
+                element.className =
+                    "field-message";
+
+            }
 
         }
     );
@@ -632,9 +1313,13 @@ function resetForm() {
     updateCharacterCount();
 
 
-    confirmationSection.classList.add(
-        "hidden"
-    );
+    if (confirmationSection) {
+
+        confirmationSection.classList.add(
+            "hidden"
+        );
+
+    }
 
 
     showStatus(
@@ -646,28 +1331,42 @@ function resetForm() {
 
 
 // ============================================================
-// CHARACTER COUNTER
+// 24. CHARACTER COUNTER
 // ============================================================
 
 function updateCharacterCount() {
 
+    if (
+        !feedbackInput ||
+        !characterCount
+    ) {
+
+        return;
+
+    }
+
+
     const length =
         feedbackInput.value.length;
 
+
     const maxLength =
-        feedbackInput.maxLength;
+        feedbackInput.maxLength || 250;
 
 
     characterCount.textContent =
         `${length} / ${maxLength}`;
 
 
-    if (length >= maxLength * 0.9) {
+    if (
+        length >= maxLength * 0.9
+    ) {
 
         characterCount.style.fontWeight =
             "800";
 
     }
+
     else {
 
         characterCount.style.fontWeight =
@@ -679,7 +1378,7 @@ function updateCharacterCount() {
 
 
 // ============================================================
-// SHOW STATUS
+// 25. SHOW STATUS
 // ============================================================
 
 function showStatus(
@@ -687,12 +1386,22 @@ function showStatus(
     type
 ) {
 
+    if (!statusMessage) {
+        return;
+    }
+
+
     statusMessage.textContent =
         message;
 
 
     statusMessage.className =
         `status-message ${type}`;
+
+
+    statusMessage.classList.remove(
+        "hidden"
+    );
 
 
     setTimeout(
@@ -710,38 +1419,64 @@ function showStatus(
 
 
 // ============================================================
-// KEYBOARD EVENT
+// 26. KEYBOARD EVENTS
 // ============================================================
 
-document.addEventListener(
-    "keydown",
-    function (event) {
+function setupKeyboardEvents() {
 
-        /*
-         * Pressing Enter while inside the form
-         * does not submit automatically.
-         *
-         * This demonstrates keyboard event handling.
-         */
+    document.addEventListener(
+        "keydown",
+        function (event) {
 
-        if (
-            event.key === "Enter" &&
-            event.ctrlKey
-        ) {
+            // Ctrl + Enter submits the form
+
+            if (
+                event.key === "Enter" &&
+                event.ctrlKey
+            ) {
+
+                event.preventDefault();
+
+                handleSubmit();
+
+            }
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// 27. PREVENT NORMAL FORM SUBMISSION
+// ============================================================
+
+if (feedbackForm) {
+
+    feedbackForm.addEventListener(
+        "submit",
+        function (event) {
 
             event.preventDefault();
 
-            handleSubmit();
+            showStatus(
+                "Please double-click the Submit Feedback button.",
+                "warning"
+            );
 
         }
+    );
 
-    }
+}
+
+
+// ============================================================
+// 28. CONSOLE INFORMATION
+// ============================================================
+
+console.log(
+    "=========================================="
 );
-
-
-// ============================================================
-// CONSOLE INFORMATION
-// ============================================================
 
 console.log(
     "StudentHub Task 07 loaded successfully."
@@ -760,5 +1495,37 @@ console.log(
 );
 
 console.log(
+    "Ctrl + Enter submit event: ACTIVE"
+);
+
+console.log(
     "Reusable validation functions: ACTIVE"
+);
+
+console.log(
+    "Character counter: ACTIVE"
+);
+
+console.log(
+    "Form reset event: ACTIVE"
+);
+
+console.log(
+    "MySQL API integration: ACTIVE"
+);
+
+console.log(
+    "Feedback loading: ACTIVE"
+);
+
+console.log(
+    "Statistics: ACTIVE"
+);
+
+console.log(
+    "HTML security escaping: ACTIVE"
+);
+
+console.log(
+    "=========================================="
 );

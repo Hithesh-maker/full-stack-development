@@ -1,39 +1,30 @@
 // ============================================================
-// STUDENTHUB — TASK 4
-// ORDER MANAGEMENT USING JOINS
+// STUDENTHUB — TASK 04
+// ORDER MANAGEMENT
+// Node.js + Express + MySQL
 // ============================================================
 
 
 // ============================================================
-// SUPABASE CONFIGURATION
+// 1. API CONFIGURATION
 // ============================================================
 
-const SUPABASE_URL =
-    "https://cppjrfaftlwlzmwgicxj.supabase.co";
-
-const SUPABASE_KEY =
-    "sb_publishable_-uuWKMVV61MAgUIdP21cQg_BDwtyIcb";
-
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+const ORDERS_API_URL =
+    "http://localhost:5000/api/orders";
 
 
 // ============================================================
-// DOM ELEMENTS
+// 2. DOM ELEMENTS
 // ============================================================
-
-const orderTableBody =
-    document.getElementById("orderTableBody");
 
 const loading =
     document.getElementById("loading");
 
 const errorMessage =
     document.getElementById("errorMessage");
+
+const orderTableBody =
+    document.getElementById("orderTableBody");
 
 const sortOrders =
     document.getElementById("sortOrders");
@@ -58,59 +49,14 @@ const totalCustomers =
 
 
 // ============================================================
-// DATA STORAGE
+// 3. ORDER DATA
 // ============================================================
 
-let orderData = [];
-
-
-// ============================================================
-// FORMAT CURRENCY
-// ============================================================
-
-function formatCurrency(amount) {
-
-    return new Intl.NumberFormat(
-        "en-IN",
-        {
-            style: "currency",
-            currency: "INR",
-            maximumFractionDigits: 2
-        }
-    ).format(Number(amount) || 0);
-}
+let orders = [];
 
 
 // ============================================================
-// FORMAT DATE
-// ============================================================
-
-function formatDate(date) {
-
-    if (!date) {
-        return "-";
-    }
-
-    const parsedDate =
-        new Date(date);
-
-    if (Number.isNaN(parsedDate.getTime())) {
-        return "-";
-    }
-
-    return parsedDate.toLocaleDateString(
-        "en-IN",
-        {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        }
-    );
-}
-
-
-// ============================================================
-// SHOW ERROR
+// 4. SHOW ERROR
 // ============================================================
 
 function showError(message) {
@@ -119,34 +65,30 @@ function showError(message) {
         return;
     }
 
-    errorMessage.textContent =
-        message;
+    errorMessage.textContent = message;
+    errorMessage.style.display = "block";
 
-    errorMessage.style.display =
-        "block";
 }
 
 
 // ============================================================
-// HIDE ERROR
+// 5. CLEAR ERROR
 // ============================================================
 
-function hideError() {
+function clearError() {
 
     if (!errorMessage) {
         return;
     }
 
-    errorMessage.textContent =
-        "";
+    errorMessage.textContent = "";
+    errorMessage.style.display = "none";
 
-    errorMessage.style.display =
-        "none";
 }
 
 
 // ============================================================
-// SET LOADING STATE
+// 6. LOADING STATE
 // ============================================================
 
 function setLoading(isLoading) {
@@ -157,421 +99,540 @@ function setLoading(isLoading) {
 
     loading.style.display =
         isLoading ? "flex" : "none";
+
 }
 
 
 // ============================================================
-// LOAD ORDER DATA
-// ============================================================
-//
-// Supabase RPC functions:
-//
-// 1. get_customer_order_history()
-//    JOIN + ORDER BY
-//
-// 2. get_highest_value_order()
-//    JOIN + SUBQUERY
-//
-// 3. get_most_active_customer()
-//    JOIN + SUBQUERY + GROUP BY
-//
+// 7. FORMAT CURRENCY
 // ============================================================
 
-async function loadOrderData() {
+function formatCurrency(amount) {
 
-    setLoading(true);
+    const value =
+        Number(amount) || 0;
 
-    hideError();
-
-
-    try {
-
-        // ====================================================
-        // 1. CUSTOMER ORDER HISTORY
-        // JOIN + ORDER BY
-        // ====================================================
-
-        const orderResult =
-            await supabaseClient.rpc(
-                "get_customer_order_history"
-            );
-
-
-        if (orderResult.error) {
-
-            console.error(
-                "Customer order history error:",
-                orderResult.error
-            );
-
-            throw new Error(
-                "Unable to load customer order history. " +
-                orderResult.error.message
-            );
-        }
-
-
-        // Always convert null into an empty array.
-        orderData =
-            Array.isArray(orderResult.data)
-                ? orderResult.data
-                : [];
-
-
-        // ====================================================
-        // 2. HIGHEST VALUE ORDER
-        // SUBQUERY
-        // ====================================================
-
-        const highestResult =
-            await supabaseClient.rpc(
-                "get_highest_value_order"
-            );
-
-
-        if (highestResult.error) {
-
-            console.error(
-                "Highest-value order error:",
-                highestResult.error
-            );
-
-            throw new Error(
-                "Unable to find the highest-value order. " +
-                highestResult.error.message
-            );
-        }
-
-
-        const highestOrders =
-            Array.isArray(highestResult.data)
-                ? highestResult.data
-                : [];
-
-
-        // ====================================================
-        // 3. MOST ACTIVE CUSTOMER
-        // SUBQUERY + GROUP BY
-        // ====================================================
-
-        const activeResult =
-            await supabaseClient.rpc(
-                "get_most_active_customer"
-            );
-
-
-        if (activeResult.error) {
-
-            console.error(
-                "Most-active customer error:",
-                activeResult.error
-            );
-
-            throw new Error(
-                "Unable to find the most-active customer. " +
-                activeResult.error.message
-            );
-        }
-
-
-        const activeCustomers =
-            Array.isArray(activeResult.data)
-                ? activeResult.data
-                : [];
-
-
-        // ====================================================
-        // UPDATE TOTAL ORDERS
-        // ====================================================
-
-        if (totalOrders) {
-
-            totalOrders.textContent =
-                orderData.length;
-        }
-
-
-        // ====================================================
-        // UPDATE TOTAL CUSTOMERS
-        // ====================================================
-        //
-        // Count unique customer IDs/names from the JOIN result.
-        //
-        // ====================================================
-
-        const uniqueCustomers =
-            new Set(
-                orderData.map(
-                    order => {
-
-                        return (
-                            order.customer_id ??
-                            order.customer_name
-                        );
-
-                    }
-                )
-            );
-
-
-        if (totalCustomers) {
-
-            totalCustomers.textContent =
-                uniqueCustomers.size;
-        }
-
-
-        // ====================================================
-        // UPDATE HIGHEST VALUE ORDER
-        // ====================================================
-
-        if (
-            highestOrders.length > 0
-        ) {
-
-            const highest =
-                highestOrders[0];
-
-
-            if (highestOrderAmount) {
-
-                highestOrderAmount.textContent =
-                    formatCurrency(
-                        highest.total_amount
-                    );
+    return "₹" +
+        value.toLocaleString(
+            "en-IN",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
             }
-
-
-            if (highestOrderProduct) {
-
-                highestOrderProduct.textContent =
-                    `${highest.customer_name || "Unknown Customer"} • ` +
-                    `${highest.product_name || "Unknown Product"}`;
-            }
-
-        } else {
-
-            if (highestOrderAmount) {
-
-                highestOrderAmount.textContent =
-                    "₹0";
-            }
-
-
-            if (highestOrderProduct) {
-
-                highestOrderProduct.textContent =
-                    "No orders available";
-            }
-        }
-
-
-        // ====================================================
-        // UPDATE MOST ACTIVE CUSTOMER
-        // ====================================================
-
-        if (
-            activeCustomers.length > 0
-        ) {
-
-            const active =
-                activeCustomers[0];
-
-
-            if (activeCustomer) {
-
-                activeCustomer.textContent =
-                    active.customer_name ||
-                    "Unknown Customer";
-            }
-
-
-            if (activeCustomerOrders) {
-
-                const count =
-                    Number(
-                        active.order_count
-                    ) || 0;
-
-
-                activeCustomerOrders.textContent =
-                    `${count} order${
-                        count === 1
-                            ? ""
-                            : "s"
-                    }`;
-            }
-
-        } else {
-
-            if (activeCustomer) {
-
-                activeCustomer.textContent =
-                    "None";
-            }
-
-
-            if (activeCustomerOrders) {
-
-                activeCustomerOrders.textContent =
-                    "No orders available";
-            }
-        }
-
-
-        // ====================================================
-        // DISPLAY ORDER TABLE
-        // ====================================================
-
-        renderOrders(
-            orderData
         );
 
-    }
-
-    catch (error) {
-
-        console.error(
-            "Task 4 dashboard error:",
-            error
-        );
-
-
-        // Clear stale data if the request failed.
-        orderData = [];
-
-
-        if (totalOrders) {
-            totalOrders.textContent = "0";
-        }
-
-
-        if (totalCustomers) {
-            totalCustomers.textContent = "0";
-        }
-
-
-        if (highestOrderAmount) {
-            highestOrderAmount.textContent = "₹0";
-        }
-
-
-        if (highestOrderProduct) {
-            highestOrderProduct.textContent =
-                "No data available";
-        }
-
-
-        if (activeCustomer) {
-            activeCustomer.textContent =
-                "None";
-        }
-
-
-        if (activeCustomerOrders) {
-            activeCustomerOrders.textContent =
-                "No data available";
-        }
-
-
-        if (orderTableBody) {
-
-            orderTableBody.innerHTML = `
-                <tr>
-                    <td
-                        colspan="7"
-                        class="empty-row"
-                    >
-                        Unable to load order data.
-                    </td>
-                </tr>
-            `;
-        }
-
-
-        showError(
-            error.message ||
-            "Unable to load the order management dashboard."
-        );
-
-    }
-
-    finally {
-
-        setLoading(false);
-    }
 }
 
 
 // ============================================================
-// RENDER ORDERS
-// ============================================================
-//
-// RPC returns:
-//
-// order_id
-// customer_name
-// product_name
-// category
-// quantity
-// total_amount
-// order_date
-//
+// 8. FORMAT DATE
 // ============================================================
 
-function renderOrders(orders) {
+function formatDate(dateValue) {
+
+    if (!dateValue) {
+        return "N/A";
+    }
+
+    const date =
+        new Date(dateValue);
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return String(dateValue);
+    }
+
+    return date.toLocaleString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+
+}
+
+
+// ============================================================
+// 9. ESCAPE HTML
+// ============================================================
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// ============================================================
+// 10. GET ITEM TOTAL
+// ============================================================
+// Uses API total_amount first.
+// If total_amount is unavailable,
+// quantity × unit_price is used as fallback.
+
+function getItemTotal(order) {
+
+    if (
+        order.total_amount !== undefined &&
+        order.total_amount !== null &&
+        order.total_amount !== ""
+    ) {
+
+        const apiTotal =
+            Number(order.total_amount);
+
+        if (!Number.isNaN(apiTotal)) {
+            return apiTotal;
+        }
+
+    }
+
+
+    const quantity =
+        Number(order.quantity) || 0;
+
+    const unitPrice =
+        Number(order.unit_price) || 0;
+
+    return quantity * unitPrice;
+
+}
+
+
+// ============================================================
+// 11. CALCULATE ORDER SUMMARIES
+// ============================================================
+// Multiple rows may belong to the same order.
+//
+// Example:
+//
+// Order #1
+// Laptop       ₹55,000
+// Keyboard      ₹1,500
+// --------------------
+// Total        ₹56,500
+//
+// This function groups rows by order_id.
+
+function calculateOrderSummaries(data) {
+
+    const orderMap = {};
+
+
+    data.forEach(order => {
+
+        const orderId =
+            order.order_id;
+
+
+        if (!orderMap[orderId]) {
+
+            orderMap[orderId] = {
+
+                order_id:
+                    order.order_id,
+
+                customer_id:
+                    order.customer_id ?? null,
+
+                customer_name:
+                    order.customer_name ||
+                    "Unknown",
+
+                order_date:
+                    order.order_date,
+
+                total_amount:
+                    0,
+
+                products:
+                    []
+
+            };
+
+        }
+
+
+        const itemTotal =
+            getItemTotal(order);
+
+
+        orderMap[orderId].total_amount +=
+            itemTotal;
+
+
+        orderMap[orderId].products.push({
+
+            product_name:
+                order.product_name ||
+                "Product",
+
+            quantity:
+                Number(order.quantity) || 0,
+
+            unit_price:
+                Number(order.unit_price) || 0
+
+        });
+
+    });
+
+
+    return Object.values(orderMap);
+
+}
+
+
+// ============================================================
+// 12. RENDER ORDERS
+// ============================================================
+
+function renderOrders(data) {
 
     if (!orderTableBody) {
-
-        console.error(
-            "HTML element #orderTableBody was not found."
-        );
-
         return;
     }
 
 
-    orderTableBody.innerHTML =
-        "";
+    orderTableBody.innerHTML = "";
 
 
-    // ========================================================
-    // EMPTY DATA
-    // ========================================================
+    // --------------------------------------------------------
+    // NO DATA
+    // --------------------------------------------------------
 
     if (
-        !Array.isArray(orders) ||
-        orders.length === 0
+        !data ||
+        data.length === 0
     ) {
 
         orderTableBody.innerHTML = `
+
             <tr>
-                <td
-                    colspan="7"
-                    class="empty-row"
-                >
-                    No orders found.
+
+                <td colspan="7">
+
+                    <div class="empty-order-state">
+
+                        <div>
+                            📦
+                        </div>
+
+                        <strong>
+                            No orders found
+                        </strong>
+
+                        <span>
+                            There are currently no
+                            orders in the database.
+                        </span>
+
+                    </div>
+
                 </td>
+
             </tr>
+
         `;
 
         return;
+
     }
 
 
-    // ========================================================
+    // --------------------------------------------------------
     // CREATE TABLE ROWS
-    // ========================================================
+    // --------------------------------------------------------
 
-    orders.forEach(order => {
+    data.forEach(order => {
 
         const row =
             document.createElement("tr");
 
 
-        const orderId =
-            order.order_id ??
-            "-";
+        row.innerHTML = `
+
+            <td>
+
+                <strong>
+                    #${escapeHTML(
+                        order.order_id
+                    )}
+                </strong>
+
+            </td>
+
+
+            <td>
+
+                ${escapeHTML(
+                    order.customer_name ||
+                    "N/A"
+                )}
+
+            </td>
+
+
+            <td>
+
+                ${escapeHTML(
+                    order.product_name ||
+                    "N/A"
+                )}
+
+            </td>
+
+
+            <td>
+
+                ${escapeHTML(
+                    order.quantity ?? 0
+                )}
+
+            </td>
+
+
+            <td>
+
+                ${formatCurrency(
+                    order.unit_price
+                )}
+
+            </td>
+
+
+            <td>
+
+                <strong>
+
+                    ${formatCurrency(
+                        getItemTotal(order)
+                    )}
+
+                </strong>
+
+            </td>
+
+
+            <td>
+
+                ${formatDate(
+                    order.order_date
+                )}
+
+            </td>
+
+        `;
+
+
+        orderTableBody.appendChild(row);
+
+    });
+
+}
+
+
+// ============================================================
+// 13. UPDATE DASHBOARD
+// ============================================================
+
+function updateDashboard(data) {
+
+    // --------------------------------------------------------
+    // EMPTY DATA
+    // --------------------------------------------------------
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        if (highestOrderAmount) {
+
+            highestOrderAmount.textContent =
+                "₹0.00";
+
+        }
+
+
+        if (highestOrderProduct) {
+
+            highestOrderProduct.textContent =
+                "No data available";
+
+        }
+
+
+        if (activeCustomer) {
+
+            activeCustomer.textContent =
+                "None";
+
+        }
+
+
+        if (activeCustomerOrders) {
+
+            activeCustomerOrders.textContent =
+                "No data available";
+
+        }
+
+
+        if (totalOrders) {
+
+            totalOrders.textContent =
+                "0";
+
+        }
+
+
+        if (totalCustomers) {
+
+            totalCustomers.textContent =
+                "0";
+
+        }
+
+        return;
+
+    }
+
+
+    // ========================================================
+    // ORDER SUMMARIES
+    // ========================================================
+
+    const orderSummaries =
+        calculateOrderSummaries(data);
+
+
+    // ========================================================
+    // HIGHEST VALUE ORDER
+    // ========================================================
+
+    const highest =
+        orderSummaries.reduce(
+            (max, order) => {
+
+                return Number(
+                    order.total_amount
+                ) >
+                Number(
+                    max.total_amount
+                )
+                    ? order
+                    : max;
+
+            },
+            orderSummaries[0]
+        );
+
+
+    if (highestOrderAmount) {
+
+        highestOrderAmount.textContent =
+            formatCurrency(
+                highest.total_amount
+            );
+
+    }
+
+
+    if (highestOrderProduct) {
+
+        const productNames =
+            highest.products
+                .map(
+                    product =>
+                        product.product_name
+                )
+                .join(" + ");
+
+
+        highestOrderProduct.textContent =
+            `${productNames} • Order #${highest.order_id}`;
+
+    }
+
+
+    // ========================================================
+    // TOTAL ORDERS
+    // ========================================================
+
+    if (totalOrders) {
+
+        totalOrders.textContent =
+            orderSummaries.length;
+
+    }
+
+
+    // ========================================================
+    // TOTAL CUSTOMERS
+    // ========================================================
+    // API currently provides customer_name,
+    // so names are used when customer_id is unavailable.
+
+    const customerSet =
+        new Set();
+
+
+    orderSummaries.forEach(order => {
+
+        const customerKey =
+            order.customer_id ??
+            order.customer_name ??
+            "Unknown";
+
+
+        customerSet.add(
+            customerKey
+        );
+
+    });
+
+
+    if (totalCustomers) {
+
+        totalCustomers.textContent =
+            customerSet.size;
+
+    }
+
+
+    // ========================================================
+    // MOST ACTIVE CUSTOMER
+    // ========================================================
+
+    const customerCounts = {};
+
+
+    orderSummaries.forEach(order => {
+
+        const customerKey =
+            order.customer_id ??
+            order.customer_name ??
+            "Unknown";
 
 
         const customerName =
@@ -579,244 +640,556 @@ function renderOrders(orders) {
             "Unknown";
 
 
-        const productName =
-            order.product_name ||
-            "Unknown";
+        if (!customerCounts[customerKey]) {
+
+            customerCounts[customerKey] = {
+
+                name:
+                    customerName,
+
+                orders:
+                    0
+
+            };
+
+        }
 
 
-        const category =
-            order.category ||
-            "—";
-
-
-        const quantity =
-            order.quantity ??
-            0;
-
-
-        const amount =
-            formatCurrency(
-                order.total_amount
-            );
-
-
-        const date =
-            formatDate(
-                order.order_date
-            );
-
-
-        row.innerHTML = `
-
-            <td>
-                #${escapeHTML(orderId)}
-            </td>
-
-            <td class="customer-name">
-                ${escapeHTML(customerName)}
-            </td>
-
-            <td class="product-name">
-                ${escapeHTML(productName)}
-            </td>
-
-            <td>
-
-                <span class="category">
-                    ${escapeHTML(category)}
-                </span>
-
-            </td>
-
-            <td>
-                ${escapeHTML(quantity)}
-            </td>
-
-            <td class="amount">
-                ${amount}
-            </td>
-
-            <td>
-                ${escapeHTML(date)}
-            </td>
-
-        `;
-
-
-        orderTableBody.appendChild(
-            row
-        );
+        customerCounts[customerKey].orders++;
 
     });
-}
 
 
-// ============================================================
-// SORT ORDERS
-// ============================================================
-
-function sortOrderData(type) {
-
-    const sorted =
-        [...orderData];
+    const customersList =
+        Object.values(
+            customerCounts
+        );
 
 
-    switch (type) {
+    if (
+        customersList.length === 0
+    ) {
+
+        if (activeCustomer) {
+
+            activeCustomer.textContent =
+                "None";
+
+        }
 
 
-        // ----------------------------------------------------
-        // NEWEST FIRST
-        // ----------------------------------------------------
+        if (activeCustomerOrders) {
 
-        case "date-desc":
+            activeCustomerOrders.textContent =
+                "No data available";
 
-            sorted.sort(
-                (a, b) =>
-                    new Date(b.order_date) -
-                    new Date(a.order_date)
-            );
+        }
 
-            break;
+        return;
 
-
-        // ----------------------------------------------------
-        // OLDEST FIRST
-        // ----------------------------------------------------
-
-        case "date-asc":
-
-            sorted.sort(
-                (a, b) =>
-                    new Date(a.order_date) -
-                    new Date(b.order_date)
-            );
-
-            break;
-
-
-        // ----------------------------------------------------
-        // HIGHEST AMOUNT
-        // ----------------------------------------------------
-
-        case "amount-desc":
-
-            sorted.sort(
-                (a, b) =>
-                    Number(b.total_amount) -
-                    Number(a.total_amount)
-            );
-
-            break;
-
-
-        // ----------------------------------------------------
-        // LOWEST AMOUNT
-        // ----------------------------------------------------
-
-        case "amount-asc":
-
-            sorted.sort(
-                (a, b) =>
-                    Number(a.total_amount) -
-                    Number(b.total_amount)
-            );
-
-            break;
-
-
-        // ----------------------------------------------------
-        // CUSTOMER NAME
-        // ----------------------------------------------------
-
-        case "customer":
-
-            sorted.sort(
-                (a, b) => {
-
-                    const customerA =
-                        String(
-                            a.customer_name || ""
-                        );
-
-                    const customerB =
-                        String(
-                            b.customer_name || ""
-                        );
-
-
-                    return customerA.localeCompare(
-                        customerB
-                    );
-                }
-            );
-
-            break;
-
-
-        // ----------------------------------------------------
-        // DEFAULT
-        // ----------------------------------------------------
-
-        default:
-
-            break;
     }
 
 
-    renderOrders(
-        sorted
-    );
-}
+    // ========================================================
+    // FIND HIGHEST ORDER COUNT
+    // ========================================================
 
-
-// ============================================================
-// ESCAPE HTML
-// ============================================================
-
-function escapeHTML(value) {
-
-    const div =
-        document.createElement("div");
-
-
-    div.textContent =
-        String(
-            value ?? ""
+    const highestCustomerCount =
+        Math.max(
+            ...customersList.map(
+                customer =>
+                    customer.orders
+            )
         );
 
 
-    return div.innerHTML;
+    // ========================================================
+    // FIND TOP CUSTOMERS
+    // ========================================================
+
+    const topCustomers =
+        customersList.filter(
+            customer =>
+                customer.orders ===
+                highestCustomerCount
+        );
+
+
+    // ========================================================
+    // DISPLAY CUSTOMER NAMES
+    // ========================================================
+
+    if (
+        topCustomers.length > 1
+    ) {
+
+        const tiedCustomerNames =
+            topCustomers
+                .map(
+                    customer =>
+                        customer.name
+                )
+                .join(" & ");
+
+
+        if (activeCustomer) {
+
+            activeCustomer.textContent =
+                tiedCustomerNames;
+
+        }
+
+
+        if (activeCustomerOrders) {
+
+            activeCustomerOrders.textContent =
+                `${highestCustomerCount} order` +
+                `${highestCustomerCount === 1 ? "" : "s"} each`;
+
+        }
+
+    }
+
+
+    // ========================================================
+    // SINGLE MOST ACTIVE CUSTOMER
+    // ========================================================
+
+    else {
+
+        const mostActive =
+            topCustomers[0];
+
+
+        if (activeCustomer) {
+
+            activeCustomer.textContent =
+                mostActive
+                    ? mostActive.name
+                    : "None";
+
+        }
+
+
+        if (activeCustomerOrders) {
+
+            activeCustomerOrders.textContent =
+                mostActive
+                    ? `${mostActive.orders} order` +
+                      `${mostActive.orders === 1 ? "" : "s"}`
+                    : "No data available";
+
+        }
+
+    }
+
 }
 
 
 // ============================================================
-// SORT EVENT
+// 14. SORT ORDERS
+// ============================================================
+
+function sortOrderData() {
+
+    const sortType =
+        sortOrders
+            ? sortOrders.value
+            : "date-desc";
+
+
+    const sorted =
+        [...orders];
+
+
+    // ========================================================
+    // NEWEST ORDER
+    // ========================================================
+
+    if (
+        sortType === "date-desc"
+    ) {
+
+        sorted.sort(
+            (a, b) =>
+                new Date(
+                    b.order_date
+                ) -
+                new Date(
+                    a.order_date
+                )
+        );
+
+    }
+
+
+    // ========================================================
+    // OLDEST ORDER
+    // ========================================================
+
+    else if (
+        sortType === "date-asc"
+    ) {
+
+        sorted.sort(
+            (a, b) =>
+                new Date(
+                    a.order_date
+                ) -
+                new Date(
+                    b.order_date
+                )
+        );
+
+    }
+
+
+    // ========================================================
+    // HIGHEST AMOUNT
+    // ========================================================
+
+    else if (
+        sortType === "amount-desc"
+    ) {
+
+        sorted.sort(
+            (a, b) =>
+                getItemTotal(b) -
+                getItemTotal(a)
+        );
+
+    }
+
+
+    // ========================================================
+    // LOWEST AMOUNT
+    // ========================================================
+
+    else if (
+        sortType === "amount-asc"
+    ) {
+
+        sorted.sort(
+            (a, b) =>
+                getItemTotal(a) -
+                getItemTotal(b)
+        );
+
+    }
+
+
+    // ========================================================
+    // CUSTOMER NAME
+    // ========================================================
+
+    else if (
+        sortType === "customer"
+    ) {
+
+        sorted.sort(
+            (a, b) =>
+                String(
+                    a.customer_name || ""
+                ).localeCompare(
+                    String(
+                        b.customer_name || ""
+                    )
+                )
+        );
+
+    }
+
+
+    renderOrders(sorted);
+
+}
+
+
+// ============================================================
+// 15. LOAD ORDERS
+// ============================================================
+
+async function loadOrders() {
+
+    setLoading(true);
+    clearError();
+
+
+    try {
+
+        console.log(
+            "======================================"
+        );
+
+        console.log(
+            "StudentHub Task 04"
+        );
+
+        console.log(
+            "Fetching orders from:"
+        );
+
+        console.log(
+            ORDERS_API_URL
+        );
+
+        console.log(
+            "======================================"
+        );
+
+
+        const response =
+            await fetch(
+                ORDERS_API_URL
+            );
+
+
+        // ====================================================
+        // HTTP ERROR
+        // ====================================================
+
+        if (!response.ok) {
+
+            let serverMessage =
+                "";
+
+
+            try {
+
+                const errorData =
+                    await response.json();
+
+
+                serverMessage =
+                    errorData.message ||
+                    "";
+
+            }
+
+            catch {
+
+                // Server did not return JSON.
+
+            }
+
+
+            throw new Error(
+
+                serverMessage
+                    ? `${serverMessage} (HTTP ${response.status})`
+                    : `Server returned HTTP ${response.status}`
+
+            );
+
+        }
+
+
+        // ====================================================
+        // READ JSON
+        // ====================================================
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "StudentHub Order Response:",
+            result
+        );
+
+
+        // ====================================================
+        // VALIDATE API RESPONSE
+        // ====================================================
+
+        if (
+            Array.isArray(result)
+        ) {
+
+            orders =
+                result;
+
+        }
+
+        else if (
+            result &&
+            Array.isArray(
+                result.data
+            )
+        ) {
+
+            orders =
+                result.data;
+
+        }
+
+        else {
+
+            throw new Error(
+                result?.message ||
+                "Invalid order data received from server."
+            );
+
+        }
+
+
+        // ====================================================
+        // SUCCESS
+        // ====================================================
+
+        console.log(
+            `✓ Loaded ${orders.length} order record(s)`
+        );
+
+
+        console.log(
+            "Orders:",
+            orders
+        );
+
+
+        // ====================================================
+        // UPDATE DASHBOARD
+        // ====================================================
+
+        updateDashboard(
+            orders
+        );
+
+
+        // ====================================================
+        // RENDER TABLE
+        // ====================================================
+
+        sortOrderData();
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "StudentHub Order Error:",
+            error
+        );
+
+
+        orders = [];
+
+
+        updateDashboard([]);
+
+
+        let message =
+            error.message ||
+            "Unknown error occurred.";
+
+
+        // ====================================================
+        // CONNECTION ERROR
+        // ====================================================
+
+        if (
+            error.message ===
+            "Failed to fetch"
+        ) {
+
+            message =
+                "Unable to connect to the StudentHub server. " +
+                "Make sure Node.js is running on port 5000.";
+
+        }
+
+
+        showError(
+            message
+        );
+
+
+        if (orderTableBody) {
+
+            orderTableBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="7">
+
+                        <div class="order-error-state">
+
+                            <div>
+                                ⚠️
+                            </div>
+
+                            <strong>
+                                Unable to load order data
+                            </strong>
+
+                            <span>
+                                ${escapeHTML(
+                                    message
+                                )}
+                            </span>
+
+                            <small>
+                                Make sure the Node.js server
+                                is running on port 5000.
+                            </small>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    }
+
+    finally {
+
+        setLoading(false);
+
+    }
+
+}
+
+
+// ============================================================
+// 16. SORT EVENT
 // ============================================================
 
 if (sortOrders) {
 
     sortOrders.addEventListener(
         "change",
-        () => {
-
-            sortOrderData(
-                sortOrders.value
-            );
-
-        }
+        sortOrderData
     );
+
 }
 
 
 // ============================================================
-// START APPLICATION
+// 17. PAGE LOAD
 // ============================================================
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
+    function () {
 
-        loadOrderData();
+        console.log(
+            "StudentHub Task 04 loaded."
+        );
+
+
+        console.log(
+            "Orders API:",
+            ORDERS_API_URL
+        );
+
+
+        loadOrders();
 
     }
 );

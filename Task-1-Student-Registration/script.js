@@ -1,29 +1,25 @@
 // ============================================================
-// STUDENTHUB — STUDENT REGISTRATION
-// Task 01: Student Registration & Data Storage
+// STUDENTHUB — TASK 01
+// STUDENT REGISTRATION & DATA STORAGE
+// ============================================================
+// Frontend : HTML + CSS + JavaScript
+// Backend  : Node.js + Express
+// Database : MySQL
 // ============================================================
 
 
 // ============================================================
-// SUPABASE CONFIGURATION
+// 1. API CONFIGURATION
 // ============================================================
 
-const SUPABASE_URL =
-    "https://cppjrfaftlwlzmwgicxj.supabase.co";
+const API_BASE_URL = "http://localhost:5000";
 
-const SUPABASE_KEY =
-    "sb_publishable_-uuWKMVV61MAgUIdP21cQg_BDwtyIcb";
-
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+const STUDENTS_API =
+    `${API_BASE_URL}/api/students`;
 
 
 // ============================================================
-// DOM ELEMENTS
+// 2. DOM ELEMENTS
 // ============================================================
 
 const form =
@@ -41,6 +37,9 @@ const nameInput =
 const emailInput =
     document.getElementById("email");
 
+const passwordInput =
+    document.getElementById("password");
+
 const dobInput =
     document.getElementById("dob");
 
@@ -50,34 +49,78 @@ const departmentInput =
 const phoneInput =
     document.getElementById("phone");
 
+const yearInput =
+    document.getElementById("year");
+
 
 // ============================================================
-// APPLICATION CHECK
+// 3. CHECK REQUIRED ELEMENTS
 // ============================================================
 
-if (
-    !form ||
-    !message ||
-    !submitBtn ||
-    !nameInput ||
-    !emailInput ||
-    !dobInput ||
-    !departmentInput ||
-    !phoneInput
-) {
-
+if (!form) {
     console.error(
-        "StudentHub: Required form elements were not found."
+        "StudentHub: studentForm not found."
     );
+}
 
+if (!submitBtn) {
+    console.error(
+        "StudentHub: submitBtn not found."
+    );
+}
+
+if (!nameInput) {
+    console.error(
+        "StudentHub: name input not found."
+    );
+}
+
+if (!emailInput) {
+    console.error(
+        "StudentHub: email input not found."
+    );
+}
+
+if (!passwordInput) {
+    console.error(
+        "StudentHub: password input not found."
+    );
+}
+
+if (!dobInput) {
+    console.error(
+        "StudentHub: dob input not found."
+    );
+}
+
+if (!departmentInput) {
+    console.error(
+        "StudentHub: department input not found."
+    );
+}
+
+if (!phoneInput) {
+    console.error(
+        "StudentHub: phone input not found."
+    );
+}
+
+if (!yearInput) {
+    console.error(
+        "StudentHub: year input not found."
+    );
 }
 
 
 // ============================================================
-// PREVENT FUTURE DATE SELECTION
+// 4. SET MAXIMUM DATE FOR DOB
 // ============================================================
 
-if (dobInput) {
+function setDobMaximumDate() {
+
+    if (!dobInput) {
+        return;
+    }
 
     const today =
         new Date()
@@ -85,12 +128,13 @@ if (dobInput) {
             .split("T")[0];
 
     dobInput.max = today;
-
 }
+
+setDobMaximumDate();
 
 
 // ============================================================
-// FORM SUBMISSION
+// 5. FORM SUBMISSION
 // ============================================================
 
 if (form) {
@@ -104,7 +148,7 @@ if (form) {
 
 
 // ============================================================
-// REGISTRATION FUNCTION
+// 6. HANDLE STUDENT REGISTRATION
 // ============================================================
 
 async function handleRegistration(event) {
@@ -113,7 +157,7 @@ async function handleRegistration(event) {
 
 
     // --------------------------------------------------------
-    // GET VALUES
+    // GET FORM VALUES
     // --------------------------------------------------------
 
     const name =
@@ -124,34 +168,42 @@ async function handleRegistration(event) {
             .trim()
             .toLowerCase();
 
+    const password =
+        passwordInput.value;
+
     const dob =
         dobInput.value;
 
     const department =
-        departmentInput.value;
+        departmentInput.value.trim();
 
     const phone =
         phoneInput.value.trim();
 
+    const year =
+        yearInput.value;
+
 
     // --------------------------------------------------------
-    // CLEAR PREVIOUS MESSAGE
+    // CLEAR OLD MESSAGE
     // --------------------------------------------------------
 
     clearMessage();
 
 
     // --------------------------------------------------------
-    // VALIDATE FORM
+    // VALIDATE DATA
     // --------------------------------------------------------
 
     const validationError =
         validateStudentData(
             name,
             email,
+            password,
             dob,
             department,
-            phone
+            phone,
+            year
         );
 
 
@@ -163,12 +215,11 @@ async function handleRegistration(event) {
         );
 
         return;
-
     }
 
 
     // --------------------------------------------------------
-    // DISABLE SUBMIT BUTTON
+    // LOADING STATE
     // --------------------------------------------------------
 
     setLoadingState(true);
@@ -176,58 +227,141 @@ async function handleRegistration(event) {
 
     try {
 
-
-        // ====================================================
-        // INSERT INTO SUPABASE
-        // ====================================================
-        //
-        // IMPORTANT:
-        // We intentionally DO NOT use .select()
-        //
-        // This keeps the public browser operation
-        // INSERT-only for privacy.
-        //
-        // ====================================================
-
-        const { error } =
-            await supabaseClient
-                .from("students")
-                .insert([
-                    {
-                        name: name,
-                        email: email,
-                        dob: dob,
-                        department: department,
-                        phone: phone
-                    }
-                ]);
+        console.log(
+            "StudentHub: Sending registration request..."
+        );
 
 
         // ----------------------------------------------------
-        // DATABASE ERROR
+        // DATA BEING SENT
         // ----------------------------------------------------
 
-        if (error) {
+        const studentData = {
 
-            console.error(
-                "StudentHub Supabase Error:",
-                error
+            name: name,
+
+            email: email,
+
+            password: password,
+
+            dob: dob,
+
+            department: department,
+
+            phone: phone,
+
+            year: Number(year)
+
+        };
+
+
+        console.log(
+            "StudentHub Request:",
+            {
+                ...studentData,
+                password: "********"
+            }
+        );
+
+
+        // ====================================================
+        // SEND REQUEST TO NODE.JS
+        // ====================================================
+
+        const response =
+            await fetch(
+                STUDENTS_API,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            studentData
+                        )
+
+                }
             );
 
 
-            handleDatabaseError(error);
+        // ====================================================
+        // READ SERVER RESPONSE
+        // ====================================================
 
-            return;
+        const responseText =
+            await response.text();
+
+        let result;
+
+
+        try {
+
+            result =
+                responseText
+                    ? JSON.parse(responseText)
+                    : {};
 
         }
 
+        catch (jsonError) {
 
-        // ----------------------------------------------------
-        // SUCCESS
-        // ----------------------------------------------------
+            console.error(
+                "StudentHub: Invalid JSON response.",
+                jsonError
+            );
+
+            console.error(
+                "Raw server response:",
+                responseText
+            );
+
+
+            showMessage(
+                `Server returned an invalid response (${response.status}). Check the Node.js terminal.`,
+                "error"
+            );
+
+            return;
+        }
+
 
         console.log(
-            "Student registration successful."
+            "StudentHub API Response:",
+            result
+        );
+
+
+        // ====================================================
+        // HANDLE API ERROR
+        // ====================================================
+
+        if (
+            !response.ok ||
+            result.success === false
+        ) {
+
+            handleDatabaseError(
+                result,
+                response.status
+            );
+
+            return;
+        }
+
+
+        // ====================================================
+        // SUCCESS
+        // ====================================================
+
+        console.log(
+            "✓ Student saved successfully."
         );
 
 
@@ -237,49 +371,53 @@ async function handleRegistration(event) {
         );
 
 
-        // ----------------------------------------------------
+        // ====================================================
         // RESET FORM
-        // ----------------------------------------------------
+        // ====================================================
 
         form.reset();
 
-
-        // Restore today's maximum DOB
-        if (dobInput) {
-
-            dobInput.max =
-                new Date()
-                    .toISOString()
-                    .split("T")[0];
-
-        }
+        setDobMaximumDate();
 
 
-    } catch (error) {
+    }
 
+    catch (error) {
 
-        // ----------------------------------------------------
-        // UNEXPECTED ERROR
-        // ----------------------------------------------------
+        // ====================================================
+        // NETWORK / SERVER CONNECTION ERROR
+        // ====================================================
 
         console.error(
-            "StudentHub Unexpected Error:",
+            "StudentHub connection error:",
             error
         );
 
 
-        showMessage(
-            "Something went wrong. Please try again.",
-            "error"
-        );
+        if (
+            error instanceof TypeError
+        ) {
 
+            showMessage(
+                "Unable to connect to StudentHub. Make sure Node.js is running on http://localhost:5000.",
+                "error"
+            );
 
-    } finally {
+        }
 
+        else {
 
-        // ----------------------------------------------------
-        // ENABLE BUTTON
-        // ----------------------------------------------------
+            showMessage(
+                error.message ||
+                "Registration failed. Please check the Node.js server.",
+                "error"
+            );
+
+        }
+
+    }
+
+    finally {
 
         setLoadingState(false);
 
@@ -289,15 +427,17 @@ async function handleRegistration(event) {
 
 
 // ============================================================
-// VALIDATION
+// 7. VALIDATE STUDENT DATA
 // ============================================================
 
 function validateStudentData(
     name,
     email,
+    password,
     dob,
     department,
-    phone
+    phone,
+    year
 ) {
 
 
@@ -308,9 +448,11 @@ function validateStudentData(
     if (
         !name ||
         !email ||
+        !password ||
         !dob ||
         !department ||
-        !phone
+        !phone ||
+        !year
     ) {
 
         return (
@@ -321,14 +463,16 @@ function validateStudentData(
 
 
     // --------------------------------------------------------
-    // NAME
+    // NAME VALIDATION
     // --------------------------------------------------------
 
     const namePattern =
         /^[A-Za-z\s.'-]{2,100}$/;
 
 
-    if (!namePattern.test(name)) {
+    if (
+        !namePattern.test(name)
+    ) {
 
         return (
             "Please enter a valid full name."
@@ -338,14 +482,16 @@ function validateStudentData(
 
 
     // --------------------------------------------------------
-    // EMAIL
+    // EMAIL VALIDATION
     // --------------------------------------------------------
 
     const emailPattern =
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
-    if (!emailPattern.test(email)) {
+    if (
+        !emailPattern.test(email)
+    ) {
 
         return (
             "Please enter a valid email address."
@@ -355,15 +501,40 @@ function validateStudentData(
 
 
     // --------------------------------------------------------
-    // DATE OF BIRTH
+    // PASSWORD VALIDATION
+    // --------------------------------------------------------
+
+    if (
+        password.length < 6
+    ) {
+
+        return (
+            "Password must contain at least 6 characters."
+        );
+
+    }
+
+
+    if (
+        password.length > 255
+    ) {
+
+        return (
+            "Password cannot exceed 255 characters."
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // DATE OF BIRTH VALIDATION
     // --------------------------------------------------------
 
     const selectedDate =
-        new Date(dob);
+        new Date(`${dob}T00:00:00`);
 
     const today =
         new Date();
-
 
     today.setHours(
         0,
@@ -386,7 +557,9 @@ function validateStudentData(
     }
 
 
-    if (selectedDate > today) {
+    if (
+        selectedDate > today
+    ) {
 
         return (
             "Date of birth cannot be in the future."
@@ -396,10 +569,12 @@ function validateStudentData(
 
 
     // --------------------------------------------------------
-    // DEPARTMENT
+    // DEPARTMENT VALIDATION
     // --------------------------------------------------------
 
-    if (!department) {
+    if (
+        !department
+    ) {
 
         return (
             "Please select a department."
@@ -409,14 +584,16 @@ function validateStudentData(
 
 
     // --------------------------------------------------------
-    // PHONE
+    // PHONE VALIDATION
     // --------------------------------------------------------
 
     const phonePattern =
         /^[0-9]{10}$/;
 
 
-    if (!phonePattern.test(phone)) {
+    if (
+        !phonePattern.test(phone)
+    ) {
 
         return (
             "Please enter a valid 10-digit phone number."
@@ -425,30 +602,72 @@ function validateStudentData(
     }
 
 
+    // --------------------------------------------------------
+    // YEAR VALIDATION
+    // --------------------------------------------------------
+
+    const studentYear =
+        Number(year);
+
+
+    if (
+        !Number.isInteger(studentYear) ||
+        studentYear < 1 ||
+        studentYear > 4
+    ) {
+
+        return (
+            "Please select a valid academic year."
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // VALIDATION SUCCESS
+    // --------------------------------------------------------
+
     return null;
 
 }
 
 
 // ============================================================
-// DATABASE ERROR HANDLER
+// 8. HANDLE DATABASE / API ERRORS
 // ============================================================
 
-function handleDatabaseError(error) {
+function handleDatabaseError(
+    error,
+    statusCode
+) {
+
+    console.error(
+        "StudentHub API Error:",
+        error
+    );
+
 
     const errorMessage =
-        (error.message || "")
-            .toLowerCase();
+        String(
+            error?.message ||
+            error?.error ||
+            error?.sqlMessage ||
+            ""
+        );
+
+
+    const lowerMessage =
+        errorMessage.toLowerCase();
 
 
     // --------------------------------------------------------
-    // DUPLICATE RECORD
+    // DUPLICATE EMAIL
     // --------------------------------------------------------
 
     if (
-        error.code === "23505" ||
-        errorMessage.includes("duplicate") ||
-        errorMessage.includes("unique")
+        lowerMessage.includes("duplicate") ||
+        lowerMessage.includes("already registered") ||
+        lowerMessage.includes("unique")
     ) {
 
         showMessage(
@@ -457,80 +676,109 @@ function handleDatabaseError(error) {
         );
 
         return;
-
     }
 
 
     // --------------------------------------------------------
-    // RLS ERROR
+    // DATABASE COLUMN / STRUCTURE ERROR
     // --------------------------------------------------------
 
     if (
-        errorMessage.includes(
-            "row-level security"
-        )
+        lowerMessage.includes("unknown column") ||
+        lowerMessage.includes("column") ||
+        lowerMessage.includes("doesn't exist") ||
+        lowerMessage.includes("not null")
     ) {
 
         showMessage(
-            "Registration was blocked by the database security policy.",
+            `Database structure problem: ${errorMessage}`,
             "error"
         );
 
         return;
-
     }
 
 
     // --------------------------------------------------------
-    // PERMISSION ERROR
+    // PASSWORD ERROR
     // --------------------------------------------------------
 
     if (
-        error.code === "42501" ||
-        errorMessage.includes(
-            "permission denied"
-        )
+        lowerMessage.includes("password")
     ) {
 
         showMessage(
-            "Database permission denied. Please check the security policy.",
+            `Password/database problem: ${errorMessage}`,
             "error"
         );
 
         return;
-
     }
 
 
     // --------------------------------------------------------
-    // NETWORK / CONNECTION ERROR
+    // DATABASE CONNECTION ERROR
     // --------------------------------------------------------
 
     if (
-        errorMessage.includes(
-            "network"
-        ) ||
-        errorMessage.includes(
-            "fetch"
-        )
+        lowerMessage.includes("database") ||
+        lowerMessage.includes("mysql") ||
+        lowerMessage.includes("connection") ||
+        lowerMessage.includes("connect")
     ) {
 
         showMessage(
-            "Unable to connect to the database. Please check your internet connection.",
+            `MySQL error: ${errorMessage}`,
             "error"
         );
 
         return;
-
     }
 
 
     // --------------------------------------------------------
-    // DEFAULT DATABASE ERROR
+    // VALIDATION ERROR
+    // --------------------------------------------------------
+
+    if (
+        statusCode === 400
+    ) {
+
+        showMessage(
+            errorMessage ||
+            "Invalid student data.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // --------------------------------------------------------
+    // SERVER ERROR
+    // --------------------------------------------------------
+
+    if (
+        statusCode >= 500
+    ) {
+
+        showMessage(
+            errorMessage ||
+            "Server error. Check the Node.js terminal.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    // --------------------------------------------------------
+    // DEFAULT ERROR
     // --------------------------------------------------------
 
     showMessage(
-        "Registration failed. Please try again.",
+        errorMessage ||
+        "Registration failed. Please check the Node.js server.",
         "error"
     );
 
@@ -538,10 +786,17 @@ function handleDatabaseError(error) {
 
 
 // ============================================================
-// BUTTON LOADING STATE
+// 9. BUTTON LOADING STATE
 // ============================================================
 
-function setLoadingState(isLoading) {
+function setLoadingState(
+    isLoading
+) {
+
+    if (!submitBtn) {
+        return;
+    }
+
 
     submitBtn.disabled =
         isLoading;
@@ -567,7 +822,9 @@ function setLoadingState(isLoading) {
             "loading"
         );
 
-    } else {
+    }
+
+    else {
 
         buttonText.textContent =
             "Register Student";
@@ -582,7 +839,7 @@ function setLoadingState(isLoading) {
 
 
 // ============================================================
-// SHOW MESSAGE
+// 10. SHOW MESSAGE
 // ============================================================
 
 function showMessage(
@@ -603,7 +860,6 @@ function showMessage(
         `message ${type}`;
 
 
-    // Accessibility
     message.setAttribute(
         "role",
         type === "error"
@@ -612,21 +868,28 @@ function showMessage(
     );
 
 
-    // --------------------------------------------------------
-    // AUTO HIDE
-    // --------------------------------------------------------
+    if (
+        showMessage.timeout
+    ) {
 
-    clearMessage.timeout =
+        clearTimeout(
+            showMessage.timeout
+        );
+
+    }
+
+
+    showMessage.timeout =
         setTimeout(
             clearMessage,
-            6000
+            8000
         );
 
 }
 
 
 // ============================================================
-// CLEAR MESSAGE
+// 11. CLEAR MESSAGE
 // ============================================================
 
 function clearMessage() {
@@ -636,11 +899,16 @@ function clearMessage() {
     }
 
 
-    if (clearMessage.timeout) {
+    if (
+        showMessage.timeout
+    ) {
 
         clearTimeout(
-            clearMessage.timeout
+            showMessage.timeout
         );
+
+        showMessage.timeout =
+            null;
 
     }
 
@@ -655,7 +923,7 @@ function clearMessage() {
 
 
 // ============================================================
-// PHONE INPUT CLEANUP
+// 12. PHONE INPUT CLEANUP
 // ============================================================
 
 if (phoneInput) {
@@ -664,14 +932,13 @@ if (phoneInput) {
         "input",
         function () {
 
-            // Keep only numbers
             this.value =
                 this.value.replace(
                     /\D/g,
                     ""
                 );
 
-            // Maximum 10 digits
+
             if (
                 this.value.length > 10
             ) {
@@ -691,7 +958,7 @@ if (phoneInput) {
 
 
 // ============================================================
-// NAME INPUT CLEANUP
+// 13. NAME INPUT CLEANUP
 // ============================================================
 
 if (nameInput) {
@@ -700,7 +967,7 @@ if (nameInput) {
         "input",
         function () {
 
-            // Prevent accidental leading spaces
+            // Remove leading spaces
             this.value =
                 this.value.replace(
                     /^\s+/,
@@ -714,7 +981,7 @@ if (nameInput) {
 
 
 // ============================================================
-// EMAIL INPUT CLEANUP
+// 14. EMAIL INPUT CLEANUP
 // ============================================================
 
 if (emailInput) {
@@ -733,5 +1000,159 @@ if (emailInput) {
 
 
 // ============================================================
-// END OF STUDENTHUB SCRIPT
+// 15. PASSWORD INPUT CLEANUP
+// ============================================================
+
+if (passwordInput) {
+
+    passwordInput.addEventListener(
+        "input",
+        function () {
+
+            // Remove spaces from beginning
+            // but allow spaces inside password.
+
+            this.value =
+                this.value.replace(
+                    /^\s+/,
+                    ""
+                );
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// 16. YEAR INPUT VALIDATION
+// ============================================================
+
+if (yearInput) {
+
+    yearInput.addEventListener(
+        "change",
+        function () {
+
+            const year =
+                Number(this.value);
+
+
+            if (
+                year < 1 ||
+                year > 4
+            ) {
+
+                this.value =
+                    "";
+
+            }
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// 17. PREVENT DOUBLE SUBMISSION
+// ============================================================
+
+let registrationInProgress =
+    false;
+
+
+if (form) {
+
+    form.addEventListener(
+        "submit",
+        function (event) {
+
+            if (
+                registrationInProgress
+            ) {
+
+                event.preventDefault();
+
+                return;
+
+            }
+
+            registrationInProgress =
+                true;
+
+
+            setTimeout(
+                function () {
+
+                    registrationInProgress =
+                        false;
+
+                },
+                3000
+            );
+
+        },
+        true
+    );
+
+}
+
+
+// ============================================================
+// 18. STARTUP MESSAGE
+// ============================================================
+
+console.log(
+    "=========================================="
+);
+
+console.log(
+    "✓ StudentHub Task 01 loaded"
+);
+
+console.log(
+    "✓ Frontend: HTML + CSS + JavaScript"
+);
+
+console.log(
+    "✓ Backend: Node.js + Express"
+);
+
+console.log(
+    "✓ Database: MySQL"
+);
+
+console.log(
+    "✓ Email field: ACTIVE"
+);
+
+console.log(
+    "✓ Password field: ACTIVE"
+);
+
+console.log(
+    "✓ Date of birth: ACTIVE"
+);
+
+console.log(
+    "✓ Phone field: ACTIVE"
+);
+
+console.log(
+    "✓ Academic year: ACTIVE"
+);
+
+console.log(
+    "✓ API:",
+    STUDENTS_API
+);
+
+console.log(
+    "=========================================="
+);
+
+
+// ============================================================
+// TASK 01 COMPLETE
 // ============================================================

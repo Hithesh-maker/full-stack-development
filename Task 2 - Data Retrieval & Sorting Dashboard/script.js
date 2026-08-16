@@ -1,106 +1,72 @@
 // ============================================================
 // STUDENTHUB — TASK 02
 // DATA RETRIEVAL & SORTING DASHBOARD
+// Node.js + Express + MySQL
 // ============================================================
 
 
 // ============================================================
-// SUPABASE CONFIGURATION
+// 1. API CONFIGURATION
 // ============================================================
 
-const SUPABASE_URL =
-    "https://cppjrfaftlwlzmwgicxj.supabase.co";
-
-const SUPABASE_KEY =
-    "sb_publishable_-uuWKMVV61MAgUIdP21cQg_BDwtyIcb";
-
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+const API_URL =
+    "http://localhost:5000/api/students";
 
 
 // ============================================================
-// GLOBAL DATA
+// 2. GLOBAL DATA
 // ============================================================
 
 let students = [];
 
 
 // ============================================================
-// DOM ELEMENTS
+// 3. DOM ELEMENTS
 // ============================================================
 
 const tableBody =
-    document.getElementById(
-        "studentTableBody"
-    );
+    document.getElementById("studentTableBody");
 
 const departmentFilter =
-    document.getElementById(
-        "departmentFilter"
-    );
+    document.getElementById("departmentFilter");
 
 const sortOption =
-    document.getElementById(
-        "sortOption"
-    );
+    document.getElementById("sortOption");
 
 const totalStudents =
-    document.getElementById(
-        "totalStudents"
-    );
+    document.getElementById("totalStudents");
 
 const cseCount =
-    document.getElementById(
-        "cseCount"
-    );
+    document.getElementById("cseCount");
 
 const eceCount =
-    document.getElementById(
-        "eceCount"
-    );
+    document.getElementById("eceCount");
 
 const eeeCount =
-    document.getElementById(
-        "eeeCount"
-    );
+    document.getElementById("eeeCount");
 
 const recordCount =
-    document.getElementById(
-        "recordCount"
-    );
+    document.getElementById("recordCount");
 
 const refreshBtn =
-    document.getElementById(
-        "refreshBtn"
-    );
+    document.getElementById("refreshBtn");
 
 const connectionStatus =
-    document.getElementById(
-        "connectionStatus"
-    );
+    document.getElementById("connectionStatus");
 
 
 // ============================================================
-// CONNECTION STATUS
+// 4. CONNECTION STATUS
 // ============================================================
 
-function setConnectionStatus(
-    text,
-    type
-) {
+function setConnectionStatus(text, type) {
 
     if (!connectionStatus) {
         return;
     }
 
-
     connectionStatus.className =
         `status ${type}`;
-
 
     connectionStatus.innerHTML = `
 
@@ -114,77 +80,68 @@ function setConnectionStatus(
 
 
 // ============================================================
-// FETCH STUDENTS
+// 5. FETCH STUDENTS FROM MYSQL API
 // ============================================================
 
 async function fetchStudents() {
 
     showLoading();
 
-
     console.log(
-        "StudentHub: Fetching student records..."
+        "StudentHub: Fetching students from MySQL..."
     );
-
 
     try {
 
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .from("students")
-                .select(
-                    "id, name, email, dob, department, phone"
-                );
+        const response =
+            await fetch(API_URL);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "StudentHub API Response:",
+            result
+        );
 
 
         // ----------------------------------------------------
-        // DATABASE ERROR
+        // CHECK API RESPONSE
         // ----------------------------------------------------
 
-        if (error) {
+        if (!result.success) {
 
-            console.error(
-                "StudentHub Supabase Error:",
-                error
+            throw new Error(
+                result.message ||
+                "Failed to retrieve student records."
             );
-
-
-            showDatabaseError(
-                error
-            );
-
-
-            return;
 
         }
 
 
         // ----------------------------------------------------
-        // STORE DATA
+        // STORE STUDENT DATA
         // ----------------------------------------------------
 
         students =
-            Array.isArray(data)
-                ? data
+            Array.isArray(result.data)
+                ? result.data
                 : [];
 
 
         console.log(
-            "StudentHub: Records retrieved:",
-            students.length
-        );
-
-
-        // ----------------------------------------------------
-        // CONNECTION SUCCESS
-        // ----------------------------------------------------
-
-        setConnectionStatus(
-            "Connected",
-            "success-status"
+            `StudentHub: ${students.length} students loaded`
         );
 
 
@@ -192,26 +149,26 @@ async function fetchStudents() {
         // UPDATE DASHBOARD
         // ----------------------------------------------------
 
+        setConnectionStatus(
+            "Connected to MySQL",
+            "success-status"
+        );
+
         updateDepartmentFilter();
 
         updateCounts();
 
         displayStudents();
 
-    }
 
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
-            "StudentHub unexpected error:",
+            "StudentHub connection error:",
             error
         );
 
-
-        showUnexpectedError(
-            error
-        );
+        showUnexpectedError(error);
 
     }
 
@@ -219,13 +176,13 @@ async function fetchStudents() {
 
 
 // ============================================================
-// LOADING STATE
+// 6. LOADING STATE
 // ============================================================
 
 function showLoading() {
 
     setConnectionStatus(
-        "Connecting...",
+        "Connecting to MySQL...",
         "loading-status"
     );
 
@@ -263,69 +220,10 @@ function showLoading() {
 
 
 // ============================================================
-// DATABASE ERROR
+// 7. ERROR STATE
 // ============================================================
 
-function showDatabaseError(
-    error
-) {
-
-    setConnectionStatus(
-        "Database Error",
-        "error-status"
-    );
-
-
-    const message =
-        error?.message ||
-        "Unable to retrieve records.";
-
-
-    if (tableBody) {
-
-        tableBody.innerHTML = `
-
-            <tr>
-
-                <td
-                    colspan="6"
-                    class="message"
-                >
-
-                    <strong>
-                        Unable to retrieve student records.
-                    </strong>
-
-                    <br><br>
-
-                    ${escapeHTML(message)}
-
-                </td>
-
-            </tr>
-
-        `;
-
-    }
-
-
-    if (recordCount) {
-
-        recordCount.textContent =
-            "Database error";
-
-    }
-
-}
-
-
-// ============================================================
-// UNEXPECTED ERROR
-// ============================================================
-
-function showUnexpectedError(
-    error
-) {
+function showUnexpectedError(error) {
 
     setConnectionStatus(
         "Connection Error",
@@ -345,13 +243,22 @@ function showUnexpectedError(
                 >
 
                     <strong>
-                        Unable to connect to Supabase.
+                        Unable to retrieve student records.
                     </strong>
 
                     <br><br>
 
-                    Check the browser console
-                    for more information.
+                    Make sure the Node.js server
+                    and MySQL database are running.
+
+                    <br><br>
+
+                    <small>
+                        ${escapeHTML(
+                            error?.message ||
+                            "Unknown error"
+                        )}
+                    </small>
 
                 </td>
 
@@ -369,16 +276,105 @@ function showUnexpectedError(
 
     }
 
+}
 
-    console.error(
-        error
+
+// ============================================================
+// 8. NORMALIZE DEPARTMENT
+// ============================================================
+// Converts all department formats into short codes.
+//
+// CSE
+// ECE
+// EEE
+//
+// Examples:
+//
+// CSE
+// Computer Science
+// Computer Science and Engineering
+//       ↓
+//      CSE
+//
+// ECE
+// Electronics
+// Electronics and Communication Engineering
+//       ↓
+//      ECE
+//
+// EEE
+// Electrical
+// Electrical and Electronics Engineering
+//       ↓
+//      EEE
+// ============================================================
+
+function normalizeDepartment(department) {
+
+    const value =
+        String(
+            department || ""
+        )
+            .trim()
+            .toUpperCase();
+
+
+    const departmentMap = {
+
+        // ----------------------------------------------------
+        // CSE
+        // ----------------------------------------------------
+
+        "CSE":
+            "CSE",
+
+        "COMPUTER SCIENCE":
+            "CSE",
+
+        "COMPUTER SCIENCE AND ENGINEERING":
+            "CSE",
+
+
+        // ----------------------------------------------------
+        // ECE
+        // ----------------------------------------------------
+
+        "ECE":
+            "ECE",
+
+        "ELECTRONICS":
+            "ECE",
+
+        "ELECTRONICS AND COMMUNICATION ENGINEERING":
+            "ECE",
+
+
+        // ----------------------------------------------------
+        // EEE
+        // ----------------------------------------------------
+
+        "EEE":
+            "EEE",
+
+        "ELECTRICAL":
+            "EEE",
+
+        "ELECTRICAL AND ELECTRONICS ENGINEERING":
+            "EEE"
+
+    };
+
+
+    return (
+        departmentMap[value] ||
+        value
     );
 
 }
 
 
 // ============================================================
-// DEPARTMENT FILTER
+// 9. UPDATE DEPARTMENT FILTER
 // ============================================================
 
 function updateDepartmentFilter() {
@@ -388,19 +384,20 @@ function updateDepartmentFilter() {
     }
 
 
+    // --------------------------------------------------------
+    // Get unique department codes
+    // --------------------------------------------------------
+
     const departments = [
 
         ...new Set(
 
             students
-
-                .map(
-                    student =>
-                        String(
-                            student.department || ""
-                        ).trim()
+                .map(student =>
+                    normalizeDepartment(
+                        student.department
+                    )
                 )
-
                 .filter(Boolean)
 
         )
@@ -414,6 +411,10 @@ function updateDepartmentFilter() {
     );
 
 
+    // --------------------------------------------------------
+    // Reset filter
+    // --------------------------------------------------------
+
     departmentFilter.innerHTML = `
 
         <option value="all">
@@ -422,6 +423,10 @@ function updateDepartmentFilter() {
 
     `;
 
+
+    // --------------------------------------------------------
+    // Add department options
+    // --------------------------------------------------------
 
     departments.forEach(
         department => {
@@ -435,6 +440,8 @@ function updateDepartmentFilter() {
             option.value =
                 department;
 
+
+            // Display SHORT CODE
 
             option.textContent =
                 department;
@@ -451,61 +458,94 @@ function updateDepartmentFilter() {
 
 
 // ============================================================
-// UPDATE COUNTS
+// 10. UPDATE DASHBOARD COUNTS
 // ============================================================
 
 function updateCounts() {
 
-    totalStudents.textContent =
-        students.length;
+    // --------------------------------------------------------
+    // TOTAL STUDENTS
+    // --------------------------------------------------------
 
+    if (totalStudents) {
+
+        totalStudents.textContent =
+            students.length;
+
+    }
+
+
+    // --------------------------------------------------------
+    // CSE COUNT
+    // --------------------------------------------------------
 
     const cse =
         students.filter(
             student =>
-                isDepartment(
-                    student.department,
-                    "CSE"
-                )
+                normalizeDepartment(
+                    student.department
+                ) === "CSE"
         ).length;
 
+
+    // --------------------------------------------------------
+    // ECE COUNT
+    // --------------------------------------------------------
 
     const ece =
         students.filter(
             student =>
-                isDepartment(
-                    student.department,
-                    "ECE"
-                )
+                normalizeDepartment(
+                    student.department
+                ) === "ECE"
         ).length;
 
+
+    // --------------------------------------------------------
+    // EEE COUNT
+    // --------------------------------------------------------
 
     const eee =
         students.filter(
             student =>
-                isDepartment(
-                    student.department,
-                    "EEE"
-                )
+                normalizeDepartment(
+                    student.department
+                ) === "EEE"
         ).length;
 
 
-    cseCount.textContent =
-        cse;
+    // --------------------------------------------------------
+    // UPDATE UI
+    // --------------------------------------------------------
+
+    if (cseCount) {
+
+        cseCount.textContent =
+            cse;
+
+    }
 
 
-    eceCount.textContent =
-        ece;
+    if (eceCount) {
+
+        eceCount.textContent =
+            ece;
+
+    }
 
 
-    eeeCount.textContent =
-        eee;
+    if (eeeCount) {
+
+        eeeCount.textContent =
+            eee;
+
+    }
 
 }
 
 
 // ============================================================
-// DEPARTMENT IDENTIFICATION
+// 11. DEPARTMENT IDENTIFICATION
 // ============================================================
 
 function isDepartment(
@@ -513,96 +553,17 @@ function isDepartment(
     code
 ) {
 
-    const value =
-        String(
-            department || ""
-        )
-            .trim()
-            .toUpperCase();
-
-
-    const target =
-        code.toUpperCase();
-
-
-    // Exact match
-
-    if (
-        value === target
-    ) {
-
-        return true;
-
-    }
-
-
-    // CSE
-
-    if (
-        target === "CSE" &&
-        (
-            value.includes(
-                "COMPUTER SCIENCE"
-            ) ||
-            value.includes(
-                "COMPUTER & SCIENCE"
-            ) ||
-            value.includes(
-                "COMPUTER ENGINEERING"
-            )
-        )
-    ) {
-
-        return true;
-
-    }
-
-
-    // ECE
-
-    if (
-        target === "ECE" &&
-        (
-            value.includes(
-                "ELECTRONICS AND COMMUNICATION"
-            ) ||
-            value.includes(
-                "ELECTRONICS & COMMUNICATION"
-            )
-        )
-    ) {
-
-        return true;
-
-    }
-
-
-    // EEE
-
-    if (
-        target === "EEE" &&
-        (
-            value.includes(
-                "ELECTRICAL AND ELECTRONICS"
-            ) ||
-            value.includes(
-                "ELECTRICAL & ELECTRONICS"
-            )
-        )
-    ) {
-
-        return true;
-
-    }
-
-
-    return false;
+    return (
+        normalizeDepartment(
+            department
+        ) === code
+    );
 
 }
 
 
 // ============================================================
-// DISPLAY STUDENTS
+// 12. DISPLAY STUDENTS
 // ============================================================
 
 function displayStudents() {
@@ -611,12 +572,14 @@ function displayStudents() {
         [...students];
 
 
-    // --------------------------------------------------------
-    // FILTER
-    // --------------------------------------------------------
+    // ========================================================
+    // FILTER BY DEPARTMENT
+    // ========================================================
 
     const selectedDepartment =
-        departmentFilter.value;
+        departmentFilter
+            ? departmentFilter.value
+            : "all";
 
 
     if (
@@ -626,24 +589,28 @@ function displayStudents() {
         filteredStudents =
             filteredStudents.filter(
                 student =>
-                    String(
-                        student.department || ""
-                    ).trim() ===
-                    selectedDepartment
+                    isDepartment(
+                        student.department,
+                        selectedDepartment
+                    )
             );
 
     }
 
 
-    // --------------------------------------------------------
+    // ========================================================
     // SORT
-    // --------------------------------------------------------
+    // ========================================================
 
     const selectedSort =
-        sortOption.value;
+        sortOption
+            ? sortOption.value
+            : "default";
 
 
-    // NAME A-Z
+    // --------------------------------------------------------
+    // NAME A → Z
+    // --------------------------------------------------------
 
     if (
         selectedSort === "nameAsc"
@@ -663,7 +630,9 @@ function displayStudents() {
     }
 
 
-    // NAME Z-A
+    // --------------------------------------------------------
+    // NAME Z → A
+    // --------------------------------------------------------
 
     else if (
         selectedSort === "nameDesc"
@@ -683,7 +652,9 @@ function displayStudents() {
     }
 
 
-    // DATE OLDEST -> NEWEST
+    // --------------------------------------------------------
+    // DATE OLDEST → NEWEST
+    // --------------------------------------------------------
 
     else if (
         selectedSort === "dateAsc"
@@ -691,14 +662,22 @@ function displayStudents() {
 
         filteredStudents.sort(
             (a, b) =>
-                getDateValue(a.dob) -
-                getDateValue(b.dob)
+                getDateValue(
+                    a.created_at ||
+                    a.createdAt
+                ) -
+                getDateValue(
+                    b.created_at ||
+                    b.createdAt
+                )
         );
 
     }
 
 
-    // DATE NEWEST -> OLDEST
+    // --------------------------------------------------------
+    // DATE NEWEST → OLDEST
+    // --------------------------------------------------------
 
     else if (
         selectedSort === "dateDesc"
@@ -706,16 +685,22 @@ function displayStudents() {
 
         filteredStudents.sort(
             (a, b) =>
-                getDateValue(b.dob) -
-                getDateValue(a.dob)
+                getDateValue(
+                    b.created_at ||
+                    b.createdAt
+                ) -
+                getDateValue(
+                    a.created_at ||
+                    a.createdAt
+                )
         );
 
     }
 
 
-    // --------------------------------------------------------
+    // ========================================================
     // NO RESULTS
-    // --------------------------------------------------------
+    // ========================================================
 
     if (
         filteredStudents.length === 0
@@ -739,36 +724,45 @@ function displayStudents() {
         `;
 
 
-        recordCount.textContent =
-            "0 records found";
+        if (recordCount) {
 
+            recordCount.textContent =
+                "0 records found";
+
+        }
 
         return;
 
     }
 
 
-    // --------------------------------------------------------
+    // ========================================================
     // CLEAR TABLE
-    // --------------------------------------------------------
+    // ========================================================
 
-    tableBody.innerHTML =
-        "";
+    tableBody.innerHTML = "";
 
 
-    // --------------------------------------------------------
-    // CREATE ROWS
-    // --------------------------------------------------------
+    // ========================================================
+    // CREATE TABLE ROWS
+    // ========================================================
 
     filteredStudents.forEach(
-        (
-            student,
-            index
-        ) => {
+        (student, index) => {
 
             const row =
                 document.createElement(
                     "tr"
+                );
+
+
+            // ------------------------------------------------
+            // NORMALIZE DEPARTMENT
+            // ------------------------------------------------
+
+            const department =
+                normalizeDepartment(
+                    student.department
                 );
 
 
@@ -838,7 +832,7 @@ function displayStudents() {
                     <span class="department">
 
                         ${escapeHTML(
-                            student.department
+                            department
                         )}
 
                     </span>
@@ -865,27 +859,29 @@ function displayStudents() {
     );
 
 
-    // --------------------------------------------------------
+    // ========================================================
     // RECORD COUNT
-    // --------------------------------------------------------
+    // ========================================================
 
-    recordCount.textContent =
-        `${filteredStudents.length} ${
-            filteredStudents.length === 1
-                ? "record"
-                : "records"
-        } found`;
+    if (recordCount) {
+
+        recordCount.textContent =
+            `${filteredStudents.length} ${
+                filteredStudents.length === 1
+                    ? "record"
+                    : "records"
+            } found`;
+
+    }
 
 }
 
 
 // ============================================================
-// DATE VALUE
+// 13. DATE VALUE
 // ============================================================
 
-function getDateValue(
-    date
-) {
+function getDateValue(date) {
 
     if (!date) {
         return 0;
@@ -904,12 +900,10 @@ function getDateValue(
 
 
 // ============================================================
-// DATE FORMATTER
+// 14. DATE FORMAT
 // ============================================================
 
-function formatDate(
-    date
-) {
+function formatDate(date) {
 
     if (!date) {
         return "-";
@@ -944,12 +938,10 @@ function formatDate(
 
 
 // ============================================================
-// GET INITIALS
+// 15. GET INITIALS
 // ============================================================
 
-function getInitials(
-    name
-) {
+function getInitials(name) {
 
     if (!name) {
         return "?";
@@ -982,12 +974,10 @@ function getInitials(
 
 
 // ============================================================
-// HTML ESCAPE
+// 16. ESCAPE HTML
 // ============================================================
 
-function escapeHTML(
-    value
-) {
+function escapeHTML(value) {
 
     if (
         value === null ||
@@ -1031,7 +1021,7 @@ function escapeHTML(
 
 
 // ============================================================
-// EVENT LISTENERS
+// 17. FILTER EVENT
 // ============================================================
 
 if (departmentFilter) {
@@ -1044,6 +1034,10 @@ if (departmentFilter) {
 }
 
 
+// ============================================================
+// 18. SORT EVENT
+// ============================================================
+
 if (sortOption) {
 
     sortOption.addEventListener(
@@ -1053,6 +1047,10 @@ if (sortOption) {
 
 }
 
+
+// ============================================================
+// 19. REFRESH EVENT
+// ============================================================
 
 if (refreshBtn) {
 
@@ -1065,10 +1063,46 @@ if (refreshBtn) {
 
 
 // ============================================================
-// INITIAL LOAD
+// 20. INITIAL LOAD
 // ============================================================
 
-fetchStudents();
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        fetchStudents();
+
+    }
+);
+
+
+// ============================================================
+// 21. CONSOLE
+// ============================================================
+
+console.log(
+    "StudentHub Task 02 loaded."
+);
+
+console.log(
+    "Database: MySQL"
+);
+
+console.log(
+    "API: http://localhost:5000/api/students"
+);
+
+console.log(
+    "Departments: CSE / ECE / EEE"
+);
+
+console.log(
+    "Sorting: ACTIVE"
+);
+
+console.log(
+    "Filtering: ACTIVE"
+);
 
 
 // ============================================================

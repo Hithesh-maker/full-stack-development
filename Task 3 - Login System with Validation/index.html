@@ -1,71 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
+    <!-- ============================================================
+         DOCUMENT SETUP
+    ============================================================ -->
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>StudentHub | Login</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <!-- Inter Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta
+        name="description"
+        content="StudentHub secure student login system using MySQL"
+    >
+
+    <meta
+        name="theme-color"
+        content="#0b0d12"
+    >
+
+    <title>
+        StudentHub | Login
+    </title>
+
+
+    <!-- ============================================================
+         GOOGLE FONT
+    ============================================================ -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
     >
 
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <link rel="stylesheet" href="style.css">
+    <!-- ============================================================
+         STYLESHEET
+    ============================================================ -->
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
+
 
 <body>
 
+
+    <!-- ============================================================
+         MAIN PAGE
+    ============================================================ -->
+
     <main class="page-container">
 
-        <!-- Header -->
-        <header class="page-header">
-            <div>
-                <p class="eyebrow">FULL STACK DEVELOPMENT • TASK 3</p>
 
-                <h1>Welcome Back</h1>
+        <!-- ========================================================
+             HEADER
+        ========================================================= -->
+
+        <header class="page-header">
+
+            <div>
+
+                <p class="eyebrow">
+
+                    FULL STACK DEVELOPMENT
+
+                    <span aria-hidden="true">
+                        •
+                    </span>
+
+                    TASK 03
+
+                </p>
+
+
+                <h1>
+                    Welcome Back
+                </h1>
+
 
                 <p class="subtitle">
+
                     Sign in to access your StudentHub account.
+
                 </p>
+
             </div>
+
         </header>
 
 
-        <!-- Login Section -->
-        <section class="login-section">
+
+        <!-- ========================================================
+             LOGIN SECTION
+        ========================================================= -->
+
+        <section
+            class="login-section"
+            aria-labelledby="login-title"
+        >
+
+
+            <!-- ====================================================
+                 LOGIN CARD
+            ===================================================== -->
 
             <div class="login-card">
 
-                <!-- Login Icon -->
-                <div class="login-icon">
+
+                <!-- ==================================================
+                     LOGIN ICON
+                =================================================== -->
+
+                <div
+                    class="login-icon"
+                    aria-hidden="true"
+                >
                     🔐
                 </div>
 
+
+
+                <!-- ==================================================
+                     LOGIN HEADING
+                =================================================== -->
+
                 <div class="login-heading">
-                    <h2>Student Login</h2>
+
+                    <h2 id="login-title">
+                        Student Login
+                    </h2>
+
 
                     <p>
-                        Enter your registered credentials to continue.
+
+                        Enter your registered credentials
+                        to continue.
+
                     </p>
+
                 </div>
 
 
-                <!-- Login Form -->
-                <form id="loginForm">
 
-                    <!-- Email -->
+                <!-- ==================================================
+                     LOGIN FORM
+                =================================================== -->
+
+                <form
+                    id="loginForm"
+                    novalidate
+                >
+
+
+                    <!-- ==============================================
+                         EMAIL
+                    =============================================== -->
+
                     <div class="form-group">
 
                         <label for="email">
                             Email Address
                         </label>
+
 
                         <input
                             type="email"
@@ -73,22 +189,32 @@
                             name="email"
                             placeholder="Enter your email"
                             autocomplete="email"
+                            maxlength="150"
+                            required
+                            aria-describedby="emailError"
                         >
+
 
                         <small
                             class="field-error"
-                            id="emailError">
-                        </small>
+                            id="emailError"
+                            aria-live="polite"
+                        ></small>
 
                     </div>
 
 
-                    <!-- Password -->
+
+                    <!-- ==============================================
+                         PASSWORD
+                    =============================================== -->
+
                     <div class="form-group">
 
                         <label for="password">
                             Password
                         </label>
+
 
                         <div class="password-wrapper">
 
@@ -98,39 +224,58 @@
                                 name="password"
                                 placeholder="Enter your password"
                                 autocomplete="current-password"
+                                minlength="6"
+                                required
+                                aria-describedby="passwordError"
                             >
+
 
                             <button
                                 type="button"
                                 id="togglePassword"
                                 class="toggle-password"
-                                aria-label="Show password">
+                                aria-label="Show password"
+                            >
+
                                 Show
+
                             </button>
 
                         </div>
 
+
                         <small
                             class="field-error"
-                            id="passwordError">
-                        </small>
+                            id="passwordError"
+                            aria-live="polite"
+                        ></small>
 
                     </div>
 
 
-                    <!-- General Message -->
+
+                    <!-- ==============================================
+                         LOGIN MESSAGE
+                    =============================================== -->
+
                     <div
                         id="loginMessage"
                         class="message"
-                        role="alert">
-                    </div>
+                        role="alert"
+                        aria-live="polite"
+                    ></div>
 
 
-                    <!-- Login Button -->
+
+                    <!-- ==============================================
+                         LOGIN BUTTON
+                    =============================================== -->
+
                     <button
                         type="submit"
                         id="loginButton"
-                        class="login-button">
+                        class="login-button"
+                    >
 
                         <span id="buttonText">
                             Login
@@ -141,20 +286,37 @@
                 </form>
 
 
-                <!-- Demo Information -->
+
+                <!-- ==================================================
+                     SECURITY INFORMATION
+                =================================================== -->
+
                 <div class="login-info">
 
-                    <div class="info-icon">
+
+                    <div
+                        class="info-icon"
+                        aria-hidden="true"
+                    >
                         ✓
                     </div>
 
+
                     <div>
-                        <strong>Secure Login</strong>
+
+                        <strong>
+                            Secure Login
+                        </strong>
+
 
                         <p>
-                            Your credentials are verified using the
-                            StudentHub database.
+
+                            Your credentials are verified
+                            securely through the StudentHub
+                            Node.js server and MySQL database.
+
                         </p>
+
                     </div>
 
                 </div>
@@ -164,17 +326,74 @@
         </section>
 
 
-        <!-- Footer -->
+
+        <!-- ========================================================
+             TECHNOLOGY INFORMATION
+        ========================================================= -->
+
+        <section
+            class="technology-info"
+            aria-label="Technology used"
+        >
+
+            <span>
+                Node.js
+            </span>
+
+            <span>
+                Express
+            </span>
+
+            <span>
+                MySQL
+            </span>
+
+            <span>
+                JavaScript
+            </span>
+
+        </section>
+
+
+
+        <!-- ========================================================
+             FOOTER
+        ========================================================= -->
+
         <footer class="page-footer">
+
             <p>
-                StudentHub • Full Stack Development
+
+                StudentHub
+
+                <span aria-hidden="true">
+                    •
+                </span>
+
+                Full Stack Development
+
+                <span aria-hidden="true">
+                    •
+                </span>
+
+                Task 03
+
             </p>
+
         </footer>
+
 
     </main>
 
 
+
+    <!-- ============================================================
+         APPLICATION JAVASCRIPT
+    ============================================================ -->
+
     <script src="script.js"></script>
 
+
 </body>
+
 </html>

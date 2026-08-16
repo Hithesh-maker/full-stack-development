@@ -3,6 +3,10 @@
 
 <head>
 
+    <!-- ============================================================
+         BASIC DOCUMENT SETTINGS
+         ============================================================ -->
+
     <meta charset="UTF-8">
 
     <meta
@@ -10,23 +14,23 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        Interactive Feedback | Task 7
-    </title>
+    <meta
+        name="description"
+        content="StudentHub Task 6 - Automated Logging using MySQL Triggers and Views"
+    >
+
+    <title>StudentHub | Task 6 - Audit Logging</title>
 
 
     <!-- ============================================================
          GOOGLE FONT
          ============================================================ -->
 
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
     <link
         rel="preconnect"
-        href="https://fonts.googleapis.com"
+        href="https://fonts.gstatic.com"
         crossorigin
     >
 
@@ -37,16 +41,7 @@
 
 
     <!-- ============================================================
-         SUPABASE
-         ============================================================ -->
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
-
-
-    <!-- ============================================================
-         CSS
+         STYLESHEET
          ============================================================ -->
 
     <link
@@ -68,13 +63,10 @@
 
         <div class="nav-container">
 
-
-            <!-- LOGO -->
-
             <div class="logo">
 
                 <div class="logo-icon">
-                    ⚡
+                    ✓
                 </div>
 
                 <div>
@@ -84,7 +76,7 @@
                     </h2>
 
                     <span>
-                        Task 07
+                        Task 06
                     </span>
 
                 </div>
@@ -92,11 +84,9 @@
             </div>
 
 
-            <!-- TASK TITLE -->
-
             <div class="task-title">
 
-                Interactive Web Form with Events & Functions
+                Automated Logging
 
             </div>
 
@@ -107,7 +97,7 @@
 
 
     <!-- ============================================================
-         MAIN CONTAINER
+         MAIN CONTENT
          ============================================================ -->
 
     <main class="container">
@@ -119,398 +109,392 @@
 
         <section class="page-header">
 
-            <span class="badge">
-                INTERACTIVE FEEDBACK SYSTEM
-            </span>
+            <div>
 
-            <h1>
-                Share Your Experience
-            </h1>
-
-            <p>
-                Submit customer feedback using
-                <strong>JavaScript Events</strong>,
-                <strong>Reusable Functions</strong>,
-                real-time validation and
-                <strong>Supabase Database Storage</strong>.
-            </p>
-
-        </section>
-
-
-
-        <!-- ========================================================
-             STATISTICS
-             ======================================================== -->
-
-        <section class="stats-grid">
-
-
-            <!-- KEYBOARD EVENTS -->
-
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    ⌨️
-                </div>
-
-                <div>
-
-                    <p>
-                        Keyboard Events
-                    </p>
-
-                    <h2>
-                        Active
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- MOUSE EVENTS -->
-
-            <div class="stat-card">
-
-                <div class="stat-icon insert-icon">
-                    🖱️
-                </div>
-
-                <div>
-
-                    <p>
-                        Mouse Events
-                    </p>
-
-                    <h2>
-                        Active
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- VALIDATION -->
-
-            <div class="stat-card">
-
-                <div class="stat-icon update-icon">
-                    ✓
-                </div>
-
-                <div>
-
-                    <p>
-                        Live Validation
-                    </p>
-
-                    <h2>
-                        Enabled
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- DATABASE -->
-
-            <div class="stat-card">
-
-                <div class="stat-icon today-icon">
-                    ☁️
-                </div>
-
-                <div>
-
-                    <p>
-                        Database
-                    </p>
-
-                    <h2>
-                        Connected
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- ========================================================
-             FEEDBACK FORM
-             ======================================================== -->
-
-        <section class="activity-section">
-
-
-            <div class="section-heading">
-
-                <span class="section-tag">
-                    CUSTOMER FEEDBACK
+                <span class="badge">
+                    DATABASE AUDIT SYSTEM
                 </span>
 
-                <h2>
-                    Feedback Form
-                </h2>
+                <h1>
+                    Automated Logging
+                </h1>
 
                 <p>
-                    Complete the form below. Fields are validated
-                    while you type and the feedback is stored
-                    securely in the Supabase database.
+
+                    Track database changes automatically using
+                    <strong>MySQL Triggers</strong> and generate
+                    daily activity reports using
+                    <strong>SQL Views</strong>.
+
                 </p>
 
             </div>
 
 
+            <div class="system-status">
 
-            <form
-                id="feedbackForm"
-                class="feedback-form"
-                novalidate
-            >
+                <span class="status-dot"></span>
 
+                <span>
+                    Audit System Active
+                </span>
 
-                <!-- ==================================================
-                     NAME
-                     ================================================== -->
-
-                <div class="form-group">
-
-                    <label for="name">
-                        Full Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        placeholder="Enter your full name"
-                        autocomplete="name"
-                    >
-
-                    <small
-                        id="nameMessage"
-                        class="field-message"
-                    ></small>
-
-                </div>
-
-
-
-                <!-- ==================================================
-                     EMAIL
-                     ================================================== -->
-
-                <div class="form-group">
-
-                    <label for="email">
-                        Email Address
-                    </label>
-
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="student@example.com"
-                        autocomplete="email"
-                    >
-
-                    <small
-                        id="emailMessage"
-                        class="field-message"
-                    ></small>
-
-                </div>
-
-
-
-                <!-- ==================================================
-                     CATEGORY
-                     ================================================== -->
-
-                <div class="form-group">
-
-                    <label for="category">
-                        Feedback Category
-                    </label>
-
-                    <select
-                        id="category"
-                        name="category"
-                    >
-
-                        <option value="">
-                            Select a category
-                        </option>
-
-                        <option value="Website">
-                            Website
-                        </option>
-
-                        <option value="Service">
-                            Service
-                        </option>
-
-                        <option value="Customer Support">
-                            Customer Support
-                        </option>
-
-                        <option value="Overall Experience">
-                            Overall Experience
-                        </option>
-
-                    </select>
-
-                    <small
-                        id="categoryMessage"
-                        class="field-message"
-                    ></small>
-
-                </div>
-
-
-
-                <!-- ==================================================
-                     RATING
-                     ================================================== -->
-
-                <div class="form-group">
-
-                    <label for="rating">
-                        Overall Rating
-                    </label>
-
-                    <select
-                        id="rating"
-                        name="rating"
-                    >
-
-                        <option value="">
-                            Select your rating
-                        </option>
-
-                        <option value="5">
-                            ⭐ 5 — Excellent
-                        </option>
-
-                        <option value="4">
-                            ⭐ 4 — Very Good
-                        </option>
-
-                        <option value="3">
-                            ⭐ 3 — Good
-                        </option>
-
-                        <option value="2">
-                            ⭐ 2 — Needs Improvement
-                        </option>
-
-                        <option value="1">
-                            ⭐ 1 — Poor
-                        </option>
-
-                    </select>
-
-                    <small
-                        id="ratingMessage"
-                        class="field-message"
-                    ></small>
-
-                </div>
-
-
-
-                <!-- ==================================================
-                     FEEDBACK MESSAGE
-                     ================================================== -->
-
-                <div class="form-group">
-
-                    <label for="feedback">
-                        Your Feedback
-                    </label>
-
-                    <textarea
-                        id="feedback"
-                        name="feedback"
-                        rows="6"
-                        maxlength="250"
-                        placeholder="Tell us about your experience..."
-                    ></textarea>
-
-                    <div class="textarea-footer">
-
-                        <small
-                            id="feedbackMessage"
-                            class="field-message"
-                        ></small>
-
-                        <span id="characterCount">
-                            0 / 250
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- ==================================================
-                     BUTTONS
-                     ================================================== -->
-
-                <div class="button-group">
-
-                    <!-- SINGLE CLICK SUBMIT -->
-
-                    <button
-                        type="button"
-                        id="submitButton"
-                        class="insert-button"
-                    >
-                        ✓ Submit Feedback
-                    </button>
-
-
-                    <!-- RESET -->
-
-                    <button
-                        type="button"
-                        id="resetButton"
-                        class="reset-button"
-                    >
-                        ↻ Reset Form
-                    </button>
-
-                </div>
-
-
-
-                <!-- ==================================================
-                     STATUS MESSAGE
-                     ================================================== -->
-
-                <div
-                    id="statusMessage"
-                    class="status-message hidden"
-                ></div>
-
-            </form>
+            </div>
 
         </section>
 
 
 
         <!-- ========================================================
-             EVENT FLOW
+             SUMMARY CARDS
+             ======================================================== -->
+
+        <section
+            class="summary-grid"
+            aria-label="Audit statistics"
+        >
+
+
+            <!-- TOTAL LOGS -->
+
+            <article class="summary-card">
+
+                <div class="summary-icon">
+                    #
+                </div>
+
+                <div>
+
+                    <p class="summary-label">
+                        Total Logs
+                    </p>
+
+                    <h2 id="totalLogs">
+                        0
+                    </h2>
+
+                    <p class="summary-description">
+                        Recorded database activities
+                    </p>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- INSERT OPERATIONS -->
+
+            <article class="summary-card">
+
+                <div class="summary-icon">
+                    +
+                </div>
+
+                <div>
+
+                    <p class="summary-label">
+                        INSERT Operations
+                    </p>
+
+                    <h2 id="insertOperations">
+                        0
+                    </h2>
+
+                    <p class="summary-description">
+                        New records created
+                    </p>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- UPDATE OPERATIONS -->
+
+            <article class="summary-card">
+
+                <div class="summary-icon">
+                    ↻
+                </div>
+
+                <div>
+
+                    <p class="summary-label">
+                        UPDATE Operations
+                    </p>
+
+                    <h2 id="updateOperations">
+                        0
+                    </h2>
+
+                    <p class="summary-description">
+                        Records modified
+                    </p>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- TODAY -->
+
+            <article class="summary-card">
+
+                <div class="summary-icon">
+                    ◷
+                </div>
+
+                <div>
+
+                    <p class="summary-label">
+                        Today's Activity
+                    </p>
+
+                    <h2 id="todayActivity">
+                        0
+                    </h2>
+
+                    <p class="summary-description">
+                        Database changes today
+                    </p>
+
+                </div>
+
+            </article>
+
+        </section>
+
+
+
+        <!-- ========================================================
+             AUDIT LOG
+             ======================================================== -->
+
+        <section class="content-card">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="section-tag">
+                        AUDIT LOG
+                    </span>
+
+                    <h2>
+                        Database Activity
+                    </h2>
+
+                    <p>
+
+                        Every INSERT and UPDATE operation on the
+                        <strong>students</strong> table is automatically
+                        recorded by MySQL triggers.
+
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="refreshLogs"
+                    class="secondary-button"
+                    type="button"
+                >
+
+                    ↻ Refresh Logs
+
+                </button>
+
+            </div>
+
+
+
+            <!-- STATUS MESSAGE -->
+
+            <div
+                id="statusMessage"
+                class="status-message hidden"
+                role="alert"
+                aria-live="polite"
+            ></div>
+
+
+
+            <!-- ERROR MESSAGE -->
+
+            <div
+                id="errorMessage"
+                class="error-message"
+                role="alert"
+                aria-live="assertive"
+            ></div>
+
+
+
+            <!-- AUDIT TABLE -->
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <caption class="sr-only">
+                        Database audit activity
+                    </caption>
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Log ID
+                            </th>
+
+                            <th>
+                                Table
+                            </th>
+
+                            <th>
+                                Operation
+                            </th>
+
+                            <th>
+                                Record ID
+                            </th>
+
+                            <th>
+                                Description
+                            </th>
+
+                            <th>
+                                Timestamp
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="auditTableBody">
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="empty-state"
+                            >
+
+                                Loading audit activity...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================================
+             DAILY ACTIVITY REPORT
+             ======================================================== -->
+
+        <section class="content-card">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="section-tag">
+                        SQL VIEW
+                    </span>
+
+                    <h2>
+                        Daily Activity Report
+                    </h2>
+
+                    <p>
+
+                        Activity summarized by date and operation
+                        using the
+                        <strong>daily_activity_report</strong>
+                        database view.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <caption class="sr-only">
+                        Daily database activity report
+                    </caption>
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Activity Date
+                            </th>
+
+                            <th>
+                                Operation
+                            </th>
+
+                            <th>
+                                Total Operations
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="activityTableBody">
+
+                        <tr>
+
+                            <td
+                                colspan="3"
+                                class="empty-state"
+                            >
+
+                                Loading daily report...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================================================
+             TRIGGER INFORMATION
              ======================================================== -->
 
         <section class="process-section">
@@ -518,18 +502,25 @@
 
             <div class="section-heading">
 
-                <span class="section-tag">
-                    JAVASCRIPT EVENTS
-                </span>
+                <div>
 
-                <h2>
-                    Interactive Event Flow
-                </h2>
+                    <span class="section-tag">
+                        DATABASE AUTOMATION
+                    </span>
 
-                <p>
-                    The application uses JavaScript events and
-                    reusable functions to control user interaction.
-                </p>
+                    <h2>
+                        How Automated Logging Works
+                    </h2>
+
+                    <p>
+
+                        Database changes are captured automatically
+                        without requiring manual logging from the
+                        application.
+
+                    </p>
+
+                </div>
 
             </div>
 
@@ -538,87 +529,111 @@
             <div class="process-grid">
 
 
-                <!-- 01 -->
+                <!-- STEP 01 -->
 
-                <div class="process-card">
+                <article class="process-card">
 
                     <div class="process-number">
                         01
                     </div>
 
-                    <h3>
-                        Keyboard Validation
-                    </h3>
+                    <div>
 
-                    <p>
-                        Input fields are validated as the user
-                        types using keyboard and input events.
-                    </p>
+                        <h3>
+                            INSERT / UPDATE
+                        </h3>
 
-                </div>
+                        <p>
+
+                            A student record is created or
+                            modified in the database.
+
+                        </p>
+
+                    </div>
+
+                </article>
 
 
 
-                <!-- 02 -->
+                <!-- STEP 02 -->
 
-                <div class="process-card">
+                <article class="process-card">
 
                     <div class="process-number">
                         02
                     </div>
 
-                    <h3>
-                        Mouse Events
-                    </h3>
+                    <div>
 
-                    <p>
-                        Form fields visually respond when the
-                        mouse pointer moves over them.
-                    </p>
+                        <h3>
+                            Trigger Fires
+                        </h3>
 
-                </div>
+                        <p>
+
+                            MySQL automatically executes the
+                            appropriate trigger.
+
+                        </p>
+
+                    </div>
+
+                </article>
 
 
 
-                <!-- 03 -->
+                <!-- STEP 03 -->
 
-                <div class="process-card">
+                <article class="process-card">
 
                     <div class="process-number">
                         03
                     </div>
 
-                    <h3>
-                        Single Click
-                    </h3>
+                    <div>
 
-                    <p>
-                        The feedback submission is triggered
-                        using a single-click event.
-                    </p>
+                        <h3>
+                            Audit Log Created
+                        </h3>
 
-                </div>
+                        <p>
+
+                            The operation, table name, record ID
+                            and description are stored.
+
+                        </p>
+
+                    </div>
+
+                </article>
 
 
 
-                <!-- 04 -->
+                <!-- STEP 04 -->
 
-                <div class="process-card">
+                <article class="process-card">
 
                     <div class="process-number">
                         04
                     </div>
 
-                    <h3>
-                        Reusable Functions
-                    </h3>
+                    <div>
 
-                    <p>
-                        Common validation logic is handled through
-                        reusable JavaScript functions.
-                    </p>
+                        <h3>
+                            Daily Report
+                        </h3>
 
-                </div>
+                        <p>
+
+                            The SQL view summarizes database
+                            activity by date and operation.
+
+                        </p>
+
+                    </div>
+
+                </article>
 
             </div>
 
@@ -627,130 +642,108 @@
 
 
         <!-- ========================================================
-             VALIDATION RULES
+             SQL CONCEPTS
              ======================================================== -->
 
-        <section class="records-section">
+        <section class="concept-card">
 
 
-            <div class="section-heading">
+            <div>
 
-                <span class="section-tag">
-                    VALIDATION SYSTEM
+                <span class="section-label">
+                    SQL CONCEPTS
                 </span>
 
                 <h2>
-                    Validation Rules
+                    Concepts Used
                 </h2>
-
-                <p>
-                    Every field is checked before the feedback
-                    is stored in the database.
-                </p>
 
             </div>
 
 
 
-            <div class="validation-grid">
+            <div class="concept-grid">
 
 
-                <!-- NAME -->
+                <div class="concept-item">
 
-                <div class="validation-card">
+                    <strong>
+                        TRIGGER
+                    </strong>
 
-                    <div class="validation-icon">
-                        👤
-                    </div>
-
-                    <h3>
-                        Full Name
-                    </h3>
-
-                    <p>
-                        Must contain at least 3 characters.
-                    </p>
+                    <span>
+                        Automatically executes after INSERT or UPDATE
+                    </span>
 
                 </div>
 
 
 
-                <!-- EMAIL -->
+                <div class="concept-item">
 
-                <div class="validation-card">
+                    <strong>
+                        AUDIT LOG
+                    </strong>
 
-                    <div class="validation-icon">
-                        ✉️
-                    </div>
-
-                    <h3>
-                        Email Address
-                    </h3>
-
-                    <p>
-                        Must contain a valid email format.
-                    </p>
+                    <span>
+                        Stores database activity and change history
+                    </span>
 
                 </div>
 
 
 
-                <!-- CATEGORY -->
+                <div class="concept-item">
 
-                <div class="validation-card">
+                    <strong>
+                        OLD
+                    </strong>
 
-                    <div class="validation-icon">
-                        🏷️
-                    </div>
-
-                    <h3>
-                        Category
-                    </h3>
-
-                    <p>
-                        A feedback category must be selected.
-                    </p>
+                    <span>
+                        Represents previous values during an UPDATE
+                    </span>
 
                 </div>
 
 
 
-                <!-- RATING -->
+                <div class="concept-item">
 
-                <div class="validation-card">
+                    <strong>
+                        NEW
+                    </strong>
 
-                    <div class="validation-icon">
-                        ⭐
-                    </div>
-
-                    <h3>
-                        Rating
-                    </h3>
-
-                    <p>
-                        A rating from 1 to 5 must be selected.
-                    </p>
+                    <span>
+                        Represents the latest values during INSERT or UPDATE
+                    </span>
 
                 </div>
 
 
 
-                <!-- FEEDBACK -->
+                <div class="concept-item">
 
-                <div class="validation-card">
+                    <strong>
+                        VIEW
+                    </strong>
 
-                    <div class="validation-icon">
-                        💬
-                    </div>
+                    <span>
+                        Virtual table used for the daily activity report
+                    </span>
 
-                    <h3>
-                        Feedback
-                    </h3>
+                </div>
 
-                    <p>
-                        Feedback must contain at least
-                        10 characters.
-                    </p>
+
+
+                <div class="concept-item">
+
+                    <strong>
+                        GROUP BY
+                    </strong>
+
+                    <span>
+                        Groups operations by date and operation type
+                    </span>
 
                 </div>
 
@@ -761,143 +754,35 @@
 
 
         <!-- ========================================================
-             DATABASE STORAGE
+             ENTERPRISE USE
              ======================================================== -->
 
-        <section class="info-section">
+        <section class="enterprise-card">
 
-
-            <div class="section-heading">
-
-                <span class="section-tag">
-                    SUPABASE DATABASE
-                </span>
-
-                <h2>
-                    Feedback Storage Architecture
-                </h2>
-
-                <p>
-                    Submitted feedback is stored in the
-                    <strong>feedback</strong> table in Supabase.
-                </p>
-
-            </div>
-
-
-
-            <div class="process-grid">
-
-
-                <!-- TABLE -->
-
-                <div class="process-card">
-
-                    <div class="process-number">
-                        DB
-                    </div>
-
-                    <h3>
-                        Feedback Table
-                    </h3>
-
-                    <p>
-                        Stores name, email, category, rating,
-                        feedback and submission timestamp.
-                    </p>
-
-                </div>
-
-
-
-                <!-- VALIDATION -->
-
-                <div class="process-card">
-
-                    <div class="process-number">
-                        JS
-                    </div>
-
-                    <h3>
-                        JavaScript Validation
-                    </h3>
-
-                    <p>
-                        Validates user input before sending
-                        information to the database.
-                    </p>
-
-                </div>
-
-
-
-                <!-- SUPABASE -->
-
-                <div class="process-card">
-
-                    <div class="process-number">
-                        SB
-                    </div>
-
-                    <h3>
-                        Supabase
-                    </h3>
-
-                    <p>
-                        Receives and stores the submitted
-                        feedback records.
-                    </p>
-
-                </div>
-
-
-
-                <!-- TIMESTAMP -->
-
-                <div class="process-card">
-
-                    <div class="process-number">
-                        TM
-                    </div>
-
-                    <h3>
-                        Created At
-                    </h3>
-
-                    <p>
-                        Each feedback record automatically receives
-                        a submission timestamp.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- ========================================================
-             CONFIRMATION
-             ======================================================== -->
-
-        <section
-            id="confirmationSection"
-            class="confirmation-section hidden"
-        >
-
-            <div class="confirmation-icon">
+            <div class="enterprise-icon">
                 ✓
             </div>
 
-            <h2>
-                Feedback Submitted Successfully
-            </h2>
+            <div>
 
-            <p>
-                Your feedback has been validated and stored
-                successfully in the StudentHub database.
-            </p>
+                <span class="section-tag">
+                    REAL-TIME USAGE
+                </span>
+
+                <h2>
+                    Enterprise Audit Logging
+                </h2>
+
+                <p>
+
+                    Automated audit logging is commonly used in
+                    banking, healthcare, e-commerce and enterprise
+                    systems to track database changes and maintain
+                    an audit history.
+
+                </p>
+
+            </div>
 
         </section>
 
@@ -910,15 +795,15 @@
          FOOTER
          ============================================================ -->
 
-    <footer>
+    <footer class="page-footer">
 
         <p>
-            Task 07 • Interactive Web Form with Events & Functions
+            StudentHub • Full Stack Development
         </p>
 
-        <span>
-            Full Stack Development • StudentHub
-        </span>
+        <p>
+            Task 06 • Automated Logging using Triggers & Views
+        </p>
 
     </footer>
 
@@ -928,10 +813,7 @@
          JAVASCRIPT
          ============================================================ -->
 
-    <script
-        src="script.js"
-    ></script>
-
+    <script src="script.js"></script>
 
 </body>
 

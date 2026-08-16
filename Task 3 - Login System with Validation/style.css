@@ -3,7 +3,7 @@
 
 /* ============================================================
    GLOBAL
-   ============================================================ */
+============================================================ */
 
 * {
     margin: 0;
@@ -13,12 +13,10 @@
 
 
 :root {
-
     --primary: #4f46e5;
     --primary-dark: #3730a3;
 
     --background: #f5f7fb;
-
     --white: #ffffff;
 
     --text: #111827;
@@ -26,11 +24,20 @@
 
     --border: #e5e7eb;
 
+    /* ERROR */
     --error: #dc2626;
     --error-background: #fef2f2;
+    --error-border: #fecaca;
 
-    --success: #059669;
+    /* SUCCESS */
+    --success: #047857;
     --success-background: #ecfdf5;
+    --success-border: #6ee7b7;
+
+    /* LOADING */
+    --loading: #4f46e5;
+    --loading-background: #eef2ff;
+    --loading-border: #c7d2fe;
 
     --shadow:
         0 5px 20px rgba(0, 0, 0, 0.04);
@@ -38,109 +45,81 @@
 
 
 body {
-
     font-family: 'Inter', sans-serif;
-
     background: var(--background);
-
     color: var(--text);
-
     min-height: 100vh;
 }
 
 
 /* ============================================================
    PAGE CONTAINER
-   ============================================================ */
+============================================================ */
 
 .page-container {
-
     width: 92%;
-
     max-width: 1400px;
-
     margin: 0 auto;
-
     padding: 40px 0;
 }
 
 
 /* ============================================================
    HEADER
-   ============================================================ */
+============================================================ */
 
 .page-header {
-
     text-align: center;
-
     margin-bottom: 35px;
 }
 
 
 .eyebrow {
-
     color: var(--primary);
-
     font-size: 13px;
-
     font-weight: 700;
-
     letter-spacing: 0.08em;
-
     margin-bottom: 10px;
 }
 
 
 .page-header h1 {
-
     font-size: 38px;
-
     font-weight: 800;
-
     letter-spacing: -0.03em;
-
     margin-bottom: 10px;
 }
 
 
 .subtitle {
-
     color: var(--text-secondary);
-
     font-size: 15px;
-
     line-height: 1.6;
 }
 
 
 /* ============================================================
    LOGIN SECTION
-   ============================================================ */
+============================================================ */
 
 .login-section {
-
     display: flex;
-
     justify-content: center;
-
     align-items: center;
 }
 
 
 /* ============================================================
    LOGIN CARD
-   ============================================================ */
+============================================================ */
 
 .login-card {
-
     width: 100%;
-
     max-width: 470px;
 
     background: var(--white);
 
     border: 1px solid var(--border);
-
     border-radius: 16px;
 
     padding: 36px;
@@ -151,20 +130,16 @@ body {
 
 /* ============================================================
    LOGIN ICON
-   ============================================================ */
+============================================================ */
 
 .login-icon {
-
     width: 64px;
-
     height: 64px;
 
     margin: 0 auto 20px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     background: #eef2ff;
@@ -177,52 +152,41 @@ body {
 
 /* ============================================================
    LOGIN HEADING
-   ============================================================ */
+============================================================ */
 
 .login-heading {
-
     text-align: center;
-
     margin-bottom: 30px;
 }
 
 
 .login-heading h2 {
-
     font-size: 22px;
-
     font-weight: 700;
-
     margin-bottom: 8px;
 }
 
 
 .login-heading p {
-
     color: var(--text-secondary);
-
     font-size: 14px;
-
     line-height: 1.5;
 }
 
 
 /* ============================================================
    FORM
-   ============================================================ */
+============================================================ */
 
 .form-group {
-
     margin-bottom: 22px;
 }
 
 
 .form-group label {
-
     display: block;
 
     font-size: 14px;
-
     font-weight: 600;
 
     margin-bottom: 8px;
@@ -230,41 +194,35 @@ body {
 
 
 .form-group input {
-
     width: 100%;
-
     height: 48px;
 
     padding: 0 14px;
 
     border: 1px solid var(--border);
-
     border-radius: 10px;
 
     outline: none;
 
     background: #ffffff;
-
     color: var(--text);
 
     font-family: inherit;
-
     font-size: 14px;
 
     transition:
         border-color 0.2s ease,
-        box-shadow 0.2s ease;
+        box-shadow 0.2s ease,
+        background 0.2s ease;
 }
 
 
 .form-group input::placeholder {
-
     color: #9ca3af;
 }
 
 
 .form-group input:focus {
-
     border-color: var(--primary);
 
     box-shadow:
@@ -274,26 +232,22 @@ body {
 
 /* ============================================================
    PASSWORD
-   ============================================================ */
+============================================================ */
 
 .password-wrapper {
-
     position: relative;
 }
 
 
 .password-wrapper input {
-
     padding-right: 70px;
 }
 
 
 .toggle-password {
-
     position: absolute;
 
     right: 12px;
-
     top: 50%;
 
     transform: translateY(-50%);
@@ -305,9 +259,7 @@ body {
     color: var(--primary);
 
     font-family: inherit;
-
     font-size: 12px;
-
     font-weight: 700;
 
     cursor: pointer;
@@ -317,23 +269,20 @@ body {
 
 
 .toggle-password:hover {
-
     color: var(--primary-dark);
 }
 
 
 /* ============================================================
    FIELD ERRORS
-   ============================================================ */
+============================================================ */
 
 .field-error {
-
     display: block;
 
     color: var(--error);
 
     font-size: 12px;
-
     font-weight: 500;
 
     margin-top: 6px;
@@ -343,7 +292,6 @@ body {
 
 
 .input-error {
-
     border-color: var(--error) !important;
 
     background: var(--error-background) !important;
@@ -352,11 +300,12 @@ body {
 
 /* ============================================================
    GENERAL MESSAGE
-   ============================================================ */
+============================================================ */
 
 .message {
-
     display: none;
+
+    width: 100%;
 
     padding: 12px 14px;
 
@@ -365,49 +314,68 @@ body {
     margin-bottom: 18px;
 
     font-size: 13px;
-
-    font-weight: 500;
+    font-weight: 600;
 
     line-height: 1.5;
+
+    border: 1px solid transparent;
 }
 
 
-.message.error {
+/* ============================================================
+   ERROR MESSAGE — RED
+============================================================ */
 
-    display: block;
+#loginMessage.message.error {
+    display: block !important;
 
-    color: var(--error);
+    color: var(--error) !important;
 
-    background: var(--error-background);
+    background: var(--error-background) !important;
 
-    border: 1px solid #fecaca;
+    border: 1px solid var(--error-border) !important;
 }
 
 
-.message.success {
+/* ============================================================
+   SUCCESS MESSAGE — GREEN
+============================================================ */
 
-    display: block;
+#loginMessage.message.success {
+    display: block !important;
 
-    color: var(--success);
+    color: var(--success) !important;
 
-    background: var(--success-background);
+    background: var(--success-background) !important;
 
-    border: 1px solid #a7f3d0;
+    border: 1px solid var(--success-border) !important;
+}
+
+
+/* ============================================================
+   LOADING MESSAGE — BLUE
+============================================================ */
+
+#loginMessage.message.loading {
+    display: block !important;
+
+    color: var(--loading) !important;
+
+    background: var(--loading-background) !important;
+
+    border: 1px solid var(--loading-border) !important;
 }
 
 
 /* ============================================================
    LOGIN BUTTON
-   ============================================================ */
+============================================================ */
 
 .login-button {
-
     width: 100%;
-
     height: 48px;
 
     border: none;
-
     border-radius: 10px;
 
     background: var(--primary);
@@ -415,45 +383,39 @@ body {
     color: white;
 
     font-family: inherit;
-
     font-size: 14px;
-
     font-weight: 700;
 
     cursor: pointer;
 
     transition:
         background 0.2s ease,
-        transform 0.1s ease;
+        transform 0.1s ease,
+        opacity 0.2s ease;
 }
 
 
 .login-button:hover {
-
     background: var(--primary-dark);
 }
 
 
 .login-button:active {
-
     transform: scale(0.99);
 }
 
 
 .login-button:disabled {
-
     opacity: 0.7;
-
     cursor: not-allowed;
 }
 
 
 /* ============================================================
    LOGIN INFORMATION
-   ============================================================ */
+============================================================ */
 
 .login-info {
-
     display: flex;
 
     align-items: flex-start;
@@ -473,17 +435,13 @@ body {
 
 
 .info-icon {
-
     width: 28px;
-
     height: 28px;
 
     flex-shrink: 0;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     border-radius: 8px;
@@ -493,13 +451,11 @@ body {
     color: var(--primary-dark);
 
     font-size: 13px;
-
     font-weight: 700;
 }
 
 
 .login-info strong {
-
     display: block;
 
     font-size: 12px;
@@ -509,7 +465,6 @@ body {
 
 
 .login-info p {
-
     color: var(--text-secondary);
 
     font-size: 11px;
@@ -519,11 +474,44 @@ body {
 
 
 /* ============================================================
+   TECHNOLOGY INFORMATION
+============================================================ */
+
+.technology-info {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 25px;
+}
+
+
+.technology-info span {
+    padding: 6px 10px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 8px;
+
+    background: var(--white);
+
+    color: var(--text-secondary);
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* ============================================================
    FOOTER
-   ============================================================ */
+============================================================ */
 
 .page-footer {
-
     text-align: center;
 
     margin-top: 30px;
@@ -536,26 +524,28 @@ body {
 
 /* ============================================================
    RESPONSIVE
-   ============================================================ */
+============================================================ */
 
 @media (max-width: 600px) {
 
     .page-container {
-
         width: 94%;
-
         padding: 25px 0;
     }
 
 
     .page-header h1 {
-
         font-size: 30px;
     }
 
 
     .login-card {
-
         padding: 25px 20px;
     }
+
+
+    .technology-info {
+        gap: 6px;
+    }
+
 }
