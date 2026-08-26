@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Campus | Event Management</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header class="header">
+    <div class="container">
+        <h1>Smart Campus</h1>
+        <p>Event Management System</p>
+    </div>
+</header>
+
+<nav class="navbar">
+    <div class="container">
+
+        <a th:href="@{/}" class="nav-brand">
+            Smart Campus
+        </a>
+
+        <div class="nav-links">
+            <a th:href="@{/}" class="active">Home</a>
+            <a th:href="@{/events}">Events</a>
+            <a th:href="@{/login}">Admin Login</a>
+        </div>
+
+    </div>
+</nav>
+
+<main>
+
+    <div class="container">
+
+        <div class="page-header">
+
+            <div>
+                <h1>Upcoming Campus Events</h1>
+                <p>Discover the latest events happening on campus.</p>
+            </div>
+
+            <a th:href="@{/events}" class="btn">
+                View All Events
+            </a>
+
+        </div>
+
+        <div class="dashboard-grid">
+
+            <div
+                class="card"
+                th:each="event : ${events}"
+                style="padding: 24px;">
+
+                <h2
+                    th:text="${event.title}">
+                    Event Title
+                </h2>
+
+                <p
+                    class="text-muted mt-1"
+                    th:text="${event.description}">
+                    Event description
+                </p>
+
+                <div class="mt-2">
+
+                    <p>
+                        <strong>Department:</strong>
+                        <span th:text="${event.department}">
+                            CSE
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>Date:</strong>
+                        <span th:text="${event.date}">
+                            2026-09-10
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>Time:</strong>
+                        <span th:text="${event.time}">
+                            10:00
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>Venue:</strong>
+                        <span th:text="${event.venue}">
+                            Auditorium
+                        </span>
+                    </p>
+
+                </div>
+
+                <div class="mt-2">
+
+                    <a
+                        th:href="@{/events/{id}(id=${event.id})}"
+                        class="btn btn-outline">
+
+                        View Details
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div
+            th:if="${#lists.isEmpty(events)}"
+            class="card empty-state">
+
+            <h3>No Upcoming Events</h3>
+
+            <p>
+                There are currently no upcoming campus events.
+            </p>
+
+        </div>
+
+    </div>
+
+</main>
+
+<footer class="footer">
+
+    <p>
+        Department of Computer Science and Engineering
+        &nbsp;•&nbsp;
+        Smart Campus
+    </p>
+
+</footer>
+
+</body>
+</html>

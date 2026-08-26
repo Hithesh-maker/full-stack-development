@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Event Registrations | Smart Campus</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header class="header">
+    <div class="container">
+        <h1>Smart Campus</h1>
+        <p>Event Management System</p>
+    </div>
+</header>
+
+
+<!-- =========================
+     NAVIGATION
+========================= -->
+
+<nav class="navbar">
+
+    <div class="container">
+
+        <a th:href="@{/admin/events}" class="nav-brand">
+            Admin Panel
+        </a>
+
+        <div class="nav-links">
+
+            <a th:href="@{/admin/events}">
+                Events
+            </a>
+
+            <a th:href="@{/admin/events/add}">
+                Add Event
+            </a>
+
+            <a th:href="@{/}">
+                Home
+            </a>
+
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger">
+                    Logout
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- =========================
+     MAIN CONTENT
+========================= -->
+
+<main class="container">
+
+    <!-- Page Header -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Event Registrations
+            </h1>
+
+            <p>
+                View students enrolled in this event.
+            </p>
+
+        </div>
+
+        <div class="actions">
+
+            <a th:href="@{/admin/events}" class="btn btn-secondary">
+                ← Back to Events
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         EVENT INFORMATION
+    ========================== -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <h2 th:text="${event.title}">
+                Event Title
+            </h2>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="grid grid-3">
+
+                <div>
+                    <strong>Department</strong>
+                    <p class="text-muted"
+                       th:text="${event.department}">
+                        Department
+                    </p>
+                </div>
+
+                <div>
+                    <strong>Date</strong>
+                    <p class="text-muted"
+                       th:text="${event.date}">
+                        Date
+                    </p>
+                </div>
+
+                <div>
+                    <strong>Time</strong>
+                    <p class="text-muted"
+                       th:text="${event.time}">
+                        Time
+                    </p>
+                </div>
+
+                <div>
+                    <strong>Venue</strong>
+                    <p class="text-muted"
+                       th:text="${event.venue}">
+                        Venue
+                    </p>
+                </div>
+
+                <div>
+                    <strong>Capacity</strong>
+                    <p class="text-muted"
+                       th:text="${event.capacity}">
+                        Capacity
+                    </p>
+                </div>
+
+                <div>
+                    <strong>Event Type</strong>
+                    <p class="text-muted"
+                       th:text="${event.type}">
+                        Type
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         STATISTICS
+    ========================== -->
+
+    <div class="dashboard-grid mt-3">
+
+        <div class="stat-card">
+
+            <h3>Registered Students</h3>
+
+            <div class="number"
+                 th:text="${registrationCount}">
+                0
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>Total Tickets</h3>
+
+            <div class="number"
+                 th:text="${totalTickets}">
+                0
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>Available Seats</h3>
+
+            <div class="number"
+                 th:text="${event.capacity - totalTickets}">
+                0
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         STUDENT REGISTRATIONS
+    ========================== -->
+
+    <div class="card mt-3">
+
+        <div class="card-header">
+
+            <h2>
+                Enrolled Students
+            </h2>
+
+        </div>
+
+        <div class="card-body">
+
+
+            <!-- No registrations -->
+
+            <div class="empty-state"
+                 th:if="${#lists.isEmpty(registrations)}">
+
+                <h3>
+                    No Students Registered
+                </h3>
+
+                <p>
+                    No students have enrolled for this event yet.
+                </p>
+
+            </div>
+
+
+            <!-- Registrations Table -->
+
+            <div class="table-wrapper"
+                 th:if="${!#lists.isEmpty(registrations)}">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>
+                            #
+                        </th>
+
+                        <th>
+                            Student Name
+                        </th>
+
+                        <th>
+                            Email
+                        </th>
+
+                        <th>
+                            Department
+                        </th>
+
+                        <th>
+                            Tickets
+                        </th>
+
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    <tr th:each="registration, stat : ${registrations}">
+
+                        <td th:text="${stat.count}">
+                            1
+                        </td>
+
+                        <td>
+
+                            <strong
+                                th:text="${registration.studentName}">
+                                Student Name
+                            </strong>
+
+                        </td>
+
+                        <td th:text="${registration.email}">
+                            student@example.com
+                        </td>
+
+                        <td>
+
+                            <span class="badge badge-primary"
+                                  th:text="${registration.department}">
+                                CSE
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <span class="badge badge-success"
+                                  th:text="${registration.tickets}">
+                                1
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer class="footer">
+
+    <p>
+        Department of Computer Science and Engineering
+    </p>
+
+</footer>
+
+</body>
+
+</html>

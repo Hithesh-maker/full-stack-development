@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Register for Event | Smart Campus</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header class="header">
+    <div class="container">
+        <h1>Smart Campus</h1>
+        <p>Event Management System</p>
+    </div>
+</header>
+
+<nav class="navbar">
+    <div class="container">
+
+        <a th:href="@{/}" class="nav-brand">
+            Smart Campus
+        </a>
+
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/events}" class="active">Events</a>
+            <a th:href="@{/login}">Admin</a>
+        </div>
+
+    </div>
+</nav>
+
+<main class="container">
+
+    <div class="page-header">
+        <div>
+            <h1>Event Registration</h1>
+            <p>Register for the selected campus event.</p>
+        </div>
+    </div>
+
+    <!-- Event information -->
+    <div class="card" style="margin-bottom: 25px;">
+
+        <div class="card-header">
+            <h2 th:text="${event.title}">
+                Event Title
+            </h2>
+        </div>
+
+        <div class="card-body">
+
+            <div class="grid grid-2">
+
+                <div>
+                    <p class="text-muted">Department</p>
+                    <strong th:text="${event.department}">
+                        Department
+                    </strong>
+                </div>
+
+                <div>
+                    <p class="text-muted">Event Type</p>
+                    <strong th:text="${event.type}">
+                        Type
+                    </strong>
+                </div>
+
+                <div>
+                    <p class="text-muted">Date</p>
+                    <strong th:text="${event.date}">
+                        Date
+                    </strong>
+                </div>
+
+                <div>
+                    <p class="text-muted">Time</p>
+                    <strong th:text="${event.time}">
+                        Time
+                    </strong>
+                </div>
+
+                <div>
+                    <p class="text-muted">Venue</p>
+                    <strong th:text="${event.venue}">
+                        Venue
+                    </strong>
+                </div>
+
+                <div>
+                    <p class="text-muted">Capacity</p>
+                    <strong th:text="${event.capacity}">
+                        Capacity
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Registration form -->
+    <div class="card">
+
+        <div class="card-header">
+            <h2>Student Details</h2>
+        </div>
+
+        <div class="card-body">
+
+            <!-- General error -->
+            <div th:if="${error}" class="error" th:text="${error}">
+                Registration error
+            </div>
+
+            <form
+                th:action="@{/events/register}"
+                th:object="${registration}"
+                method="post">
+
+                <!-- Keep event ID -->
+                <input
+                    type="hidden"
+                    th:field="*{eventId}"
+                >
+
+                <div class="form-group">
+
+                    <label for="studentName">
+                        Student Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="studentName"
+                        th:field="*{studentName}"
+                        placeholder="Enter your full name"
+                        autocomplete="name"
+                        required
+                    >
+
+                    <div
+                        th:if="${#fields.hasErrors('studentName')}"
+                        th:errors="*{studentName}"
+                        class="error">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        th:field="*{email}"
+                        placeholder="Enter your email address"
+                        autocomplete="email"
+                        required
+                    >
+
+                    <div
+                        th:if="${#fields.hasErrors('email')}"
+                        th:errors="*{email}"
+                        class="error">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="department">
+                        Department
+                    </label>
+
+                    <select
+                        id="department"
+                        th:field="*{department}"
+                        required>
+
+                        <option value="">
+                            Select your department
+                        </option>
+
+                        <option value="Computer Science and Engineering">
+                            Computer Science and Engineering
+                        </option>
+
+                        <option value="Information Technology">
+                            Information Technology
+                        </option>
+
+                        <option value="Electronics and Communication Engineering">
+                            Electronics and Communication Engineering
+                        </option>
+
+                        <option value="Electrical and Electronics Engineering">
+                            Electrical and Electronics Engineering
+                        </option>
+
+                        <option value="Mechanical Engineering">
+                            Mechanical Engineering
+                        </option>
+
+                        <option value="Civil Engineering">
+                            Civil Engineering
+                        </option>
+
+                        <option value="Artificial Intelligence and Data Science">
+                            Artificial Intelligence and Data Science
+                        </option>
+
+                    </select>
+
+                    <div
+                        th:if="${#fields.hasErrors('department')}"
+                        th:errors="*{department}"
+                        class="error">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="tickets">
+                        Number of Tickets
+                    </label>
+
+                    <input
+                        type="number"
+                        id="tickets"
+                        th:field="*{tickets}"
+                        min="1"
+                        max="10"
+                        placeholder="Enter number of tickets"
+                        required
+                    >
+
+                    <div
+                        th:if="${#fields.hasErrors('tickets')}"
+                        th:errors="*{tickets}"
+                        class="error">
+                    </div>
+
+                </div>
+
+                <div class="actions">
+
+                    <a
+                        th:href="@{/events/{id}(id=${event.id})}"
+                        class="btn btn-secondary">
+                        Back to Event
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn">
+                        Register for Event
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</main>
+
+<footer class="footer">
+    <p>
+        Department of Computer Science and Engineering
+    </p>
+</footer>
+
+</body>
+
+</html>

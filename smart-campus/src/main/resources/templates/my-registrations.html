@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Registrations | Smart Campus</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header class="header">
+    <div class="container">
+        <h1>Smart Campus</h1>
+        <p>Event Management System</p>
+    </div>
+</header>
+
+<nav class="navbar">
+    <div class="container">
+
+        <a th:href="@{/}" class="nav-brand">
+            Smart Campus
+        </a>
+
+        <div class="nav-links">
+            <a th:href="@{/}">
+                Home
+            </a>
+
+            <a th:href="@{/events}">
+                Events
+            </a>
+
+            <a th:href="@{/login}">
+                Admin
+            </a>
+        </div>
+
+    </div>
+</nav>
+
+<main class="container">
+
+    <div class="page-header">
+
+        <div>
+            <h1>My Registrations</h1>
+
+            <p>
+                Registrations for
+                <strong th:text="${email}">
+                    student@example.com
+                </strong>
+            </p>
+        </div>
+
+        <a
+            th:href="@{/events}"
+            class="btn">
+            Browse Events
+        </a>
+
+    </div>
+
+    <!-- No registrations -->
+    <div
+        th:if="${#lists.isEmpty(registrations)}"
+        class="card">
+
+        <div class="empty-state">
+
+            <h3>No Registrations Found</h3>
+
+            <p>
+                You have not registered for any events with this email address.
+            </p>
+
+            <a
+                th:href="@{/events}"
+                class="btn mt-2">
+                Browse Events
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- Registrations -->
+    <div
+        th:unless="${#lists.isEmpty(registrations)}"
+        class="table-wrapper">
+
+        <table>
+
+            <thead>
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Student Name</th>
+
+                    <th>Email</th>
+
+                    <th>Department</th>
+
+                    <th>Event ID</th>
+
+                    <th>Tickets</th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr th:each="registration : ${registrations}">
+
+                    <td th:text="${registration.id}">
+                        1
+                    </td>
+
+                    <td th:text="${registration.studentName}">
+                        Student Name
+                    </td>
+
+                    <td th:text="${registration.email}">
+                        student@example.com
+                    </td>
+
+                    <td th:text="${registration.department}">
+                        CSE
+                    </td>
+
+                    <td th:text="${registration.eventId}">
+                        1
+                    </td>
+
+                    <td>
+                        <span
+                            class="badge badge-primary"
+                            th:text="${registration.tickets}">
+                            1
+                        </span>
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
+<footer class="footer">
+    <p>
+        Department of Computer Science and Engineering
+    </p>
+</footer>
+
+</body>
+
+</html>

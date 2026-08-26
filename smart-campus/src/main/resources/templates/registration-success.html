@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Registration Successful | Smart Campus</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header class="header">
+    <div class="container">
+        <h1>Smart Campus</h1>
+        <p>Event Management System</p>
+    </div>
+</header>
+
+<nav class="navbar">
+    <div class="container">
+
+        <a th:href="@{/}" class="nav-brand">
+            Smart Campus
+        </a>
+
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/events}">Events</a>
+            <a th:href="@{/login}">Admin</a>
+        </div>
+
+    </div>
+</nav>
+
+<main class="container">
+
+    <div class="card login-card">
+
+        <div class="success text-center">
+
+            <h2>Registration Successful!</h2>
+
+            <p th:text="${message}">
+                Registration successful!
+            </p>
+
+        </div>
+
+        <div th:if="${registered}" class="card-body">
+
+            <h3 class="text-center mb-2">
+                Registration Details
+            </h3>
+
+            <p class="mb-1">
+                <strong>Student Name:</strong>
+                <span th:text="${registered.studentName}">
+                    Student Name
+                </span>
+            </p>
+
+            <p class="mb-1">
+                <strong>Email:</strong>
+                <span th:text="${registered.email}">
+                    Email
+                </span>
+            </p>
+
+            <p class="mb-1">
+                <strong>Department:</strong>
+                <span th:text="${registered.department}">
+                    Department
+                </span>
+            </p>
+
+            <p class="mb-2">
+                <strong>Tickets:</strong>
+                <span th:text="${registered.tickets}">
+                    1
+                </span>
+            </p>
+
+        </div>
+
+        <div class="actions">
+
+            <a
+                th:href="@{/events}"
+                class="btn">
+                Browse Events
+            </a>
+
+            <a
+                th:if="${registered}"
+                th:href="@{/my-registrations(email=${registered.email})}"
+                class="btn btn-outline">
+                My Registrations
+            </a>
+
+        </div>
+
+    </div>
+
+</main>
+
+<footer class="footer">
+    <p>
+        Department of Computer Science and Engineering
+    </p>
+</footer>
+
+</body>
+
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>All Events | Smart Campus</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="container">
+
+        <h1>Smart Campus</h1>
+
+        <p>Event Management System</p>
+
+    </div>
+
+</header>
+
+
+<nav class="navbar">
+
+    <div class="container">
+
+        <a th:href="@{/}" class="nav-brand">
+            Smart Campus
+        </a>
+
+        <div class="nav-links">
+
+            <a th:href="@{/}">
+                Home
+            </a>
+
+            <a th:href="@{/events}" class="active">
+                Events
+            </a>
+
+            <a th:href="@{/login}">
+                Admin Login
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<main>
+
+    <div class="container">
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>All Campus Events</h1>
+
+                <p>
+                    Browse all events organized by the campus.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-grid">
+
+            <div
+                th:each="event : ${events}"
+                class="card"
+                style="padding: 24px;">
+
+                <span
+                    class="badge badge-primary"
+                    th:text="${event.type}">
+                    Seminar
+                </span>
+
+                <h2
+                    class="mt-2"
+                    th:text="${event.title}">
+                    Event Title
+                </h2>
+
+                <p
+                    class="text-muted mt-1"
+                    th:text="${event.description}">
+                    Description
+                </p>
+
+                <div class="mt-2">
+
+                    <p>
+                        <strong>Department:</strong>
+                        <span th:text="${event.department}">
+                            CSE
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>Date:</strong>
+                        <span th:text="${event.date}">
+                            2026-09-10
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>Time:</strong>
+                        <span th:text="${event.time}">
+                            10:00
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>Venue:</strong>
+                        <span th:text="${event.venue}">
+                            Main Auditorium
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>Capacity:</strong>
+                        <span th:text="${event.capacity}">
+                            100
+                        </span>
+                    </p>
+
+                </div>
+
+                <div class="mt-2">
+
+                    <a
+                        th:href="@{/events/{id}(id=${event.id})}"
+                        class="btn">
+
+                        View Details
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            th:if="${#lists.isEmpty(events)}"
+            class="card empty-state">
+
+            <h3>No Events Available</h3>
+
+            <p>
+                There are currently no campus events to display.
+            </p>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer class="footer">
+
+    <p>
+        Department of Computer Science and Engineering
+        &nbsp;•&nbsp;
+        Smart Campus
+    </p>
+
+</footer>
+
+</body>
+
+</html>

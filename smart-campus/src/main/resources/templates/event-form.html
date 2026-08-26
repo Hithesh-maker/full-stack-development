@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title
+        th:text="${event.id == null ? 'Add Event | Smart Campus' : 'Edit Event | Smart Campus'}">
+        Event | Smart Campus
+    </title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+    <!-- ================================
+         HEADER
+    ================================= -->
+
+    <header class="header">
+
+        <div class="container">
+
+            <h1>Smart Campus</h1>
+
+            <p>
+                Event Management System
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <!-- ================================
+         NAVIGATION
+    ================================= -->
+
+    <nav class="navbar">
+
+        <div class="container">
+
+            <a
+                th:href="@{/admin/events}"
+                class="nav-brand">
+
+                Smart Campus Admin
+
+            </a>
+
+            <div class="nav-links">
+
+                <a th:href="@{/admin/events}">
+                    Events
+                </a>
+
+                <a th:href="@{/}">
+                    Home
+                </a>
+
+                <a th:href="@{/logout}">
+                    Logout
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================================
+         MAIN CONTENT
+    ================================= -->
+
+    <main>
+
+        <div class="container">
+
+            <div class="page-header">
+
+                <div>
+
+                    <h1
+                        th:text="${event.id == null ? 'Add New Event' : 'Edit Event'}">
+
+                        Add New Event
+
+                    </h1>
+
+                    <p>
+                        Enter the details of the campus event below.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================
+                 EVENT FORM
+            ================================= -->
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <form
+                        th:object="${event}"
+                        th:action="${event.id == null}
+                            ? @{/admin/events/save}
+                            : @{/admin/events/update/{id}(id=${event.id})}"
+                        method="post">
+
+
+                        <!-- ================================
+                             TITLE
+                        ================================= -->
+
+                        <div class="form-group">
+
+                            <label for="title">
+                                Event Title
+                            </label>
+
+                            <input
+                                type="text"
+                                id="title"
+                                th:field="*{title}"
+                                placeholder="Enter event title"
+                                required>
+
+                            <div
+                                th:if="${#fields.hasErrors('title')}"
+                                th:errors="*{title}"
+                                class="error">
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================================
+                             DESCRIPTION
+                        ================================= -->
+
+                        <div class="form-group">
+
+                            <label for="description">
+                                Description
+                            </label>
+
+                            <textarea
+                                id="description"
+                                th:field="*{description}"
+                                placeholder="Enter event description"
+                                required>
+                            </textarea>
+
+                            <div
+                                th:if="${#fields.hasErrors('description')}"
+                                th:errors="*{description}"
+                                class="error">
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================================
+                             DEPARTMENT + TYPE
+                        ================================= -->
+
+                        <div class="grid grid-2">
+
+                            <div class="form-group">
+
+                                <label for="department">
+                                    Department
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="department"
+                                    th:field="*{department}"
+                                    placeholder="Example: CSE"
+                                    required>
+
+                                <div
+                                    th:if="${#fields.hasErrors('department')}"
+                                    th:errors="*{department}"
+                                    class="error">
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="type">
+                                    Event Type
+                                </label>
+
+                                <select
+                                    id="type"
+                                    th:field="*{type}"
+                                    required>
+
+                                    <option value="">
+                                        Select event type
+                                    </option>
+
+                                    <option value="Workshop">
+                                        Workshop
+                                    </option>
+
+                                    <option value="Seminar">
+                                        Seminar
+                                    </option>
+
+                                    <option value="Conference">
+                                        Conference
+                                    </option>
+
+                                    <option value="Hackathon">
+                                        Hackathon
+                                    </option>
+
+                                    <option value="Competition">
+                                        Competition
+                                    </option>
+
+                                    <option value="Cultural">
+                                        Cultural
+                                    </option>
+
+                                    <option value="Sports">
+                                        Sports
+                                    </option>
+
+                                    <option value="Other">
+                                        Other
+                                    </option>
+
+                                </select>
+
+                                <div
+                                    th:if="${#fields.hasErrors('type')}"
+                                    th:errors="*{type}"
+                                    class="error">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================================
+                             DATE + TIME
+                        ================================= -->
+
+                        <div class="grid grid-2">
+
+                            <div class="form-group">
+
+                                <label for="date">
+                                    Event Date
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="date"
+                                    th:field="*{date}"
+                                    required>
+
+                                <div
+                                    th:if="${#fields.hasErrors('date')}"
+                                    th:errors="*{date}"
+                                    class="error">
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="time">
+                                    Event Time
+                                </label>
+
+                                <input
+                                    type="time"
+                                    id="time"
+                                    th:field="*{time}"
+                                    required>
+
+                                <div
+                                    th:if="${#fields.hasErrors('time')}"
+                                    th:errors="*{time}"
+                                    class="error">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================================
+                             VENUE + CAPACITY
+                        ================================= -->
+
+                        <div class="grid grid-2">
+
+                            <div class="form-group">
+
+                                <label for="venue">
+                                    Venue
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="venue"
+                                    th:field="*{venue}"
+                                    placeholder="Example: Main Auditorium"
+                                    required>
+
+                                <div
+                                    th:if="${#fields.hasErrors('venue')}"
+                                    th:errors="*{venue}"
+                                    class="error">
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="capacity">
+                                    Capacity
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="capacity"
+                                    th:field="*{capacity}"
+                                    placeholder="Example: 100"
+                                    min="1"
+                                    required>
+
+                                <div
+                                    th:if="${#fields.hasErrors('capacity')}"
+                                    th:errors="*{capacity}"
+                                    class="error">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================================
+                             FORM ACTIONS
+                        ================================= -->
+
+                        <div class="actions">
+
+                            <button
+                                type="submit"
+                                class="btn btn-success"
+                                th:text="${event.id == null ? 'Create Event' : 'Update Event'}">
+
+                                Create Event
+
+                            </button>
+
+                            <a
+                                th:href="@{/admin/events}"
+                                class="btn btn-secondary">
+
+                                Cancel
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- ================================
+         FOOTER
+    ================================= -->
+
+    <footer class="footer">
+
+        <p>
+            Department of Computer Science and Engineering
+            &nbsp;•&nbsp;
+            Smart Campus
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

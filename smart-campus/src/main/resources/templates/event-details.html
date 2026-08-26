@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title
+        th:text="${event.title + ' | Smart Campus'}">
+        Event Details | Smart Campus
+    </title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="container">
+
+        <h1>Smart Campus</h1>
+
+        <p>Event Management System</p>
+
+    </div>
+
+</header>
+
+
+<nav class="navbar">
+
+    <div class="container">
+
+        <a th:href="@{/}" class="nav-brand">
+            Smart Campus
+        </a>
+
+        <div class="nav-links">
+
+            <a th:href="@{/}">
+                Home
+            </a>
+
+            <a th:href="@{/events}" class="active">
+                Events
+            </a>
+
+            <a th:href="@{/login}">
+                Admin Login
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<main>
+
+    <div class="container">
+
+        <div class="page-header">
+
+            <div>
+
+                <h1 th:text="${event.title}">
+                    Event Title
+                </h1>
+
+                <p>
+                    Event information and details
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <span
+                    class="badge badge-primary"
+                    th:text="${event.type}">
+                    Seminar
+                </span>
+
+                <h2
+                    class="mt-1"
+                    th:text="${event.title}">
+                    Event Title
+                </h2>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <h3>
+                    About This Event
+                </h3>
+
+                <p
+                    class="text-muted mt-1"
+                    th:text="${event.description}">
+                    Event description goes here.
+                </p>
+
+
+                <div class="grid grid-2 mt-3">
+
+                    <div>
+
+                        <strong>Department</strong>
+
+                        <p
+                            class="text-muted"
+                            th:text="${event.department}">
+                            Computer Science
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>Event Type</strong>
+
+                        <p
+                            class="text-muted"
+                            th:text="${event.type}">
+                            Workshop
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>Date</strong>
+
+                        <p
+                            class="text-muted"
+                            th:text="${event.date}">
+                            2026-09-10
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>Time</strong>
+
+                        <p
+                            class="text-muted"
+                            th:text="${event.time}">
+                            10:00
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>Venue</strong>
+
+                        <p
+                            class="text-muted"
+                            th:text="${event.venue}">
+                            Main Auditorium
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>Capacity</strong>
+
+                        <p
+                            class="text-muted"
+                            th:text="${event.capacity}">
+                            100
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="actions mt-3">
+
+                    <a
+                        th:href="@{/events}"
+                        class="btn btn-secondary">
+
+                        ← Back to Events
+
+                    </a>
+
+                    <a
+                        th:href="@{/events/{id}/register(id=${event.id})}"
+                        class="btn btn-success">
+
+                        Register for Event
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer class="footer">
+
+    <p>
+        Department of Computer Science and Engineering
+        &nbsp;•&nbsp;
+        Smart Campus
+    </p>
+
+</footer>
+
+</body>
+
+</html>
