@@ -1,2 +1,17 @@
+﻿# Node / React
 node_modules/
+dist/
 .env
+.env.local
+
+# Java / Spring Boot
+target/
+*.class
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

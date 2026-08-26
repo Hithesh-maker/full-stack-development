@@ -1,0 +1,247 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f2f4f7;
+  color: #333;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+/* Header */
+header {
+  background: #1e3a8a;
+  color: white;
+  text-align: center;
+  padding: 30px 20px;
+}
+
+header h1 {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+header p {
+  font-size: 17px;
+}
+
+/* Main container */
+main {
+  width: 90%;
+  max-width: 900px;
+  margin: 30px auto;
+}
+
+/* Event Details */
+.event-card {
+  background: white;
+  padding: 25px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.event-card h2 {
+  color: #1e3a8a;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #1e3a8a;
+  padding-bottom: 10px;
+}
+
+/* Event information layout */
+.event-info p {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 16px;
+}
+
+.event-info p:last-child {
+  border-bottom: none;
+}
+
+.event-info strong {
+  color: #444;
+}
+
+.event-info span {
+  text-align: right;
+}
+
+/* Available tickets */
+.event-info .available {
+  color: #15803d;
+  font-weight: bold;
+  background: #f0fdf4;
+  padding: 10px !important;
+  border-radius: 5px;
+}
+
+/* Booking Form */
+.booking-card {
+  background: white;
+  padding: 25px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.booking-card h2 {
+  color: #1e3a8a;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #1e3a8a;
+  padding-bottom: 10px;
+}
+
+.booking-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-card label {
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.booking-card input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+.booking-card input:focus {
+  outline: none;
+  border-color: #1e3a8a;
+  box-shadow: 0 0 3px rgba(30, 58, 138, 0.3);
+}
+
+/* Error messages */
+.error {
+  color: #dc2626;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Buttons */
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+button {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 5px;
+  background: #1e3a8a;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #162d6b;
+}
+
+.reset-btn {
+  background: #666;
+}
+
+.reset-btn:hover {
+  background: #444;
+}
+
+/* Booking Confirmation */
+.confirmation {
+  background: white;
+  padding: 25px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  border-left: 5px solid #15803d;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.confirmation h2 {
+  color: #15803d;
+  margin-bottom: 20px;
+}
+
+.confirmation p {
+  margin: 12px 0;
+  font-size: 16px;
+}
+
+/* Booking ID */
+.confirmation p:first-of-type {
+  color: #1e3a8a;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Success message */
+.confirmation .success {
+  color: #15803d;
+  font-weight: bold;
+  background: #ecfdf5;
+  padding: 12px;
+  border-radius: 5px;
+  margin-top: 15px;
+}
+
+/* Footer */
+footer {
+  background: #1e3a8a;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  header h1 {
+    font-size: 25px;
+  }
+
+  main {
+    width: 94%;
+    margin: 20px auto;
+  }
+
+  .event-card,
+  .booking-card,
+  .confirmation {
+    padding: 20px;
+  }
+
+  .event-info p {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .event-info span {
+    text-align: left;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
+}
