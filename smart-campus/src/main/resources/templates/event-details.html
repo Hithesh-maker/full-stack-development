@@ -2,215 +2,216 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title
-        th:text="${event.title + ' | Smart Campus'}">
-        Event Details | Smart Campus
-    </title>
-
+    <title th:text="${event.title + ' | Smart Campus University'}">Event Details | Smart Campus</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
-
 </head>
 
 <body>
 
-<header class="header">
-
+<!-- TOP UTILITY BAR -->
+<div class="top-utility-bar">
     <div class="container">
-
-        <h1>Smart Campus</h1>
-
-        <p>Event Management System</p>
-
+        <ul class="utility-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/events}">Events</a></li>
+            <li><a th:href="@{/my-registrations}">Student Passes</a></li>
+            <li><a th:href="@{/login}">Admin Portal</a></li>
+        </ul>
+        <div class="utility-quick">
+            <span>Event Coordination Office</span>
+            <span>•</span>
+            <span>Helpdesk: +91 80 2345 6789</span>
+        </div>
     </div>
+</div>
 
-</header>
-
-
-<nav class="navbar">
-
+<!-- BRAND HEADER BAR -->
+<header class="main-header-bar">
     <div class="container">
-
-        <a th:href="@{/}" class="nav-brand">
-            Smart Campus
+        <a th:href="@{/}" class="brand-container">
+            <div class="brand-logo-badge">EDU</div>
+            <div class="brand-text-block">
+                <h1>Smart Campus</h1>
+                <span>University Event Portal</span>
+            </div>
         </a>
 
-        <div class="nav-links">
+        <div class="header-nav-group">
+            <ul class="main-nav-links">
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/events}" class="active">All Events</a></li>
+                <li><a th:href="@{/my-registrations}">My Tickets</a></li>
+                <li><a th:href="@{/login}">Faculty / Admin</a></li>
+            </ul>
 
-            <a th:href="@{/}">
-                Home
-            </a>
-
-            <a th:href="@{/events}" class="active">
-                Events
-            </a>
-
-            <a th:href="@{/login}">
-                Admin Login
-            </a>
-
+            <!-- Working Collegiate Header Search (from Photo) -->
+            <form th:action="@{/events}" method="get" class="header-search-form" role="search">
+                <div class="header-search-box">
+                    <svg class="header-search-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input
+                        type="search"
+                        name="keyword"
+                        placeholder="Search events..."
+                        aria-label="Search campus events"
+                        class="header-search-input"
+                        autocomplete="off">
+                </div>
+            </form>
         </div>
-
     </div>
+</header>
 
-</nav>
+<!-- ANNOUNCEMENT TICKER -->
+<div class="announcement-marquee">
+    <div class="container marquee-content">
+        <span class="marquee-badge">Campus Notice:</span>
+        <span>Seats are allocated on a first-come, first-served basis. Present your digital ticket pass upon arrival.</span>
+        <span class="marquee-bullet">•</span>
+        <span>Need accommodation or disability access? Contact the student services coordination office.</span>
+    </div>
+</div>
 
-
-<main>
-
+<main style="padding: 40px 0 80px 0;">
     <div class="container">
 
         <div class="page-header">
-
             <div>
-
-                <h1 th:text="${event.title}">
-                    Event Title
-                </h1>
-
-                <p>
-                    Event information and details
-                </p>
-
+                <h1 th:text="${event.title}">Event Title</h1>
+                <p>Comprehensive event schedule, venue logistics, and attendee registration.</p>
             </div>
-
+            <a th:href="@{/events}" class="btn btn-secondary">
+                ← Back to All Events
+            </a>
         </div>
 
+        <!-- Alert messages -->
+        <div th:if="${errorMessage}" class="error" th:text="${errorMessage}"></div>
 
         <div class="card">
 
-            <div class="card-header">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <!-- Calendar Date Tile -->
+                    <div class="calendar-tile" style="width: 58px; height: 64px;">
+                        <div class="cal-month" th:text="${#temporals.format(event.date, 'MMM')}">OCT</div>
+                        <div class="cal-day" th:text="${#temporals.format(event.date, 'dd')}">10</div>
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span class="badge badge-primary" th:text="${event.type}">Workshop</span>
+                            <span th:if="${event.averageRating > 0}" class="rating-badge" style="font-size: 0.8rem; padding: 3px 9px;">
+                                ★ <span th:text="${event.averageRating}">4.8</span> (<span th:text="${event.reviewCount}">12</span> Reviews)
+                            </span>
+                        </div>
+                        <h2 class="mt-1" th:text="${event.title}" style="font-size: 1.35rem; color: var(--navy);">
+                            Event Title
+                        </h2>
+                    </div>
+                </div>
 
-                <span
-                    class="badge badge-primary"
-                    th:text="${event.type}">
-                    Seminar
-                </span>
-
-                <h2
-                    class="mt-1"
-                    th:text="${event.title}">
-                    Event Title
-                </h2>
-
+                <div>
+                    <span th:if="${event.isPast()}" class="seats-badge seats-past" style="font-size: 0.88rem; padding: 6px 14px;">
+                        Event Completed
+                    </span>
+                    <span th:if="${!event.isPast() and event.isSoldOut()}" class="seats-badge seats-full" style="font-size: 0.88rem; padding: 6px 14px;">
+                        Sold Out (0 seats left)
+                    </span>
+                    <span th:if="${!event.isPast() and !event.isSoldOut()}" class="seats-badge seats-available" style="font-size: 0.88rem; padding: 6px 14px;" th:text="${event.availableSeats + ' / ' + event.capacity + ' Seats Available'}">
+                        45 / 50 Seats Available
+                    </span>
+                </div>
             </div>
-
 
             <div class="card-body">
 
-                <h3>
-                    About This Event
-                </h3>
-
-                <p
-                    class="text-muted mt-1"
-                    th:text="${event.description}">
-                    Event description goes here.
+                <h3 style="font-size: 1.15rem; color: var(--navy); margin-bottom: 8px;">About This Academic Session</h3>
+                <p class="text-muted" th:text="${event.description}" style="font-size: 1rem; line-height: 1.7; margin-bottom: 30px;">
+                    Event description and academic objectives.
                 </p>
 
+                <!-- Information Grid -->
+                <div class="grid grid-3 mb-3">
 
-                <div class="grid grid-2 mt-3">
-
-                    <div>
-
-                        <strong>Department</strong>
-
-                        <p
-                            class="text-muted"
-                            th:text="${event.department}">
-                            Computer Science
+                    <div class="stat-card">
+                        <h3>Organizing Department</h3>
+                        <p style="font-weight: 750; font-size: 1.05rem; color: var(--navy);" th:text="${event.department}">
+                            Computer Science and Engineering
                         </p>
-
                     </div>
 
-
-                    <div>
-
-                        <strong>Event Type</strong>
-
-                        <p
-                            class="text-muted"
-                            th:text="${event.type}">
-                            Workshop
+                    <div class="stat-card">
+                        <h3>Date & Day</h3>
+                        <p style="font-weight: 750; font-size: 1.05rem; color: var(--navy);" th:text="${event.date}">
+                            2026-10-10
                         </p>
-
                     </div>
 
-
-                    <div>
-
-                        <strong>Date</strong>
-
-                        <p
-                            class="text-muted"
-                            th:text="${event.date}">
-                            2026-09-10
+                    <div class="stat-card">
+                        <h3>Scheduled Time</h3>
+                        <p style="font-weight: 750; font-size: 1.05rem; color: var(--navy);" th:text="${event.time}">
+                            10:00 AM
                         </p>
-
                     </div>
 
-
-                    <div>
-
-                        <strong>Time</strong>
-
-                        <p
-                            class="text-muted"
-                            th:text="${event.time}">
-                            10:00
-                        </p>
-
-                    </div>
-
-
-                    <div>
-
-                        <strong>Venue</strong>
-
-                        <p
-                            class="text-muted"
-                            th:text="${event.venue}">
+                    <div class="stat-card">
+                        <h3>Campus Venue</h3>
+                        <p style="font-weight: 750; font-size: 1.05rem; color: var(--navy);" th:text="${event.venue}">
                             Main Auditorium
                         </p>
-
                     </div>
 
-
-                    <div>
-
-                        <strong>Capacity</strong>
-
-                        <p
-                            class="text-muted"
-                            th:text="${event.capacity}">
-                            100
+                    <div class="stat-card">
+                        <h3>Available Seats</h3>
+                        <p style="font-weight: 750; font-size: 1.05rem; color: var(--success);" th:text="${event.availableSeats + ' Remaining'}">
+                            45 Remaining
                         </p>
+                    </div>
 
+                    <div class="stat-card">
+                        <h3>Student Rating</h3>
+                        <p style="font-weight: 750; font-size: 1.05rem; color: #b45309;">
+                            ★ <span th:text="${event.averageRating > 0 ? event.averageRating + ' / 5.0' : 'No reviews yet'}">4.8 / 5.0</span>
+                            <small style="display: block; font-size: 0.78rem; color: var(--text-muted); font-weight: 500;" th:if="${event.reviewCount > 0}" th:text="${'Based on ' + event.reviewCount + ' review(s)'}">Based on 2 reviews</small>
+                        </p>
                     </div>
 
                 </div>
 
+                <!-- Registration & Review Actions -->
+                <div class="actions" style="padding-top: 20px; border-top: 1.5px solid var(--border); display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
 
-                <div class="actions mt-3">
+                    <a th:href="@{/events}" class="btn btn-secondary">
+                        ← Back to Directory
+                    </a>
 
-                    <a
-                        th:href="@{/events}"
-                        class="btn btn-secondary">
-
-                        ← Back to Events
-
+                    <a th:href="@{/events/{id}/feedback(id=${event.id})}" class="btn btn-outline" style="font-size: 0.95rem; padding: 11px 20px;">
+                        ⭐ Student Reviews & Feedback (<span th:text="${event.reviewCount}">0</span>)
                     </a>
 
                     <a
+                        th:if="${!event.isPast() and !event.isSoldOut()}"
                         th:href="@{/events/{id}/register(id=${event.id})}"
-                        class="btn btn-success">
-
-                        Register for Event
-
+                        class="btn" style="font-size: 1rem; padding: 12px 28px; margin-left: auto;">
+                        Reserve Student Seat →
                     </a>
+
+                    <button
+                        th:if="${event.isPast()}"
+                        disabled
+                        class="btn btn-secondary" style="cursor: not-allowed; opacity: 0.7; margin-left: auto;">
+                        Registration Closed (Event Completed)
+                    </button>
+
+                    <button
+                        th:if="${!event.isPast() and event.isSoldOut()}"
+                        disabled
+                        class="btn btn-danger" style="cursor: not-allowed; opacity: 0.7; margin-left: auto;">
+                        Registration Closed (Capacity Full)
+                    </button>
 
                 </div>
 
@@ -219,20 +220,60 @@
         </div>
 
     </div>
-
 </main>
 
+<!-- COLLEGIATE FOOTER -->
+<footer class="university-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                    <div class="brand-logo-badge" style="padding: 6px 10px; font-size: 0.95rem;">EDU</div>
+                    <strong style="color: #ffffff; font-size: 1.1rem;">Smart Campus</strong>
+                </div>
+                <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 14px;">
+                    Department of Computer Science & Engineering<br>
+                    Smart Campus University Center, Innovation Block<br>
+                    Bengaluru, Karnataka, India
+                </p>
+                <p style="font-size: 0.82rem; color: #64748b;">
+                    Admissions & Helpdesk: +91 80 2345 6789
+                </p>
+            </div>
 
-<footer class="footer">
+            <div class="footer-col">
+                <h4>Quick Navigation</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/}">Campus Home</a></li>
+                    <li><a th:href="@{/events}">Event Directory</a></li>
+                    <li><a th:href="@{/my-registrations}">My Student Passes</a></li>
+                    <li><a th:href="@{/login}">Faculty / Admin Sign In</a></li>
+                </ul>
+            </div>
 
-    <p>
-        Department of Computer Science and Engineering
-        &nbsp;•&nbsp;
-        Smart Campus
-    </p>
+            <div class="footer-col">
+                <h4>Academic Faculties</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/events?department=Computer+Science+and+Engineering}">Computer Science & Engg</a></li>
+                    <li><a th:href="@{/events?department=Information+Technology}">Information Technology</a></li>
+                    <li><a th:href="@{/events?department=Electronics+and+Communication+Engineering}">Electronics & Comm</a></li>
+                </ul>
+            </div>
 
+            <div class="footer-col">
+                <h4>Student Project Initiative</h4>
+                <p style="font-size: 0.84rem; line-height: 1.6; color: #94a3b8;">
+                    Designed and engineered by Computer Science students as part of the Full Stack Development curriculum.
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Smart Campus University. All rights reserved.</span>
+            <span>Academic Event Portal</span>
+        </div>
+    </div>
 </footer>
 
 </body>
-
 </html>

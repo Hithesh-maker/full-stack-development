@@ -1,0 +1,27 @@
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 12 - Product Management REST API"
+mvn spring-boot:run
+
+$body = @{
+    name = "Laptop"
+    description = "Dell Laptop"
+    price = 55000
+    quantity = 5
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8080/products" -Method Post -ContentType "application/json" -Body $body
+
+if it gives id=2:
+Invoke-RestMethod -Uri "http://localhost:8080/products/2" -Method Get
+
+Put:
+$body = @{
+    name = "Updated Laptop"
+    description = "Updated Dell Laptop"
+    price = 60000
+    quantity = 10
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8080/products/2" -Method Put -ContentType "application/json" -Body $body
+
+Delete:
+Invoke-RestMethod -Uri "http://localhost:8080/products/2" -Method Delete

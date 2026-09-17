@@ -3,13 +3,16 @@ package com.campus.smartcampus.controller;
 import com.campus.smartcampus.entity.Event;
 import com.campus.smartcampus.service.EventService;
 import com.campus.smartcampus.service.RegistrationService;
-
 import jakarta.validation.Valid;
-
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 public class EventController {
@@ -31,26 +34,42 @@ public class EventController {
 
     @GetMapping("/")
     public String home(Model model) {
-
-        model.addAttribute(
-                "events",
-                eventService.getUpcomingEvents()
-        );
+        List<Event> upcomingEvents = eventService.getUpcomingEvents();
+        model.addAttribute("events", upcomingEvents);
+        model.addAttribute("totalEvents", eventService.getTotalEventsCount());
+        model.addAttribute("upcomingCount", upcomingEvents.size());
+        model.addAttribute("totalRegistrations", eventService.getTotalRegistrationsCount());
 
         return "index";
     }
 
     // =========================================================
-    // ALL EVENTS
+    // ALL EVENTS (WITH SEARCH & FILTER)
     // =========================================================
 
     @GetMapping("/events")
-    public String events(Model model) {
+    public String events(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String department,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            Model model) {
 
-        model.addAttribute(
-                "events",
-                eventService.getAllEvents()
-        );
+        List<Event> events;
+        if ((keyword != null && !keyword.isBlank()) ||
+            (department != null && !department.isBlank()) ||
+            (type != null && !type.isBlank()) ||
+            date != null) {
+            events = eventService.searchEvents(keyword, department, type, date);
+        } else {
+            events = eventService.getAllEvents();
+        }
+
+        model.addAttribute("events", events);
+        model.addAttribute("keyword", keyword != null ? keyword : "");
+        model.addAttribute("selectedDepartment", department != null ? department : "");
+        model.addAttribute("selectedType", type != null ? type : "");
+        model.addAttribute("selectedDate", date != null ? date.toString() : "");
 
         return "events";
     }
@@ -64,25 +83,46 @@ public class EventController {
             @PathVariable Long id,
             Model model) {
 
-        model.addAttribute(
-                "event",
-                eventService.getEventById(id)
-        );
+        Event event = eventService.getEventById(id);
+        model.addAttribute("event", event);
+        model.addAttribute("availableSeats", event.getAvailableSeats());
 
         return "event-details";
     }
 
     // =========================================================
-    // ADMIN - EVENT LIST
+    // ADMIN - EVENT LIST & DASHBOARD
     // =========================================================
 
     @GetMapping("/admin/events")
-    public String adminEvents(Model model) {
+    public String adminEvents(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String department,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            Model model) {
 
-        model.addAttribute(
-                "events",
-                eventService.getAllEvents()
-        );
+        List<Event> events;
+        if ((keyword != null && !keyword.isBlank()) ||
+            (department != null && !department.isBlank()) ||
+            (type != null && !type.isBlank()) ||
+            date != null) {
+            events = eventService.searchEvents(keyword, department, type, date);
+        } else {
+            events = eventService.getAllEvents();
+        }
+
+        model.addAttribute("events", events);
+        model.addAttribute("keyword", keyword != null ? keyword : "");
+        model.addAttribute("selectedDepartment", department != null ? department : "");
+        model.addAttribute("selectedType", type != null ? type : "");
+        model.addAttribute("selectedDate", date != null ? date.toString() : "");
+
+        // Dashboard summary stats
+        model.addAttribute("totalEvents", eventService.getTotalEventsCount());
+        model.addAttribute("upcomingEvents", eventService.getUpcomingEventsCount());
+        model.addAttribute("totalRegistrations", eventService.getTotalRegistrationsCount());
+        model.addAttribute("totalTickets", eventService.getTotalTicketsSold());
 
         return "admin-events";
     }
@@ -98,25 +138,10 @@ public class EventController {
 
         Event event = eventService.getEventById(id);
 
-        model.addAttribute(
-                "event",
-                event
-        );
-
-        model.addAttribute(
-                "registrations",
-                registrationService.getRegistrationsByEvent(id)
-        );
-
-        model.addAttribute(
-                "totalTickets",
-                registrationService.getTotalTickets(id)
-        );
-
-        model.addAttribute(
-                "registrationCount",
-                registrationService.getRegistrationCount(id)
-        );
+        model.addAttribute("event", event);
+        model.addAttribute("registrations", registrationService.getRegistrationsByEvent(id));
+        model.addAttribute("totalTickets", registrationService.getTotalTickets(id));
+        model.addAttribute("registrationCount", registrationService.getRegistrationCount(id));
 
         return "admin-event-registrations";
     }
@@ -127,12 +152,7 @@ public class EventController {
 
     @GetMapping("/admin/events/add")
     public String addEventForm(Model model) {
-
-        model.addAttribute(
-                "event",
-                new Event()
-        );
-
+        model.addAttribute("event", new Event());
         return "event-form";
     }
 
@@ -143,13 +163,15 @@ public class EventController {
     @PostMapping("/admin/events/save")
     public String saveEvent(
             @Valid @ModelAttribute("event") Event event,
-            BindingResult result) {
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
             return "event-form";
         }
 
         eventService.createEvent(event);
+        redirectAttributes.addFlashAttribute("successMessage", "Event created successfully!");
 
         return "redirect:/admin/events";
     }
@@ -163,11 +185,7 @@ public class EventController {
             @PathVariable Long id,
             Model model) {
 
-        model.addAttribute(
-                "event",
-                eventService.getEventById(id)
-        );
-
+        model.addAttribute("event", eventService.getEventById(id));
         return "event-form";
     }
 
@@ -179,26 +197,42 @@ public class EventController {
     public String updateEvent(
             @PathVariable Long id,
             @Valid @ModelAttribute("event") Event event,
-            BindingResult result) {
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
             return "event-form";
         }
 
         eventService.updateEvent(id, event);
+        redirectAttributes.addFlashAttribute("successMessage", "Event updated successfully!");
 
         return "redirect:/admin/events";
     }
 
     // =========================================================
-    // ADMIN - DELETE EVENT
+    // ADMIN - DELETE EVENT (SECURE POST)
     // =========================================================
 
-    @GetMapping("/admin/events/delete/{id}")
+    @PostMapping("/admin/events/delete/{id}")
     public String deleteEvent(
-            @PathVariable Long id) {
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
 
         eventService.deleteEvent(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Event deleted successfully!");
+
+        return "redirect:/admin/events";
+    }
+
+    // Backward compatible GET delete fallback
+    @GetMapping("/admin/events/delete/{id}")
+    public String deleteEventGet(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+
+        eventService.deleteEvent(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Event deleted successfully!");
 
         return "redirect:/admin/events";
     }

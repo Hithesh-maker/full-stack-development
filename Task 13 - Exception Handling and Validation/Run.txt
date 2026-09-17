@@ -1,0 +1,62 @@
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 13 - Exception Handling and Validation"
+mvn spring-boot:run
+
+Get:
+Invoke-RestMethod -Uri "http://localhost:8080/products" -Method Get
+
+
+Post:
+
+$body = @{
+    name = "Keyboard"
+    description = "Mechanical Keyboard"
+    price = 1500
+    quantity = 10
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8080/products" -Method Post -ContentType "application/json" -Body $body
+
+
+
+GET product by ID:
+
+Invoke-RestMethod -Uri "http://localhost:8080/products/2" -Method Get
+
+
+PUT/update product:
+
+$body = @{
+    name = "Updated Keyboard"
+    description = "Updated Mechanical Keyboard"
+    price = 2000
+    quantity = 15
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8080/products/2" -Method Put -ContentType "application/json" -Body $body
+
+
+Test validation:
+
+$body = @{
+    name = ""
+    description = ""
+    price = -100
+    quantity = -5
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8080/products" -Method Post -ContentType "application/json" -Body $body
+
+
+Test exception handling:
+
+Invoke-RestMethod -Uri "http://localhost:8080/products/999" -Method Put -ContentType "application/json" -Body '{"name":"Test","description":"Test","price":100,"quantity":1}'
+
+
+Test DELETE:
+
+Invoke-RestMethod -Uri "http://localhost:8080/products/2" -Method Delete
+
+
+Verify deletion:
+
+Invoke-RestMethod -Uri "http://localhost:8080/products" -Method Get

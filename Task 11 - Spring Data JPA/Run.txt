@@ -1,0 +1,11 @@
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 11 - Spring Data JPA"
+
+mvn spring-boot:run
+
+http://localhost:8080/students
+http://localhost:8080/students/department/CSE
+http://localhost:8080/students/age/21
+http://localhost:8080/students/older-than/23
+http://localhost:8080/students/department/CSE/sorted
+http://localhost:8080/students/department/CSE/page?page=0&size=3
+http://localhost:8080/students/department/CSE/page?page=1&size=3

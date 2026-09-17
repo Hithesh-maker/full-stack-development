@@ -1,0 +1,22 @@
+cd "C:\Games\Project\Full Stack Development\full-stack-development\smart-campus"
+
+$env:JAVA_HOME="C:\Program Files\Java\jdk-23"
+$env:Path="$env:JAVA_HOME\bin;$env:Path"
+
+# Run tests
+mvn test
+
+# Run application
+mvn spring-boot:run
+
+# URLs
+# Public Portal:        http://localhost:8080/
+# Events Directory:     http://localhost:8080/events  (Filters: date, department, type, keyword)
+# Student Feedback UI:  http://localhost:8080/events/1/feedback
+# My Tickets & Passes:  http://localhost:8080/my-registrations
+# Admin Login:          http://localhost:8080/login  (User: admin / Password: admin123)
+# Admin Dashboard:      http://localhost:8080/admin/events
+# Admin Reviews View:   http://localhost:8080/admin/events/1/feedback
+# REST API Events:      http://localhost:8080/api/events  (Search: /api/events/search?date=&department=&type=)
+# REST API Feedback:    http://localhost:8080/api/feedback/event/{id}/stats
+# REST API Tickets:     http://localhost:8080/api/registrations

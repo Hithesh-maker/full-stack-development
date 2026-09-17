@@ -4,171 +4,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Admin Login | Smart Campus</title>
-
-    <!-- Professional shared stylesheet -->
+    <title>Faculty & Admin Sign In | Smart Campus University</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
 
-    <!-- ================================
-         HEADER
-    ================================= -->
-
-    <header class="header">
-        <div class="container">
-
-            <h1>Smart Campus</h1>
-
-            <p>
-                Event Management System
-            </p>
-
+<!-- TOP UTILITY BAR -->
+<div class="top-utility-bar">
+    <div class="container">
+        <ul class="utility-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/events}">Events</a></li>
+            <li><a th:href="@{/my-registrations}">Student Passes</a></li>
+            <li><a th:href="@{/login}">Admin Portal</a></li>
+        </ul>
+        <div class="utility-quick">
+            <span>Faculty & Administrative Access</span>
+            <span>•</span>
+            <span>IT Support: +91 80 2345 6789</span>
         </div>
-    </header>
+    </div>
+</div>
 
+<!-- BRAND HEADER BAR -->
+<header class="main-header-bar">
+    <div class="container">
+        <a th:href="@{/}" class="brand-container">
+            <div class="brand-logo-badge">EDU</div>
+            <div class="brand-text-block">
+                <h1>Smart Campus</h1>
+                <span>Administrative Portal</span>
+            </div>
+        </a>
 
-    <!-- ================================
-         MAIN CONTENT
-    ================================= -->
+        <div class="header-nav-group">
+            <ul class="main-nav-links">
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/events}">All Events</a></li>
+                <li><a th:href="@{/my-registrations}">My Tickets</a></li>
+                <li><a th:href="@{/login}" class="active">Faculty / Admin</a></li>
+            </ul>
 
-    <main>
-
-        <div class="container">
-
-            <div class="card login-card">
-
-                <h2>Admin Login</h2>
-
-
-                <!-- ================================
-                     LOGIN ERROR
-                ================================= -->
-
-                <div
-                    th:if="${param.error}"
-                    class="error"
-                    role="alert">
-
-                    Invalid username or password.
-
+            <!-- Working Collegiate Header Search (from Photo) -->
+            <form th:action="@{/events}" method="get" class="header-search-form" role="search">
+                <div class="header-search-box">
+                    <svg class="header-search-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input
+                        type="search"
+                        name="keyword"
+                        placeholder="Search events..."
+                        aria-label="Search campus events"
+                        class="header-search-input"
+                        autocomplete="off">
                 </div>
+            </form>
+        </div>
+    </div>
+</header>
 
+<!-- ANNOUNCEMENT TICKER -->
+<div class="announcement-marquee">
+    <div class="container marquee-content">
+        <span class="marquee-badge">Security Gateway:</span>
+        <span>Authorized university faculty and campus event coordinators only. All administrative actions are audited.</span>
+        <span class="marquee-bullet">•</span>
+        <span>For password resets or access requests, contact the campus IT Helpdesk.</span>
+    </div>
+</div>
 
-                <!-- ================================
-                     LOGOUT MESSAGE
-                ================================= -->
+<main style="padding: 50px 0 80px 0;">
+    <div class="container">
 
-                <div
-                    th:if="${param.logout}"
-                    class="success"
-                    role="alert">
-
-                    You have been logged out successfully.
-
-                </div>
-
-
-                <!-- ================================
-                     LOGIN FORM
-                ================================= -->
-
-                <form
-                    th:action="@{/login}"
-                    method="post">
-
-                    <!-- Username -->
-
-                    <div class="form-group">
-
-                        <label for="username">
-                            Username
-                        </label>
-
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            placeholder="Enter your username"
-                            autocomplete="username"
-                            required
-                            autofocus>
-
-                    </div>
-
-
-                    <!-- Password -->
-
-                    <div class="form-group">
-
-                        <label for="password">
-                            Password
-                        </label>
-
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Enter your password"
-                            autocomplete="current-password"
-                            required>
-
-                    </div>
-
-
-                    <!-- Login Button -->
-
-                    <button
-                        type="submit"
-                        class="btn">
-
-                        Sign In
-
-                    </button>
-
-                </form>
-
-
-                <!-- ================================
-                     ADMIN INFORMATION
-                ================================= -->
-
-                <div class="login-info">
-
-                    <strong>
-                        Administrator Access
-                    </strong>
-
-                    <p>
-                        Sign in with your administrator
-                        credentials to manage campus events.
-                    </p>
-
-                </div>
-
+        <div class="card login-card">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div class="brand-logo-badge" style="display: inline-flex; margin-bottom: 12px; padding: 8px 14px;">EDU</div>
+                <h2>Staff & Admin Portal</h2>
+                <p class="text-muted" style="font-size: 0.88rem;">Sign in with authorized campus credentials</p>
             </div>
 
+            <!-- Login Error -->
+            <div th:if="${param.error}" class="error" role="alert">
+                Invalid administrative username or password.
+            </div>
+
+            <!-- Logout Message -->
+            <div th:if="${param.logout}" class="success" role="alert">
+                You have been signed out successfully.
+            </div>
+
+            <form th:action="@{/login}" method="post">
+
+                <div class="form-group">
+                    <label for="username">Administrative Username</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="e.g. admin"
+                        autocomplete="username"
+                        required
+                        autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter secure password"
+                        autocomplete="current-password"
+                        required>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; padding: 12px; font-size: 0.98rem; margin-top: 10px;">
+                    Sign In to Portal →
+                </button>
+
+            </form>
+
+            <div class="login-info">
+                <strong>Default Administrator Credentials</strong>
+                <p style="margin-top: 4px;">
+                    Username: <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">admin</code> &nbsp;|&nbsp;
+                    Password: <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">admin123</code>
+                </p>
+            </div>
         </div>
 
-    </main>
+    </div>
+</main>
 
+<!-- COLLEGIATE FOOTER -->
+<footer class="university-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                    <div class="brand-logo-badge" style="padding: 6px 10px; font-size: 0.95rem;">EDU</div>
+                    <strong style="color: #ffffff; font-size: 1.1rem;">Smart Campus</strong>
+                </div>
+                <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 14px;">
+                    Department of Computer Science & Engineering<br>
+                    Smart Campus University Center, Innovation Block<br>
+                    Bengaluru, Karnataka, India
+                </p>
+                <p style="font-size: 0.82rem; color: #64748b;">
+                    IT Helpdesk: +91 80 2345 6789
+                </p>
+            </div>
 
-    <!-- ================================
-         FOOTER
-    ================================= -->
+            <div class="footer-col">
+                <h4>Quick Navigation</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/}">Campus Home</a></li>
+                    <li><a th:href="@{/events}">Event Directory</a></li>
+                    <li><a th:href="@{/my-registrations}">My Student Passes</a></li>
+                    <li><a th:href="@{/login}">Faculty / Admin Sign In</a></li>
+                </ul>
+            </div>
 
-    <footer class="footer">
+            <div class="footer-col">
+                <h4>Academic Faculties</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/events?department=Computer+Science+and+Engineering}">Computer Science & Engg</a></li>
+                    <li><a th:href="@{/events?department=Information+Technology}">Information Technology</a></li>
+                    <li><a th:href="@{/events?department=Electronics+and+Communication+Engineering}">Electronics & Comm</a></li>
+                </ul>
+            </div>
 
-        <p>
-            Department of Computer Science and Engineering
-            &nbsp;•&nbsp;
-            Smart Campus
-        </p>
+            <div class="footer-col">
+                <h4>Student Project Initiative</h4>
+                <p style="font-size: 0.84rem; line-height: 1.6; color: #94a3b8; margin-bottom: 10px;">
+                    Designed and engineered by Computer Science students as part of the Full Stack Development curriculum.
+                </p>
+                <div style="background: rgba(255,255,255,0.06); padding: 10px 14px; border-radius: 6px; font-size: 0.78rem; color: #cbd5e1;">
+                    🔒 Secured with Spring Security 6 & BCrypt Encryption
+                </div>
+            </div>
+        </div>
 
-    </footer>
+        <div class="footer-bottom">
+            <span>© 2026 Smart Campus University. All rights reserved.</span>
+            <span>Faculty & Administrative Authentication Service</span>
+        </div>
+    </div>
+</footer>
 
 </body>
-
 </html>

@@ -5,9 +5,11 @@ import com.campus.smartcampus.service.EventService;
 
 import jakarta.validation.Valid;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -36,16 +38,21 @@ public class EventRestController {
         );
     }
 
-    // Search events
+    // Search events by filters (keyword, department, type, date)
     @GetMapping("/search")
     public List<Event> searchEvents(
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String department,
-            @RequestParam(required = false) String type) {
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-        return eventService.searchEvents(
-                department,
-                type
-        );
+        if ((keyword != null && !keyword.isBlank()) ||
+            (department != null && !department.isBlank()) ||
+            (type != null && !type.isBlank()) ||
+            date != null) {
+            return eventService.searchEvents(keyword, department, type, date);
+        }
+        return eventService.getAllEvents();
     }
 
     // CREATE event

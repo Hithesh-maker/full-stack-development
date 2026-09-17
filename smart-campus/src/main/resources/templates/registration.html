@@ -4,284 +4,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Register for Event | Smart Campus</title>
-
+    <title>Reserve Admission Pass | Smart Campus University</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
 
-<header class="header">
+<!-- TOP UTILITY BAR -->
+<div class="top-utility-bar">
     <div class="container">
-        <h1>Smart Campus</h1>
-        <p>Event Management System</p>
+        <ul class="utility-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/events}">Events</a></li>
+            <li><a th:href="@{/my-registrations}">Student Passes</a></li>
+            <li><a th:href="@{/login}">Admin Portal</a></li>
+        </ul>
+        <div class="utility-quick">
+            <span>Student Registration Desk</span>
+            <span>•</span>
+            <span>Helpdesk: +91 80 2345 6789</span>
+        </div>
+    </div>
+</div>
+
+<!-- BRAND HEADER BAR -->
+<header class="main-header-bar">
+    <div class="container">
+        <a th:href="@{/}" class="brand-container">
+            <div class="brand-logo-badge">EDU</div>
+            <div class="brand-text-block">
+                <h1>Smart Campus</h1>
+                <span>University Event Portal</span>
+            </div>
+        </a>
+
+        <div class="header-nav-group">
+            <ul class="main-nav-links">
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/events}" class="active">All Events</a></li>
+                <li><a th:href="@{/my-registrations}">My Tickets</a></li>
+                <li><a th:href="@{/login}">Faculty / Admin</a></li>
+            </ul>
+
+            <!-- Working Collegiate Header Search (from Photo) -->
+            <form th:action="@{/events}" method="get" class="header-search-form" role="search">
+                <div class="header-search-box">
+                    <svg class="header-search-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input
+                        type="search"
+                        name="keyword"
+                        placeholder="Search events..."
+                        aria-label="Search campus events"
+                        class="header-search-input"
+                        autocomplete="off">
+                </div>
+            </form>
+        </div>
     </div>
 </header>
 
-<nav class="navbar">
-    <div class="container">
-
-        <a th:href="@{/}" class="nav-brand">
-            Smart Campus
-        </a>
-
-        <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/events}" class="active">Events</a>
-            <a th:href="@{/login}">Admin</a>
-        </div>
-
+<!-- ANNOUNCEMENT TICKER -->
+<div class="announcement-marquee">
+    <div class="container marquee-content">
+        <span class="marquee-badge">Ticketing Office:</span>
+        <span>Please ensure your full name and student email address are accurate. Admission passes will be linked to your student record.</span>
+        <span class="marquee-bullet">•</span>
+        <span>Each student may book up to 10 passes per registration.</span>
     </div>
-</nav>
+</div>
 
-<main class="container">
+<main style="padding: 40px 0 80px 0;">
+    <div class="container" style="max-width: 820px;">
 
-    <div class="page-header">
-        <div>
-            <h1>Event Registration</h1>
-            <p>Register for the selected campus event.</p>
-        </div>
-    </div>
-
-    <!-- Event information -->
-    <div class="card" style="margin-bottom: 25px;">
-
-        <div class="card-header">
-            <h2 th:text="${event.title}">
-                Event Title
-            </h2>
+        <div class="page-header">
+            <div>
+                <h1>Reserve Student Event Pass</h1>
+                <p>Provide your student enrollment details to secure your admission ticket.</p>
+            </div>
+            <a th:href="@{/events/{id}(id=${event.id})}" class="btn btn-secondary">
+                ← Back to Event Details
+            </a>
         </div>
 
-        <div class="card-body">
-
-            <div class="grid grid-2">
-
-                <div>
-                    <p class="text-muted">Department</p>
-                    <strong th:text="${event.department}">
-                        Department
-                    </strong>
+        <!-- Event Information Header Card -->
+        <div class="card mb-3" style="border-left: 4px solid var(--primary);">
+            <div class="card-body" style="padding: 22px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="badge badge-primary" th:text="${event.type}">Workshop</span>
+                        <h2 th:text="${event.title}" style="font-size: 1.25rem; color: var(--navy);">Event Title</h2>
+                    </div>
+                    <span class="seats-badge seats-available" th:text="${availableSeats + ' Seats Remaining'}">
+                        50 Seats Remaining
+                    </span>
                 </div>
 
-                <div>
-                    <p class="text-muted">Event Type</p>
-                    <strong th:text="${event.type}">
-                        Type
-                    </strong>
+                <div class="grid grid-3" style="font-size: 0.88rem; color: var(--navy-muted);">
+                    <div>
+                        <strong>Department:</strong> <span th:text="${event.department}">CSE</span>
+                    </div>
+                    <div>
+                        <strong>Date:</strong> <span th:text="${event.date + ' @ ' + event.time}">2026-10-10</span>
+                    </div>
+                    <div>
+                        <strong>Venue:</strong> <span th:text="${event.venue}">Auditorium</span>
+                    </div>
                 </div>
+            </div>
+        </div>
 
-                <div>
-                    <p class="text-muted">Date</p>
-                    <strong th:text="${event.date}">
-                        Date
-                    </strong>
-                </div>
-
-                <div>
-                    <p class="text-muted">Time</p>
-                    <strong th:text="${event.time}">
-                        Time
-                    </strong>
-                </div>
-
-                <div>
-                    <p class="text-muted">Venue</p>
-                    <strong th:text="${event.venue}">
-                        Venue
-                    </strong>
-                </div>
-
-                <div>
-                    <p class="text-muted">Capacity</p>
-                    <strong th:text="${event.capacity}">
-                        Capacity
-                    </strong>
-                </div>
-
+        <!-- Registration Form Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2 style="font-size: 1.25rem; color: var(--navy);">Student Admission Information</h2>
             </div>
 
-        </div>
-    </div>
+            <div class="card-body">
 
-    <!-- Registration form -->
-    <div class="card">
+                <!-- Error Alert -->
+                <div th:if="${error}" class="error" th:text="${error}"></div>
 
-        <div class="card-header">
-            <h2>Student Details</h2>
-        </div>
+                <form th:action="@{/events/register}" th:object="${registration}" method="post">
 
-        <div class="card-body">
+                    <input type="hidden" th:field="*{eventId}">
 
-            <!-- General error -->
-            <div th:if="${error}" class="error" th:text="${error}">
-                Registration error
+                    <div class="form-group">
+                        <label for="studentName">Full Student Name *</label>
+                        <input
+                            type="text"
+                            id="studentName"
+                            th:field="*{studentName}"
+                            placeholder="e.g. Rahul Sharma / Sarah Connor"
+                            autocomplete="name"
+                            required>
+                        <div th:if="${#fields.hasErrors('studentName')}" th:errors="*{studentName}" class="error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Campus / Personal Email Address *</label>
+                        <input
+                            type="email"
+                            id="email"
+                            th:field="*{email}"
+                            placeholder="e.g. rahul.sharma@campus.edu"
+                            autocomplete="email"
+                            required>
+                        <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></div>
+                        <small class="text-muted">Your booking reference and pass barcode will be associated with this email address.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="department">Your Department / Faculty *</label>
+                        <select id="department" th:field="*{department}" required>
+                            <option value="">Select your department</option>
+                            <option value="Computer Science and Engineering">Computer Science and Engineering</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Electronics and Communication Engineering">Electronics and Communication Engineering</option>
+                            <option value="Electrical and Electronics Engineering">Electrical and Electronics Engineering</option>
+                            <option value="Mechanical Engineering">Mechanical Engineering</option>
+                            <option value="Civil Engineering">Civil Engineering</option>
+                            <option value="Artificial Intelligence and Data Science">Artificial Intelligence and Data Science</option>
+                            <option value="Other Department">Other Department</option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('department')}" th:errors="*{department}" class="error"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tickets">Number of Admission Passes *</label>
+                        <input
+                            type="number"
+                            id="tickets"
+                            th:field="*{tickets}"
+                            min="1"
+                            th:max="${availableSeats lt 10 ? availableSeats : 10}"
+                            value="1"
+                            required>
+                        <div th:if="${#fields.hasErrors('tickets')}" th:errors="*{tickets}" class="error"></div>
+                        <small class="text-muted" th:text="'Limit: Up to 10 passes per student. Currently available in venue: ' + ${availableSeats}"></small>
+                    </div>
+
+                    <div class="actions mt-3">
+                        <a th:href="@{/events/{id}(id=${event.id})}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn" style="padding: 12px 28px; font-size: 0.98rem;">
+                            Confirm & Issue Event Pass →
+                        </button>
+                    </div>
+
+                </form>
+
             </div>
-
-            <form
-                th:action="@{/events/register}"
-                th:object="${registration}"
-                method="post">
-
-                <!-- Keep event ID -->
-                <input
-                    type="hidden"
-                    th:field="*{eventId}"
-                >
-
-                <div class="form-group">
-
-                    <label for="studentName">
-                        Student Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="studentName"
-                        th:field="*{studentName}"
-                        placeholder="Enter your full name"
-                        autocomplete="name"
-                        required
-                    >
-
-                    <div
-                        th:if="${#fields.hasErrors('studentName')}"
-                        th:errors="*{studentName}"
-                        class="error">
-                    </div>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label for="email">
-                        Email Address
-                    </label>
-
-                    <input
-                        type="email"
-                        id="email"
-                        th:field="*{email}"
-                        placeholder="Enter your email address"
-                        autocomplete="email"
-                        required
-                    >
-
-                    <div
-                        th:if="${#fields.hasErrors('email')}"
-                        th:errors="*{email}"
-                        class="error">
-                    </div>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label for="department">
-                        Department
-                    </label>
-
-                    <select
-                        id="department"
-                        th:field="*{department}"
-                        required>
-
-                        <option value="">
-                            Select your department
-                        </option>
-
-                        <option value="Computer Science and Engineering">
-                            Computer Science and Engineering
-                        </option>
-
-                        <option value="Information Technology">
-                            Information Technology
-                        </option>
-
-                        <option value="Electronics and Communication Engineering">
-                            Electronics and Communication Engineering
-                        </option>
-
-                        <option value="Electrical and Electronics Engineering">
-                            Electrical and Electronics Engineering
-                        </option>
-
-                        <option value="Mechanical Engineering">
-                            Mechanical Engineering
-                        </option>
-
-                        <option value="Civil Engineering">
-                            Civil Engineering
-                        </option>
-
-                        <option value="Artificial Intelligence and Data Science">
-                            Artificial Intelligence and Data Science
-                        </option>
-
-                    </select>
-
-                    <div
-                        th:if="${#fields.hasErrors('department')}"
-                        th:errors="*{department}"
-                        class="error">
-                    </div>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label for="tickets">
-                        Number of Tickets
-                    </label>
-
-                    <input
-                        type="number"
-                        id="tickets"
-                        th:field="*{tickets}"
-                        min="1"
-                        max="10"
-                        placeholder="Enter number of tickets"
-                        required
-                    >
-
-                    <div
-                        th:if="${#fields.hasErrors('tickets')}"
-                        th:errors="*{tickets}"
-                        class="error">
-                    </div>
-
-                </div>
-
-                <div class="actions">
-
-                    <a
-                        th:href="@{/events/{id}(id=${event.id})}"
-                        class="btn btn-secondary">
-                        Back to Event
-                    </a>
-
-                    <button
-                        type="submit"
-                        class="btn">
-                        Register for Event
-                    </button>
-
-                </div>
-
-            </form>
-
         </div>
 
     </div>
-
 </main>
 
-<footer class="footer">
-    <p>
-        Department of Computer Science and Engineering
-    </p>
+<!-- COLLEGIATE FOOTER -->
+<footer class="university-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                    <div class="brand-logo-badge" style="padding: 6px 10px; font-size: 0.95rem;">EDU</div>
+                    <strong style="color: #ffffff; font-size: 1.1rem;">Smart Campus</strong>
+                </div>
+                <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 14px;">
+                    Department of Computer Science & Engineering<br>
+                    Smart Campus University Center, Innovation Block<br>
+                    Bengaluru, Karnataka, India
+                </p>
+                <p style="font-size: 0.82rem; color: #64748b;">
+                    Admissions & Helpdesk: +91 80 2345 6789
+                </p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Quick Navigation</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/}">Campus Home</a></li>
+                    <li><a th:href="@{/events}">Event Directory</a></li>
+                    <li><a th:href="@{/my-registrations}">My Student Passes</a></li>
+                    <li><a th:href="@{/login}">Faculty / Admin Sign In</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Academic Faculties</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/events?department=Computer+Science+and+Engineering}">Computer Science & Engg</a></li>
+                    <li><a th:href="@{/events?department=Information+Technology}">Information Technology</a></li>
+                    <li><a th:href="@{/events?department=Electronics+and+Communication+Engineering}">Electronics & Comm</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Student Project Initiative</h4>
+                <p style="font-size: 0.84rem; line-height: 1.6; color: #94a3b8; margin-bottom: 10px;">
+                    Designed and engineered by Computer Science students as part of the Full Stack Development curriculum.
+                </p>
+                <div style="background: rgba(255,255,255,0.06); padding: 10px 14px; border-radius: 6px; font-size: 0.78rem; color: #cbd5e1;">
+                    🔒 Secured with Spring Security 6 & BCrypt Encryption
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Smart Campus University. All rights reserved.</span>
+            <span>Academic Event Ticketing & Pass Portal</span>
+        </div>
+    </div>
 </footer>
 
 </body>
-
 </html>

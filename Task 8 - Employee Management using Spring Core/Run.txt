@@ -1,0 +1,3 @@
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 8 - Employee Management using Spring Core"
+mvn compile
+mvn exec:java "-Dexec.mainClass=com.employee.Main"

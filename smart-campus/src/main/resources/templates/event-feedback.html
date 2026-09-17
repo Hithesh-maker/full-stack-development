@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${'Student Feedback: ' + event.title + ' | Smart Campus University'}">Event Feedback | Smart Campus</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<!-- TOP UTILITY BAR -->
+<div class="top-utility-bar">
+    <div class="container">
+        <ul class="utility-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/events}">Events</a></li>
+            <li><a th:href="@{/my-registrations}">Student Passes</a></li>
+            <li><a th:href="@{/login}">Admin Portal</a></li>
+        </ul>
+        <div class="utility-quick">
+            <span>Student Feedback & Academic Quality Portal</span>
+            <span>•</span>
+            <span>Helpdesk: +91 80 2345 6789</span>
+        </div>
+    </div>
+</div>
+
+<!-- BRAND HEADER BAR -->
+<header class="main-header-bar">
+    <div class="container">
+        <a th:href="@{/}" class="brand-container">
+            <div class="brand-logo-badge">EDU</div>
+            <div class="brand-text-block">
+                <h1>Smart Campus</h1>
+                <span>University Event Portal</span>
+            </div>
+        </a>
+
+        <div class="header-nav-group">
+            <ul class="main-nav-links">
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/events}" class="active">All Events</a></li>
+                <li><a th:href="@{/my-registrations}">My Tickets</a></li>
+                <li><a th:href="@{/login}">Faculty / Admin</a></li>
+            </ul>
+
+            <!-- Working Collegiate Header Search (from Photo) -->
+            <form th:action="@{/events}" method="get" class="header-search-form" role="search">
+                <div class="header-search-box">
+                    <svg class="header-search-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input
+                        type="search"
+                        name="keyword"
+                        placeholder="Search events..."
+                        aria-label="Search campus events"
+                        class="header-search-input"
+                        autocomplete="off">
+                </div>
+            </form>
+        </div>
+    </div>
+</header>
+
+<!-- ANNOUNCEMENT TICKER -->
+<div class="announcement-marquee">
+    <div class="container marquee-content">
+        <span class="marquee-badge">Feedback Desk:</span>
+        <span>Your feedback helps campus departments refine session formats and workshop curriculum.</span>
+        <span class="marquee-bullet">•</span>
+        <span>All submissions are reviewed by academic coordinators.</span>
+    </div>
+</div>
+
+<main style="padding: 40px 0 80px 0;">
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <span class="badge badge-primary" th:text="${event.type}">Workshop</span>
+                <h1 style="margin-top: 6px;" th:text="${event.title}">Event Title</h1>
+                <p>Submit your evaluation, rating, and feedback comments for this campus session.</p>
+            </div>
+            <div class="actions">
+                <a th:href="@{/events/{id}(id=${event.id})}" class="btn btn-secondary">
+                    ← Back to Event Details
+                </a>
+            </div>
+        </div>
+
+        <!-- Success notification -->
+        <div th:if="${successMessage}" class="success" th:text="${successMessage}"></div>
+
+        <!-- Event Satisfaction Summary Card -->
+        <div class="card mb-3" style="background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%); border-left: 4px solid var(--primary);">
+            <div class="card-body" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                <div style="display: flex; align-items: center; gap: 18px;">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: var(--navy); line-height: 1;" th:text="${avgRating}">
+                        4.8
+                    </div>
+                    <div>
+                        <div class="stars-gold" style="font-size: 1.25rem;">
+                            <span th:text="${event.getStarsDisplay()}">★★★★★</span>
+                        </div>
+                        <div style="font-size: 0.88rem; color: var(--navy-muted); margin-top: 4px;">
+                            Overall Score from <strong th:text="${reviewCount}">12</strong> Student Review(s)
+                        </div>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.88rem; color: var(--navy-muted); display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div>🏢 <strong>Dept:</strong> <span th:text="${event.department}">CSE</span></div>
+                    <div>📅 <strong>Date:</strong> <span th:text="${event.date}">2026-10-10</span></div>
+                    <div>📍 <strong>Venue:</strong> <span th:text="${event.venue}">Main Auditorium</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-2" style="grid-template-columns: 1fr 1.3fr; align-items: start; gap: 28px;">
+
+            <!-- FEEDBACK SUBMISSION FORM -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Share Your Experience</h2>
+                    <p class="text-muted" style="font-size: 0.88rem;">Rate this session from 1 (Poor) to 5 (Outstanding).</p>
+                </div>
+
+                <div class="card-body">
+                    <form th:action="@{/events/{id}/feedback(id=${event.id})}" th:object="${feedback}" method="post">
+
+                        <input type="hidden" th:field="*{eventId}">
+
+                        <!-- Star Rating Selector -->
+                        <div class="form-group">
+                            <label style="display: block; margin-bottom: 4px;">Overall Rating <span class="required">*</span></label>
+                            <div class="star-rating-widget">
+                                <input type="radio" id="star5" name="rating" value="5" th:field="*{rating}">
+                                <label for="star5" title="5 stars - Outstanding">★</label>
+
+                                <input type="radio" id="star4" name="rating" value="4" th:field="*{rating}">
+                                <label for="star4" title="4 stars - Very Good">★</label>
+
+                                <input type="radio" id="star3" name="rating" value="3" th:field="*{rating}">
+                                <label for="star3" title="3 stars - Good">★</label>
+
+                                <input type="radio" id="star2" name="rating" value="2" th:field="*{rating}">
+                                <label for="star2" title="2 stars - Fair">★</label>
+
+                                <input type="radio" id="star1" name="rating" value="1" th:field="*{rating}">
+                                <label for="star1" title="1 star - Needs Improvement">★</label>
+                            </div>
+                            <div th:if="${#fields.hasErrors('rating')}" class="field-error" th:errors="*{rating}"></div>
+                        </div>
+
+                        <!-- Student Name -->
+                        <div class="form-group">
+                            <label for="studentName">Full Name <span class="required">*</span></label>
+                            <input
+                                type="text"
+                                id="studentName"
+                                th:field="*{studentName}"
+                                placeholder="e.g., Aarav Sharma"
+                                th:classappend="${#fields.hasErrors('studentName')} ? 'input-error' : ''">
+                            <div th:if="${#fields.hasErrors('studentName')}" class="field-error" th:errors="*{studentName}"></div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label for="email">Campus Email Address <span class="required">*</span></label>
+                            <input
+                                type="email"
+                                id="email"
+                                th:field="*{email}"
+                                placeholder="e.g., aarav.sharma@campus.edu"
+                                th:classappend="${#fields.hasErrors('email')} ? 'input-error' : ''">
+                            <div th:if="${#fields.hasErrors('email')}" class="field-error" th:errors="*{email}"></div>
+                            <small class="text-muted">Used solely to verify campus affiliation.</small>
+                        </div>
+
+                        <!-- Comments -->
+                        <div class="form-group">
+                            <label for="comments">Review Comments & Suggestions <span class="required">*</span></label>
+                            <textarea
+                                id="comments"
+                                rows="4"
+                                th:field="*{comments}"
+                                placeholder="What did you learn? How was the speaker, venue facilities, and hands-on guidance?"
+                                th:classappend="${#fields.hasErrors('comments')} ? 'input-error' : ''"></textarea>
+                            <div th:if="${#fields.hasErrors('comments')}" class="field-error" th:errors="*{comments}"></div>
+                        </div>
+
+                        <div class="form-actions mt-3">
+                            <button type="submit" class="btn btn-block" style="font-size: 1rem; padding: 12px;">
+                                Submit Feedback & Rating
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- EXISTING REVIEWS LIST -->
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
+                    <h2 style="font-size: 1.25rem; color: var(--navy);">
+                        Student Reviews (<span th:text="${reviews.size()}">0</span>)
+                    </h2>
+                    <span class="rating-badge" th:if="${avgRating > 0}">
+                        ★ <span th:text="${avgRating}">4.8</span> Avg
+                    </span>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(reviews)}" class="card empty-state" style="padding: 36px 20px;">
+                    <h3>No Reviews Submitted Yet</h3>
+                    <p>Be the first student to review this session! Fill out the rating form on the left.</p>
+                </div>
+
+                <!-- Reviews Feed -->
+                <div class="review-list" th:if="${!#lists.isEmpty(reviews)}">
+                    <div th:each="r : ${reviews}" class="review-item">
+                        <div class="review-item-header">
+                            <div class="review-author-box">
+                                <div class="review-avatar" th:text="${#strings.substring(r.studentName, 0, 1)}">A</div>
+                                <div>
+                                    <div class="review-author-name" th:text="${r.studentName}">Student Name</div>
+                                    <div class="review-author-email" th:text="${r.email}">student@campus.edu</div>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="stars-gold" th:text="${r.getStarsDisplay()}">★★★★★</span>
+                            </div>
+                        </div>
+
+                        <div class="review-comment" th:text="${r.comments}">
+                            Review comments submitted by the student.
+                        </div>
+
+                        <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <span class="review-date" th:text="${#temporals.format(r.submittedAt, 'MMM dd, yyyy • hh:mm a')}">
+                                Oct 10, 2026 • 02:30 PM
+                            </span>
+                            <span class="badge" style="background: #f1f5f9; color: #475569; font-size: 0.72rem;">
+                                Verified Attendee
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</main>
+
+<!-- COLLEGIATE FOOTER -->
+<footer class="university-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                    <div class="brand-logo-badge" style="padding: 6px 10px; font-size: 0.95rem;">EDU</div>
+                    <strong style="color: #ffffff; font-size: 1.1rem;">Smart Campus</strong>
+                </div>
+                <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 14px;">
+                    Department of Computer Science & Engineering<br>
+                    Smart Campus University Center, Innovation Block<br>
+                    Bengaluru, Karnataka, India
+                </p>
+                <p style="font-size: 0.82rem; color: #64748b;">
+                    Admissions & Helpdesk: +91 80 2345 6789
+                </p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/}">Campus Home</a></li>
+                    <li><a th:href="@{/events}">Event Directory</a></li>
+                    <li><a th:href="@{/my-registrations}">My Passes</a></li>
+                    <li><a th:href="@{/login}">Admin Portal</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Academic Quality</h4>
+                <p style="font-size: 0.84rem; line-height: 1.6; color: #94a3b8;">
+                    Continuous feedback collection allows university faculty to enhance technical workshops and guest seminar offerings.
+                </p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Student Project Initiative</h4>
+                <p style="font-size: 0.84rem; line-height: 1.6; color: #94a3b8;">
+                    Designed and engineered as part of Full Stack Project-2: Smart Campus Event Management System.
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Smart Campus University. All rights reserved.</span>
+            <span>Student Review & Quality Assurance Portal</span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

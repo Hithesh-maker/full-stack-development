@@ -4,144 +4,356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Smart Campus | Event Management</title>
-
+    <title>Smart Campus University | Event Management Portal</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
 
-<header class="header">
+<!-- =========================================================
+     TOP UTILITY BAR (EDUCARE STYLE)
+     ========================================================= -->
+<div class="top-utility-bar">
     <div class="container">
-        <h1>Smart Campus</h1>
-        <p>Event Management System</p>
+        <ul class="utility-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/events}">Events</a></li>
+            <li><a th:href="@{/my-registrations}">Student Passes</a></li>
+            <li><a th:href="@{/events?department=Computer+Science+and+Engineering}">School & Faculties</a></li>
+            <li><a th:href="@{/login}">Admin Portal</a></li>
+        </ul>
+        <div class="utility-quick">
+            <span>Academic Year 2026–2027</span>
+            <span>•</span>
+            <span>Campus Helpdesk: +91 80 2345 6789</span>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================
+     BRAND HEADER BAR (CLEAN WHITE WITH RED LOGO BLOCK)
+     ========================================================= -->
+<header class="main-header-bar">
+    <div class="container">
+        <a th:href="@{/}" class="brand-container">
+            <div class="brand-logo-badge">
+                EDU
+            </div>
+            <div class="brand-text-block">
+                <h1>Smart Campus</h1>
+                <span>University Event Portal</span>
+            </div>
+        </a>
+
+        <div class="header-nav-group">
+            <ul class="main-nav-links">
+                <li><a th:href="@{/}" class="active">Home</a></li>
+                <li><a th:href="@{/events}">All Events</a></li>
+                <li><a th:href="@{/my-registrations}">My Tickets</a></li>
+                <li><a th:href="@{/login}">Faculty / Admin</a></li>
+            </ul>
+
+            <!-- Working Collegiate Header Search (from Photo) -->
+            <form th:action="@{/events}" method="get" class="header-search-form" role="search">
+                <div class="header-search-box">
+                    <svg class="header-search-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input
+                        type="search"
+                        name="keyword"
+                        placeholder="Search events..."
+                        aria-label="Search campus events"
+                        class="header-search-input"
+                        autocomplete="off">
+                </div>
+            </form>
+        </div>
     </div>
 </header>
 
-<nav class="navbar">
-    <div class="container">
-
-        <a th:href="@{/}" class="nav-brand">
-            Smart Campus
-        </a>
-
-        <div class="nav-links">
-            <a th:href="@{/}" class="active">Home</a>
-            <a th:href="@{/events}">Events</a>
-            <a th:href="@{/login}">Admin Login</a>
-        </div>
-
+<!-- =========================================================
+     ANNOUNCEMENT MARQUEE TICKER (FROM PHOTO)
+     ========================================================= -->
+<div class="announcement-marquee">
+    <div class="container marquee-content">
+        <span class="marquee-badge">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+            </svg>
+            Campus Notice:
+        </span>
+        <span>Apply / Admitted? Let's make it official!</span>
+        <span class="marquee-bullet">•</span>
+        <span>The university campus will remain closed on statutory holidays.</span>
+        <span class="marquee-bullet">•</span>
+        <span>Spring semester technical hackathon and symposium registrations are now live!</span>
+        <span class="marquee-bullet">•</span>
+        <span>Course registration and seminar pass reservations end on October 15, 2026.</span>
     </div>
-</nav>
+</div>
 
-<main>
+<!-- =========================================================
+     CINEMATIC COLLEGIATE HERO (FROM PHOTO)
+     ========================================================= -->
+<section class="hero-educare">
+    <div class="container">
+        <div class="hero-tag">
+            <span>★ A Global Campus for Global Students</span>
+        </div>
+        <h2>A Connected Campus for Ambitious Minds</h2>
+        <p>
+            With faculty and students from diverse backgrounds, we foster a vibrant, inclusive community. Discover hackathons, technical workshops, leadership symposiums, and cultural festivals hosted across all academic departments.
+        </p>
 
+        <!-- Direct Hero Search Bar -->
+        <form th:action="@{/events}" method="get" class="hero-search-form" role="search">
+            <div class="hero-search-bar">
+                <svg class="hero-search-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input
+                    type="search"
+                    name="keyword"
+                    placeholder="Search by event title, keyword, or topic (e.g. Hackathon, AI, Robotics)..."
+                    aria-label="Search upcoming campus events"
+                    class="hero-search-input"
+                    autocomplete="off">
+                <button type="submit" class="btn hero-search-btn">
+                    Search Events
+                </button>
+            </div>
+        </form>
+
+        <div class="hero-actions">
+            <a th:href="@{/events}" class="btn btn-outline-white" style="font-size: 0.95rem; padding: 12px 22px;">
+                Browse Directory →
+            </a>
+            <a th:href="@{/my-registrations}" class="btn btn-outline-white" style="font-size: 0.95rem; padding: 12px 22px;">
+                Lookup My Tickets
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- =========================================================
+     DARK ANNOUNCEMENTS STRIP (DIRECTLY BENEATH HERO FROM PHOTO)
+     ========================================================= -->
+<div class="dark-announcement-strip">
+    <div class="container">
+        <div class="announcement-title">
+            <span>ANNOUNCEMENTS</span>
+        </div>
+        <div>
+            • Registrations for AI & Machine Learning Hackathon 2026 now open &nbsp;•&nbsp; Limited seats available for Cloud DevOps Workshop &nbsp;•&nbsp; Visit CSE department for volunteer passes
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================
+     FEATURED SPOTLIGHT (SPLIT SECTION FROM PHOTO)
+     ========================================================= -->
+<section class="spotlight-section">
+    <div class="container">
+        <div class="spotlight-grid">
+            <div class="spotlight-content">
+                <span class="spotlight-eyebrow">Featured Campus Highlight</span>
+                <h3>Hands-On Innovation: Building Real Solutions at Smart Campus</h3>
+                <p>
+                    Every semester, our academic departments collaborate to host competitive technical hackathons, guest lectures with industry leaders, and inter-collegiate symposiums. Check out the latest scheduled sessions and reserve your student seat in advance.
+                </p>
+                <div class="actions">
+                    <a th:href="@{/events}" class="btn">
+                        View All Upcoming Events
+                    </a>
+                    <a th:href="@{/my-registrations}" class="btn btn-secondary">
+                        Check My Bookings
+                    </a>
+                </div>
+            </div>
+            <div class="spotlight-image-col"></div>
+        </div>
+    </div>
+</section>
+
+<!-- =========================================================
+     MAIN CONTENT: UPCOMING EVENTS
+     ========================================================= -->
+<main style="padding: 40px 0 70px 0;">
     <div class="container">
 
         <div class="page-header">
-
             <div>
                 <h1>Upcoming Campus Events</h1>
-                <p>Discover the latest events happening on campus.</p>
+                <p>Discover and register for scheduled sessions across academic faculties.</p>
             </div>
-
-            <a th:href="@{/events}" class="btn">
-                View All Events
+            <a th:href="@{/events}" class="btn btn-outline">
+                Browse Full Directory →
             </a>
-
         </div>
 
+        <!-- Event Cards Grid -->
         <div class="dashboard-grid">
 
             <div
-                class="card"
                 th:each="event : ${events}"
-                style="padding: 24px;">
+                class="card event-card">
 
-                <h2
-                    th:text="${event.title}">
-                    Event Title
-                </h2>
+                <div>
+                    <!-- Top Area with Calendar Date Tile and Title -->
+                    <div class="event-card-header">
+                        <!-- Signature University Date Tile -->
+                        <div class="calendar-tile">
+                            <div class="cal-month" th:text="${#temporals.format(event.date, 'MMM')}">OCT</div>
+                            <div class="cal-day" th:text="${#temporals.format(event.date, 'dd')}">10</div>
+                        </div>
 
-                <p
-                    class="text-muted mt-1"
-                    th:text="${event.description}">
-                    Event description
-                </p>
+                        <div class="event-card-title-area">
+                            <span class="badge badge-primary" th:text="${event.type}">Workshop</span>
+                            <h2 class="mt-1" th:text="${event.title}">Event Title</h2>
+                            <div class="event-meta-row">
+                                <span class="event-meta-item">
+                                    🏢 <span th:text="${event.department}">CSE</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="mt-2">
-
-                    <p>
-                        <strong>Department:</strong>
-                        <span th:text="${event.department}">
-                            CSE
-                        </span>
+                    <p
+                        class="text-muted"
+                        style="font-size: 0.9rem; margin-bottom: 16px; line-height: 1.55;"
+                        th:text="${#strings.abbreviate(event.description, 125)}">
+                        Event summary and description snippet.
                     </p>
 
-                    <p>
-                        <strong>Date:</strong>
-                        <span th:text="${event.date}">
-                            2026-09-10
-                        </span>
-                    </p>
+                    <div style="font-size: 0.84rem; color: var(--navy-muted); margin-bottom: 18px; display: flex; flex-direction: column; gap: 5px;">
+                        <div>
+                            📍 <strong>Venue:</strong> <span th:text="${event.venue}">Auditorium</span>
+                        </div>
+                        <div>
+                            🕒 <strong>Time:</strong> <span th:text="${event.time}">10:00 AM</span>
+                        </div>
+                    </div>
 
-                    <p>
-                        <strong>Time:</strong>
-                        <span th:text="${event.time}">
-                            10:00
+                    <!-- Availability Pill -->
+                    <div style="margin-bottom: 16px;">
+                        <span th:if="${event.isPast()}" class="seats-badge seats-past">
+                            Event Completed
                         </span>
-                    </p>
-
-                    <p>
-                        <strong>Venue:</strong>
-                        <span th:text="${event.venue}">
-                            Auditorium
+                        <span th:if="${!event.isPast() and event.isSoldOut()}" class="seats-badge seats-full">
+                            Sold Out (0 seats left)
                         </span>
-                    </p>
-
+                        <span th:if="${!event.isPast() and !event.isSoldOut() and event.availableSeats le 10}" class="seats-badge seats-low" th:text="${event.availableSeats + ' seats left!'}">
+                            5 seats left!
+                        </span>
+                        <span th:if="${!event.isPast() and !event.isSoldOut() and event.availableSeats gt 10}" class="seats-badge seats-available" th:text="${event.availableSeats + ' / ' + event.capacity + ' seats available'}">
+                            45 / 50 seats available
+                        </span>
+                    </div>
                 </div>
 
-                <div class="mt-2">
-
+                <!-- Action Buttons -->
+                <div class="actions" style="margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border);">
                     <a
                         th:href="@{/events/{id}(id=${event.id})}"
-                        class="btn btn-outline">
-
-                        View Details
-
+                        class="btn btn-outline" style="flex: 1;">
+                        Details
                     </a>
 
+                    <a
+                        th:if="${!event.isPast() and !event.isSoldOut()}"
+                        th:href="@{/events/{id}/register(id=${event.id})}"
+                        class="btn" style="flex: 1;">
+                        Register →
+                    </a>
+
+                    <button
+                        th:if="${event.isPast()}"
+                        disabled
+                        class="btn btn-secondary" style="flex: 1; cursor: not-allowed; opacity: 0.65;">
+                        Ended
+                    </button>
+
+                    <button
+                        th:if="${!event.isPast() and event.isSoldOut()}"
+                        disabled
+                        class="btn btn-danger" style="flex: 1; cursor: not-allowed; opacity: 0.65;">
+                        Full
+                    </button>
                 </div>
 
             </div>
 
         </div>
 
+        <!-- Empty State -->
         <div
             th:if="${#lists.isEmpty(events)}"
             class="card empty-state">
-
-            <h3>No Upcoming Events</h3>
-
-            <p>
-                There are currently no upcoming campus events.
-            </p>
-
+            <h3>No Scheduled Events</h3>
+            <p>There are currently no events listed. Please check back soon.</p>
         </div>
 
     </div>
-
 </main>
 
-<footer class="footer">
+<!-- =========================================================
+     COLLEGIATE 4-COLUMN FOOTER
+     ========================================================= -->
+<footer class="university-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                    <div class="brand-logo-badge" style="padding: 6px 10px; font-size: 0.95rem;">EDU</div>
+                    <strong style="color: #ffffff; font-size: 1.1rem;">Smart Campus</strong>
+                </div>
+                <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 14px;">
+                    Department of Computer Science & Engineering<br>
+                    Smart Campus University Center, Innovation Block<br>
+                    Bengaluru, Karnataka, India
+                </p>
+                <p style="font-size: 0.82rem; color: #64748b;">
+                    Admissions & Helpdesk: +91 80 2345 6789
+                </p>
+            </div>
 
-    <p>
-        Department of Computer Science and Engineering
-        &nbsp;•&nbsp;
-        Smart Campus
-    </p>
+            <div class="footer-col">
+                <h4>Quick Navigation</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/}">Campus Home</a></li>
+                    <li><a th:href="@{/events}">Event Directory</a></li>
+                    <li><a th:href="@{/my-registrations}">My Student Passes</a></li>
+                    <li><a th:href="@{/login}">Faculty / Admin Sign In</a></li>
+                </ul>
+            </div>
 
+            <div class="footer-col">
+                <h4>Academic Faculties</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/events?department=Computer+Science+and+Engineering}">Computer Science & Engg</a></li>
+                    <li><a th:href="@{/events?department=Information+Technology}">Information Technology</a></li>
+                    <li><a th:href="@{/events?department=Electronics+and+Communication+Engineering}">Electronics & Comm</a></li>
+                    <li><a th:href="@{/events?department=Artificial+Intelligence+and+Data+Science}">AI & Data Science</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Student Project Initiative</h4>
+                <p style="font-size: 0.84rem; line-height: 1.6; color: #94a3b8; margin-bottom: 10px;">
+                    Designed and engineered by Computer Science students as part of the Full Stack Development curriculum.
+                </p>
+                <div style="background: rgba(255,255,255,0.06); padding: 10px 14px; border-radius: 6px; font-size: 0.78rem; color: #cbd5e1;">
+                    🔒 Secured with Spring Security 6 & BCrypt Encryption
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Smart Campus University. All rights reserved.</span>
+            <span>Academic Management & Event Ticketing Portal</span>
+        </div>
+    </div>
 </footer>
 
 </body>

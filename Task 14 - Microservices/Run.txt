@@ -1,0 +1,4 @@
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 14 - Microservices\order-service"
+mvn spring-boot:run
+
+http://localhost:8082/orders

@@ -39,23 +39,30 @@ public class SecurityConfig {
             HttpSecurity http) throws Exception {
 
         http
+            // Ignore CSRF on REST API endpoints while keeping it on MVC forms
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
             .authorizeHttpRequests(auth -> auth
 
-                // Public pages
+                // Public pages and assets
                 .requestMatchers(
                     "/",
                     "/login",
                     "/events",
                     "/events/**",
-                    "/api/events/**",
-                    "/css/**"
+                    "/my-registrations",
+                    "/my-registrations/**",
+                    "/api/**",
+                    "/css/**",
+                    "/js/**",
+                    "/images/**",
+                    "/favicon.ico"
                 ).permitAll()
 
-                // Admin pages
+                // Admin pages require ADMIN role
                 .requestMatchers("/admin/**")
                 .hasRole("ADMIN")
 
-                // Other pages require authentication
+                // Any other requests require authentication
                 .anyRequest()
                 .authenticated()
             )

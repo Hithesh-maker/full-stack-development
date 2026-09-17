@@ -46,7 +46,48 @@ public class Event {
     @NotNull(message = "Capacity is required")
     private Integer capacity;
 
+    @jakarta.persistence.Transient
+    private Integer availableSeats;
+
+    @jakarta.persistence.Transient
+    private Boolean soldOut;
+
+    @jakarta.persistence.Transient
+    private Double averageRating = 0.0;
+
+    @jakarta.persistence.Transient
+    private Long reviewCount = 0L;
+
     public Event() {
+    }
+
+    public boolean isPast() {
+        return date != null && date.isBefore(LocalDate.now());
+    }
+
+    public boolean isToday() {
+        return date != null && date.isEqual(LocalDate.now());
+    }
+
+    public boolean isUpcoming() {
+        return date != null && !date.isBefore(LocalDate.now());
+    }
+
+    public Integer getAvailableSeats() {
+        return availableSeats != null ? availableSeats : capacity;
+    }
+
+    public void setAvailableSeats(Integer availableSeats) {
+        this.availableSeats = availableSeats;
+        this.soldOut = availableSeats != null && availableSeats <= 0;
+    }
+
+    public Boolean isSoldOut() {
+        return soldOut != null ? soldOut : (availableSeats != null && availableSeats <= 0);
+    }
+
+    public void setSoldOut(Boolean soldOut) {
+        this.soldOut = soldOut;
     }
 
     public Long getId() {
@@ -119,5 +160,29 @@ public class Event {
 
     public void setCapacity(Integer capacity) {
         this.capacity = capacity;
+    }
+
+    public Double getAverageRating() {
+        return averageRating != null ? averageRating : 0.0;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public Long getReviewCount() {
+        return reviewCount != null ? reviewCount : 0L;
+    }
+
+    public void setReviewCount(Long reviewCount) {
+        this.reviewCount = reviewCount;
+    }
+
+    @jakarta.persistence.Transient
+    public String getStarsDisplay() {
+        if (averageRating == null || averageRating < 0.5) return "☆☆☆☆☆";
+        int fullStars = (int) Math.round(averageRating);
+        fullStars = Math.min(5, Math.max(1, fullStars));
+        return "★".repeat(fullStars) + "☆".repeat(5 - fullStars);
     }
 }

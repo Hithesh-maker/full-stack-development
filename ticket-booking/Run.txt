@@ -1,0 +1,5 @@
+cd "C:\Games\Project\Full Stack Development\full-stack-development\ticket-booking"
+
+npm install
+
+npm run dev

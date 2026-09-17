@@ -4,114 +4,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Registration Successful | Smart Campus</title>
-
+    <title>Admission Pass Issued | Smart Campus University</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
 
-<header class="header">
+<!-- TOP UTILITY BAR -->
+<div class="top-utility-bar">
     <div class="container">
-        <h1>Smart Campus</h1>
-        <p>Event Management System</p>
+        <ul class="utility-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/events}">Events</a></li>
+            <li><a th:href="@{/my-registrations}">Student Passes</a></li>
+            <li><a th:href="@{/login}">Admin Portal</a></li>
+        </ul>
+        <div class="utility-quick">
+            <span>Official Admission Document</span>
+            <span>•</span>
+            <span>Helpdesk: +91 80 2345 6789</span>
+        </div>
+    </div>
+</div>
+
+<!-- BRAND HEADER BAR -->
+<header class="main-header-bar">
+    <div class="container">
+        <a th:href="@{/}" class="brand-container">
+            <div class="brand-logo-badge">EDU</div>
+            <div class="brand-text-block">
+                <h1>Smart Campus</h1>
+                <span>University Event Portal</span>
+            </div>
+        </a>
+
+        <div class="header-nav-group">
+            <ul class="main-nav-links">
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/events}">All Events</a></li>
+                <li><a th:href="@{/my-registrations}">My Tickets</a></li>
+                <li><a th:href="@{/login}">Faculty / Admin</a></li>
+            </ul>
+
+            <!-- Working Collegiate Header Search (from Photo) -->
+            <form th:action="@{/events}" method="get" class="header-search-form" role="search">
+                <div class="header-search-box">
+                    <svg class="header-search-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input
+                        type="search"
+                        name="keyword"
+                        placeholder="Search events..."
+                        aria-label="Search campus events"
+                        class="header-search-input"
+                        autocomplete="off">
+                </div>
+            </form>
+        </div>
     </div>
 </header>
 
-<nav class="navbar">
+<!-- ANNOUNCEMENT TICKER -->
+<div class="announcement-marquee">
+    <div class="container marquee-content">
+        <span class="marquee-badge">Admission Pass Issued:</span>
+        <span>Your digital token has been recorded in the campus event registry. Please save or print your pass.</span>
+        <span class="marquee-bullet">•</span>
+        <span>Admission is granted upon barcode or Token ID verification at the campus entry gates.</span>
+    </div>
+</div>
+
+<main style="padding: 40px 0 80px 0;">
     <div class="container">
 
-        <a th:href="@{/}" class="nav-brand">
-            Smart Campus
-        </a>
+        <div style="text-align: center; margin-bottom: 30px;">
+            <span class="badge badge-success" style="font-size: 0.95rem; padding: 6px 18px;">
+                ✓ Admission Pass Confirmed
+            </span>
+            <h1 class="mt-1" style="font-size: 2.1rem; color: var(--navy); font-weight: 850;">
+                Official Student Event Pass
+            </h1>
+            <p class="text-muted" style="font-size: 0.95rem;">
+                Present this digital pass or printed copy at the entrance for barcode verification.
+            </p>
+        </div>
 
-        <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/events}">Events</a>
-            <a th:href="@{/login}">Admin</a>
+        <!-- Ticket Pass -->
+        <div class="ticket-container">
+            <div class="ticket-pass">
+
+                <div class="ticket-header">
+                    <div>
+                        <span class="ticket-badge" th:text="${event != null ? event.type : 'CAMPUS EVENT'}">
+                            WORKSHOP
+                        </span>
+                        <h2 class="mt-1" th:text="${event != null ? event.title : 'Campus Event'}">
+                            Event Title
+                        </h2>
+                    </div>
+                    <div style="text-align: right;">
+                        <small style="opacity: 0.85; font-size: 0.72rem; text-transform: uppercase;">Token ID</small>
+                        <div style="font-weight: 850; font-size: 1.15rem; color: #fecaca;" th:text="${'#SC-' + (registered != null ? registered.id : '101')}">
+                            #SC-101
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ticket-body">
+                    <div class="ticket-info-grid">
+
+                        <div class="ticket-info-item">
+                            <label>Attendee Name</label>
+                            <div class="val" th:text="${registered != null ? registered.studentName : 'Student Name'}">
+                                Student Name
+                            </div>
+                        </div>
+
+                        <div class="ticket-info-item">
+                            <label>Registered Email</label>
+                            <div class="val" th:text="${registered != null ? registered.email : 'student@campus.edu'}">
+                                student@campus.edu
+                            </div>
+                        </div>
+
+                        <div class="ticket-info-item">
+                            <label>Academic Department</label>
+                            <div class="val" th:text="${registered != null ? registered.department : 'CSE'}">
+                                CSE
+                            </div>
+                        </div>
+
+                        <div class="ticket-info-item">
+                            <label>Pass Allocation</label>
+                            <div class="val">
+                                <span class="badge badge-primary" th:text="${(registered != null ? registered.tickets : 1) + ' Confirmed Seat(s)'}">
+                                    1 Confirmed Seat(s)
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="ticket-info-item" th:if="${event != null}">
+                            <label>Scheduled Date & Time</label>
+                            <div class="val" th:text="${event.date + ' @ ' + event.time}">
+                                2026-10-10 @ 10:00 AM
+                            </div>
+                        </div>
+
+                        <div class="ticket-info-item" th:if="${event != null}">
+                            <label>Campus Venue</label>
+                            <div class="val" th:text="${event.venue}">
+                                Main Auditorium
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="ticket-stub">
+                    <div>
+                        <strong style="color: var(--navy); font-size: 0.92rem;">Smart Campus University</strong>
+                        <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0;">
+                            Official event admission credential & token
+                        </p>
+                    </div>
+                    <div class="qr-placeholder">
+                        <span>QR VERIFIED</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="actions mt-3" style="justify-content: center;">
+                <button onclick="window.print()" class="btn">
+                    🖨 Print / Save PDF Pass
+                </button>
+
+                <a
+                    th:if="${registered}"
+                    th:href="@{/my-registrations(email=${registered.email})}"
+                    class="btn btn-secondary">
+                    View My Bookings
+                </a>
+
+                <a th:href="@{/events}" class="btn btn-outline">
+                    Browse More Events
+                </a>
+            </div>
         </div>
 
     </div>
-</nav>
-
-<main class="container">
-
-    <div class="card login-card">
-
-        <div class="success text-center">
-
-            <h2>Registration Successful!</h2>
-
-            <p th:text="${message}">
-                Registration successful!
-            </p>
-
-        </div>
-
-        <div th:if="${registered}" class="card-body">
-
-            <h3 class="text-center mb-2">
-                Registration Details
-            </h3>
-
-            <p class="mb-1">
-                <strong>Student Name:</strong>
-                <span th:text="${registered.studentName}">
-                    Student Name
-                </span>
-            </p>
-
-            <p class="mb-1">
-                <strong>Email:</strong>
-                <span th:text="${registered.email}">
-                    Email
-                </span>
-            </p>
-
-            <p class="mb-1">
-                <strong>Department:</strong>
-                <span th:text="${registered.department}">
-                    Department
-                </span>
-            </p>
-
-            <p class="mb-2">
-                <strong>Tickets:</strong>
-                <span th:text="${registered.tickets}">
-                    1
-                </span>
-            </p>
-
-        </div>
-
-        <div class="actions">
-
-            <a
-                th:href="@{/events}"
-                class="btn">
-                Browse Events
-            </a>
-
-            <a
-                th:if="${registered}"
-                th:href="@{/my-registrations(email=${registered.email})}"
-                class="btn btn-outline">
-                My Registrations
-            </a>
-
-        </div>
-
-    </div>
-
 </main>
 
-<footer class="footer">
-    <p>
-        Department of Computer Science and Engineering
-    </p>
+<!-- COLLEGIATE FOOTER -->
+<footer class="university-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                    <div class="brand-logo-badge" style="padding: 6px 10px; font-size: 0.95rem;">EDU</div>
+                    <strong style="color: #ffffff; font-size: 1.1rem;">Smart Campus</strong>
+                </div>
+                <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 14px;">
+                    Department of Computer Science & Engineering<br>
+                    Smart Campus University Center, Innovation Block<br>
+                    Bengaluru, Karnataka, India
+                </p>
+                <p style="font-size: 0.82rem; color: #64748b;">
+                    Admissions & Helpdesk: +91 80 2345 6789
+                </p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Quick Navigation</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/}">Campus Home</a></li>
+                    <li><a th:href="@{/events}">Event Directory</a></li>
+                    <li><a th:href="@{/my-registrations}">My Student Passes</a></li>
+                    <li><a th:href="@{/login}">Faculty / Admin Sign In</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Academic Faculties</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/events?department=Computer+Science+and+Engineering}">Computer Science & Engg</a></li>
+                    <li><a th:href="@{/events?department=Information+Technology}">Information Technology</a></li>
+                    <li><a th:href="@{/events?department=Electronics+and+Communication+Engineering}">Electronics & Comm</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Student Project Initiative</h4>
+                <p style="font-size: 0.84rem; line-height: 1.6; color: #94a3b8; margin-bottom: 10px;">
+                    Designed and engineered by Computer Science students as part of the Full Stack Development curriculum.
+                </p>
+                <div style="background: rgba(255,255,255,0.06); padding: 10px 14px; border-radius: 6px; font-size: 0.78rem; color: #cbd5e1;">
+                    🔒 Secured with Spring Security 6 & BCrypt Encryption
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 Smart Campus University. All rights reserved.</span>
+            <span>Academic Management & Event Ticketing Portal</span>
+        </div>
+    </div>
 </footer>
 
 </body>
-
 </html>

@@ -4,410 +4,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title
-        th:text="${event.id == null ? 'Add Event | Smart Campus' : 'Edit Event | Smart Campus'}">
-        Event | Smart Campus
-    </title>
-
+    <title th:text="${event.id == null ? 'Schedule Campus Event | Smart Campus Admin' : 'Edit Event | Smart Campus Admin'}">Event | Smart Campus</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
 
-    <!-- ================================
-         HEADER
-    ================================= -->
-
-    <header class="header">
-
-        <div class="container">
-
-            <h1>Smart Campus</h1>
-
-            <p>
-                Event Management System
-            </p>
-
+<!-- TOP UTILITY BAR -->
+<div class="top-utility-bar">
+    <div class="container">
+        <ul class="utility-links">
+            <li><a th:href="@{/admin/events}">Administration Hub</a></li>
+            <li><a th:href="@{/}">Public Portal</a></li>
+            <li><a th:href="@{/events}">Directory</a></li>
+        </ul>
+        <div class="utility-quick">
+            <span>Logged in as: <strong>Administrator</strong></span>
+            <span>•</span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: inherit; font-weight: 600; padding: 0;">
+                    Sign Out
+                </button>
+            </form>
         </div>
+    </div>
+</div>
 
-    </header>
+<!-- BRAND HEADER BAR -->
+<header class="main-header-bar">
+    <div class="container">
+        <a th:href="@{/admin/events}" class="brand-container">
+            <div class="brand-logo-badge">EDU</div>
+            <div class="brand-text-block">
+                <h1>Smart Campus</h1>
+                <span>Administrator Dashboard</span>
+            </div>
+        </a>
 
+        <ul class="main-nav-links">
+            <li><a th:href="@{/admin/events}">Manage Events</a></li>
+            <li><a th:href="@{/admin/events/add}" class="active">+ Add New Event</a></li>
+            <li><a th:href="@{/}">View Public Site</a></li>
+            <li>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--danger); border-color: #fecaca;">
+                        Sign Out
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</header>
 
-    <!-- ================================
-         NAVIGATION
-    ================================= -->
+<main style="padding: 40px 0 80px 0;">
+    <div class="container" style="max-width: 820px;">
 
-    <nav class="navbar">
-
-        <div class="container">
-
-            <a
-                th:href="@{/admin/events}"
-                class="nav-brand">
-
-                Smart Campus Admin
-
+        <div class="page-header">
+            <div>
+                <h1 th:text="${event.id == null ? 'Schedule New Campus Event' : 'Modify Event Schedule'}">
+                    Schedule New Campus Event
+                </h1>
+                <p>Publish an official workshop, seminar, hackathon, or cultural fest to the university event directory.</p>
+            </div>
+            <a th:href="@{/admin/events}" class="btn btn-secondary">
+                ← Back to Manage Events
             </a>
-
-            <div class="nav-links">
-
-                <a th:href="@{/admin/events}">
-                    Events
-                </a>
-
-                <a th:href="@{/}">
-                    Home
-                </a>
-
-                <a th:href="@{/logout}">
-                    Logout
-                </a>
-
-            </div>
-
         </div>
 
-    </nav>
-
-
-    <!-- ================================
-         MAIN CONTENT
-    ================================= -->
-
-    <main>
-
-        <div class="container">
-
-            <div class="page-header">
-
-                <div>
-
-                    <h1
-                        th:text="${event.id == null ? 'Add New Event' : 'Edit Event'}">
-
-                        Add New Event
-
-                    </h1>
-
-                    <p>
-                        Enter the details of the campus event below.
-                    </p>
-
-                </div>
-
+        <div class="card">
+            <div class="card-header">
+                <h2 style="font-size: 1.25rem; color: var(--navy);">Event Configuration Details</h2>
             </div>
 
+            <div class="card-body">
 
-            <!-- ================================
-                 EVENT FORM
-            ================================= -->
+                <form
+                    th:object="${event}"
+                    th:action="${event.id == null} ? @{/admin/events/save} : @{/admin/events/update/{id}(id=${event.id})}"
+                    method="post">
 
-            <div class="card">
+                    <!-- Title -->
+                    <div class="form-group">
+                        <label for="title">Event Title *</label>
+                        <input
+                            type="text"
+                            id="title"
+                            th:field="*{title}"
+                            placeholder="e.g. National Robotics & Autonomous Systems Expo 2026"
+                            required>
+                        <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error"></div>
+                    </div>
 
-                <div class="card-body">
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="description">Event Overview & Academic Abstract *</label>
+                        <textarea
+                            id="description"
+                            th:field="*{description}"
+                            placeholder="Provide a comprehensive description of the event, keynote speakers, agendas, and target student audience..."
+                            style="min-height: 120px;"
+                            required></textarea>
+                        <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></div>
+                    </div>
 
-                    <form
-                        th:object="${event}"
-                        th:action="${event.id == null}
-                            ? @{/admin/events/save}
-                            : @{/admin/events/update/{id}(id=${event.id})}"
-                        method="post">
-
-
-                        <!-- ================================
-                             TITLE
-                        ================================= -->
+                    <!-- Department & Event Type -->
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="department">Host Department / Faculty *</label>
+                            <select id="department" th:field="*{department}" required>
+                                <option value="">Select organizing faculty</option>
+                                <option value="Computer Science and Engineering">Computer Science and Engineering</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Electronics and Communication Engineering">Electronics and Communication Engineering</option>
+                                <option value="Electrical and Electronics Engineering">Electrical and Electronics Engineering</option>
+                                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                <option value="Civil Engineering">Civil Engineering</option>
+                                <option value="Artificial Intelligence and Data Science">Artificial Intelligence and Data Science</option>
+                                <option value="Cultural Committee">Cultural Committee</option>
+                                <option value="Department of Physical Education">Department of Physical Education</option>
+                            </select>
+                            <div th:if="${#fields.hasErrors('department')}" th:errors="*{department}" class="error"></div>
+                        </div>
 
                         <div class="form-group">
+                            <label for="type">Event Classification *</label>
+                            <select id="type" th:field="*{type}" required>
+                                <option value="">Select session format</option>
+                                <option value="Workshop">Workshop</option>
+                                <option value="Seminar">Seminar</option>
+                                <option value="Conference">Conference</option>
+                                <option value="Hackathon">Hackathon</option>
+                                <option value="Competition">Competition</option>
+                                <option value="Cultural">Cultural Fest</option>
+                                <option value="Sports">Sports Meet</option>
+                                <option value="Other">Other Academic Activity</option>
+                            </select>
+                            <div th:if="${#fields.hasErrors('type')}" th:errors="*{type}" class="error"></div>
+                        </div>
+                    </div>
 
-                            <label for="title">
-                                Event Title
-                            </label>
+                    <!-- Date & Time -->
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="date">Calendar Date *</label>
+                            <input
+                                type="date"
+                                id="date"
+                                th:field="*{date}"
+                                required>
+                            <div th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="error"></div>
+                        </div>
 
+                        <div class="form-group">
+                            <label for="time">Session Time *</label>
+                            <input
+                                type="time"
+                                id="time"
+                                th:field="*{time}"
+                                required>
+                            <div th:if="${#fields.hasErrors('time')}" th:errors="*{time}" class="error"></div>
+                        </div>
+                    </div>
+
+                    <!-- Venue & Capacity -->
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="venue">Campus Venue Location *</label>
                             <input
                                 type="text"
-                                id="title"
-                                th:field="*{title}"
-                                placeholder="Enter event title"
+                                id="venue"
+                                th:field="*{venue}"
+                                placeholder="e.g. Innovation Hall A / Main Auditorium"
                                 required>
-
-                            <div
-                                th:if="${#fields.hasErrors('title')}"
-                                th:errors="*{title}"
-                                class="error">
-                            </div>
-
+                            <div th:if="${#fields.hasErrors('venue')}" th:errors="*{venue}" class="error"></div>
                         </div>
-
-
-                        <!-- ================================
-                             DESCRIPTION
-                        ================================= -->
 
                         <div class="form-group">
-
-                            <label for="description">
-                                Description
-                            </label>
-
-                            <textarea
-                                id="description"
-                                th:field="*{description}"
-                                placeholder="Enter event description"
+                            <label for="capacity">Total Seating Capacity *</label>
+                            <input
+                                type="number"
+                                id="capacity"
+                                th:field="*{capacity}"
+                                placeholder="e.g. 75"
+                                min="1"
                                 required>
-                            </textarea>
-
-                            <div
-                                th:if="${#fields.hasErrors('description')}"
-                                th:errors="*{description}"
-                                class="error">
-                            </div>
-
+                            <div th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}" class="error"></div>
                         </div>
-
-
-                        <!-- ================================
-                             DEPARTMENT + TYPE
-                        ================================= -->
-
-                        <div class="grid grid-2">
-
-                            <div class="form-group">
-
-                                <label for="department">
-                                    Department
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="department"
-                                    th:field="*{department}"
-                                    placeholder="Example: CSE"
-                                    required>
-
-                                <div
-                                    th:if="${#fields.hasErrors('department')}"
-                                    th:errors="*{department}"
-                                    class="error">
-                                </div>
-
-                            </div>
-
-
-                            <div class="form-group">
-
-                                <label for="type">
-                                    Event Type
-                                </label>
-
-                                <select
-                                    id="type"
-                                    th:field="*{type}"
-                                    required>
-
-                                    <option value="">
-                                        Select event type
-                                    </option>
-
-                                    <option value="Workshop">
-                                        Workshop
-                                    </option>
-
-                                    <option value="Seminar">
-                                        Seminar
-                                    </option>
-
-                                    <option value="Conference">
-                                        Conference
-                                    </option>
-
-                                    <option value="Hackathon">
-                                        Hackathon
-                                    </option>
-
-                                    <option value="Competition">
-                                        Competition
-                                    </option>
-
-                                    <option value="Cultural">
-                                        Cultural
-                                    </option>
-
-                                    <option value="Sports">
-                                        Sports
-                                    </option>
-
-                                    <option value="Other">
-                                        Other
-                                    </option>
-
-                                </select>
-
-                                <div
-                                    th:if="${#fields.hasErrors('type')}"
-                                    th:errors="*{type}"
-                                    class="error">
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- ================================
-                             DATE + TIME
-                        ================================= -->
-
-                        <div class="grid grid-2">
-
-                            <div class="form-group">
-
-                                <label for="date">
-                                    Event Date
-                                </label>
-
-                                <input
-                                    type="date"
-                                    id="date"
-                                    th:field="*{date}"
-                                    required>
-
-                                <div
-                                    th:if="${#fields.hasErrors('date')}"
-                                    th:errors="*{date}"
-                                    class="error">
-                                </div>
-
-                            </div>
-
-
-                            <div class="form-group">
-
-                                <label for="time">
-                                    Event Time
-                                </label>
-
-                                <input
-                                    type="time"
-                                    id="time"
-                                    th:field="*{time}"
-                                    required>
-
-                                <div
-                                    th:if="${#fields.hasErrors('time')}"
-                                    th:errors="*{time}"
-                                    class="error">
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- ================================
-                             VENUE + CAPACITY
-                        ================================= -->
-
-                        <div class="grid grid-2">
-
-                            <div class="form-group">
-
-                                <label for="venue">
-                                    Venue
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="venue"
-                                    th:field="*{venue}"
-                                    placeholder="Example: Main Auditorium"
-                                    required>
-
-                                <div
-                                    th:if="${#fields.hasErrors('venue')}"
-                                    th:errors="*{venue}"
-                                    class="error">
-                                </div>
-
-                            </div>
-
-
-                            <div class="form-group">
-
-                                <label for="capacity">
-                                    Capacity
-                                </label>
-
-                                <input
-                                    type="number"
-                                    id="capacity"
-                                    th:field="*{capacity}"
-                                    placeholder="Example: 100"
-                                    min="1"
-                                    required>
-
-                                <div
-                                    th:if="${#fields.hasErrors('capacity')}"
-                                    th:errors="*{capacity}"
-                                    class="error">
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- ================================
-                             FORM ACTIONS
-                        ================================= -->
-
-                        <div class="actions">
-
-                            <button
-                                type="submit"
-                                class="btn btn-success"
-                                th:text="${event.id == null ? 'Create Event' : 'Update Event'}">
-
-                                Create Event
-
-                            </button>
-
-                            <a
-                                th:href="@{/admin/events}"
-                                class="btn btn-secondary">
-
-                                Cancel
-
-                            </a>
-
-                        </div>
-
-                    </form>
-
-                </div>
+                    </div>
+
+                    <div class="actions mt-3">
+                        <a th:href="@{/admin/events}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn" style="padding: 12px 28px; font-size: 0.98rem;">
+                            Publish Campus Event →
+                        </button>
+                    </div>
+
+                </form>
 
             </div>
-
         </div>
 
-    </main>
+    </div>
+</main>
 
-
-    <!-- ================================
-         FOOTER
-    ================================= -->
-
-    <footer class="footer">
-
-        <p>
-            Department of Computer Science and Engineering
-            &nbsp;•&nbsp;
-            Smart Campus
-        </p>
-
-    </footer>
+<!-- COLLEGIATE FOOTER -->
+<footer class="university-footer">
+    <div class="container">
+        <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+            <span>© 2026 Smart Campus University. All rights reserved.</span>
+            <span>Department of Computer Science & Engineering</span>
+        </div>
+    </div>
+</footer>
 
 </body>
-
 </html>

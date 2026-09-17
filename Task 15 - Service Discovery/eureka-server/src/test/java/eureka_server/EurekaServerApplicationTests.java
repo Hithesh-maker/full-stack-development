@@ -1,10 +1,10 @@
-package com.campus.smart_campus;
+package eureka_server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SmartCampusApplicationTests {
+class EurekaServerApplicationTests {
 
 	@Test
 	void contextLoads() {

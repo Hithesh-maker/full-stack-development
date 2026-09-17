@@ -1,0 +1,2 @@
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task-1-Student-Registration"
+Node server.js

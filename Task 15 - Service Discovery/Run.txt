@@ -1,0 +1,18 @@
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 15 - Service Discovery\eureka-server"
+mvn spring-boot:run
+
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 14 - Microservices\product-service"
+mvn spring-boot:run
+
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 14 - Microservices\order-service"
+mvn spring-boot:run
+
+
+Open Eureka Dashboard
+http://localhost:8761
+
+Test Product Service
+http://localhost:8081/products
+
+Step 7 — Test Service Discovery
+http://localhost:8082/orders/products

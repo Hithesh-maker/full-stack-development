@@ -4,350 +4,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Event Registrations | Smart Campus</title>
-
+    <title>Event Attendee Roster | Smart Campus Admin</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
 
-<!-- =========================
-     HEADER
-========================= -->
-
-<header class="header">
+<!-- TOP UTILITY BAR -->
+<div class="top-utility-bar">
     <div class="container">
-        <h1>Smart Campus</h1>
-        <p>Event Management System</p>
+        <ul class="utility-links">
+            <li><a th:href="@{/admin/events}">Administration Hub</a></li>
+            <li><a th:href="@{/}">Public Portal</a></li>
+            <li><a th:href="@{/events}">Directory</a></li>
+        </ul>
+        <div class="utility-quick">
+            <span>Logged in as: <strong>Administrator</strong></span>
+            <span>•</span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: inherit; font-weight: 600; padding: 0;">
+                    Sign Out
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- BRAND HEADER BAR -->
+<header class="main-header-bar">
+    <div class="container">
+        <a th:href="@{/admin/events}" class="brand-container">
+            <div class="brand-logo-badge">EDU</div>
+            <div class="brand-text-block">
+                <h1>Smart Campus</h1>
+                <span>Administrator Dashboard</span>
+            </div>
+        </a>
+
+        <ul class="main-nav-links">
+            <li><a th:href="@{/admin/events}">Manage Events</a></li>
+            <li><a th:href="@{/admin/events/add}">+ Add New Event</a></li>
+            <li><a th:href="@{/}">View Public Site</a></li>
+            <li>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--danger); border-color: #fecaca;">
+                        Sign Out
+                    </button>
+                </form>
+            </li>
+        </ul>
     </div>
 </header>
 
-
-<!-- =========================
-     NAVIGATION
-========================= -->
-
-<nav class="navbar">
-
+<main style="padding: 40px 0 80px 0;">
     <div class="container">
 
-        <a th:href="@{/admin/events}" class="nav-brand">
-            Admin Panel
-        </a>
+        <!-- Flash messages -->
+        <div th:if="${successMessage}" class="success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="error" th:text="${errorMessage}"></div>
 
-        <div class="nav-links">
+        <div class="page-header">
+            <div>
+                <h1>Event Attendees & Admission Roster</h1>
+                <p>Track registered student headcounts, venue seat usage, and export CSV attendance sheets.</p>
+            </div>
 
-            <a th:href="@{/admin/events}">
-                Events
-            </a>
+            <div class="actions">
+                <a th:href="@{/admin/events/{id}/export-csv(id=${event.id})}" class="btn" style="background-color: var(--success);">
+                    📥 Download Attendance CSV
+                </a>
+                <a th:href="@{/admin/events}" class="btn btn-secondary">
+                    ← Back to Events
+                </a>
+            </div>
+        </div>
 
-            <a th:href="@{/admin/events/add}">
-                Add Event
-            </a>
+        <!-- Event Overview Card -->
+        <div class="card mb-3" style="border-left: 4px solid var(--primary);">
+            <div class="card-body" style="padding: 22px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="badge badge-primary" th:text="${event.type}">Workshop</span>
+                        <h2 th:text="${event.title}" style="font-size: 1.3rem; color: var(--navy);">Event Title</h2>
+                    </div>
+                    <span class="seats-badge seats-available" th:text="${(event.capacity - totalTickets) + ' Seats Remaining'}">
+                        45 Seats Remaining
+                    </span>
+                </div>
 
-            <a th:href="@{/}">
-                Home
-            </a>
+                <div class="grid grid-3" style="font-size: 0.88rem; color: var(--navy-muted);">
+                    <div><strong>Faculty:</strong> <span th:text="${event.department}">CSE</span></div>
+                    <div><strong>Date & Time:</strong> <span th:text="${event.date + ' @ ' + event.time}">2026-10-10</span></div>
+                    <div><strong>Venue:</strong> <span th:text="${event.venue}">Auditorium</span></div>
+                </div>
+            </div>
+        </div>
 
-            <form th:action="@{/logout}" method="post" style="display:inline;">
-                <button type="submit" class="btn btn-danger">
-                    Logout
-                </button>
-            </form>
+        <!-- Metrics Grid -->
+        <div class="grid grid-3 mb-3">
+            <div class="stat-card">
+                <h3>Total Reserved Passes</h3>
+                <div class="number text-primary" th:text="${totalTickets}">0</div>
+            </div>
 
+            <div class="stat-card">
+                <h3>Unique Student Attendees</h3>
+                <div class="number text-navy" th:text="${registrationCount}">0</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Venue Seats Remaining</h3>
+                <div class="number" th:classappend="${(event.capacity - totalTickets) le 5 ? 'text-danger' : 'text-success'}" th:text="${event.capacity - totalTickets}">
+                    0
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendees Table -->
+        <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <h2 style="font-size: 1.15rem; color: var(--navy); margin: 0;">Enrolled Students Roster</h2>
+                    <span class="badge badge-navy" th:text="${#lists.size(registrations) + ' Total Records'}"></span>
+                </div>
+
+                <!-- Instant Roster Search Bar -->
+                <div class="search-input-field" style="max-width: 280px;" th:if="${!#lists.isEmpty(registrations)}">
+                    <svg class="search-field-icon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input
+                        type="search"
+                        id="rosterSearchInput"
+                        onkeyup="filterRoster()"
+                        placeholder="Filter by name, email, token..."
+                        aria-label="Filter attendee records"
+                        class="search-input-control"
+                        style="padding-top: 7px; padding-bottom: 7px; font-size: 0.85rem;">
+                </div>
+            </div>
+
+            <div class="card-body" style="padding: 0;">
+
+                <div class="empty-state" th:if="${#lists.isEmpty(registrations)}">
+                    <h3>No Attendees Enrolled</h3>
+                    <p>No students have reserved tickets for this event yet.</p>
+                </div>
+
+                <div class="table-wrapper" th:if="${!#lists.isEmpty(registrations)}" style="border: none; border-radius: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Student Name</th>
+                                <th>College Email</th>
+                                <th>Department</th>
+                                <th>Passes</th>
+                                <th>Status</th>
+                                <th>Enrolled Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="rosterTableBody">
+                            <tr th:each="registration, stat : ${registrations}">
+                                <td th:text="${stat.count}">1</td>
+
+                                <td>
+                                    <strong style="color: var(--navy);" th:text="${registration.studentName}">Student Name</strong>
+                                </td>
+
+                                <td th:text="${registration.email}">student@example.com</td>
+
+                                <td>
+                                    <span class="badge badge-primary" th:text="${registration.department}">CSE</span>
+                                </td>
+
+                                <td>
+                                    <span class="badge badge-navy" th:text="${registration.tickets + ' Pass(es)'}">1</span>
+                                </td>
+
+                                <td>
+                                    <span th:if="${registration.status == null or registration.status == 'CONFIRMED'}" class="badge badge-success">
+                                        Confirmed
+                                    </span>
+                                    <span th:if="${registration.status == 'CANCELLED'}" class="badge badge-danger">
+                                        Cancelled
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <small class="text-muted" th:text="${registration.registeredAt != null ? #temporals.format(registration.registeredAt, 'yyyy-MM-dd HH:mm') : 'N/A'}">
+                                        2026-09-17 10:00
+                                    </small>
+                                </td>
+
+                                <td>
+                                    <form
+                                        th:if="${registration.status == null or registration.status == 'CONFIRMED'}"
+                                        th:action="@{/admin/events/{eventId}/registrations/delete/{registrationId}(eventId=${event.id}, registrationId=${registration.id})}"
+                                        method="post"
+                                        style="display: inline;">
+                                        <button
+                                            type="submit"
+                                            class="btn btn-secondary btn-sm"
+                                            style="color: var(--danger); border-color: #fecaca;"
+                                            onclick="return confirm('Revoke this attendee registration?');">
+                                            Revoke Pass
+                                        </button>
+                                    </form>
+
+                                    <span th:if="${registration.status == 'CANCELLED'}" class="text-muted" style="font-size: 0.8rem;">
+                                        Revoked
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
         </div>
 
     </div>
-
-</nav>
-
-
-<!-- =========================
-     MAIN CONTENT
-========================= -->
-
-<main class="container">
-
-    <!-- Page Header -->
-
-    <div class="page-header">
-
-        <div>
-
-            <h1>
-                Event Registrations
-            </h1>
-
-            <p>
-                View students enrolled in this event.
-            </p>
-
-        </div>
-
-        <div class="actions">
-
-            <a th:href="@{/admin/events}" class="btn btn-secondary">
-                ← Back to Events
-            </a>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================
-         EVENT INFORMATION
-    ========================== -->
-
-    <div class="card">
-
-        <div class="card-header">
-
-            <h2 th:text="${event.title}">
-                Event Title
-            </h2>
-
-        </div>
-
-        <div class="card-body">
-
-            <div class="grid grid-3">
-
-                <div>
-                    <strong>Department</strong>
-                    <p class="text-muted"
-                       th:text="${event.department}">
-                        Department
-                    </p>
-                </div>
-
-                <div>
-                    <strong>Date</strong>
-                    <p class="text-muted"
-                       th:text="${event.date}">
-                        Date
-                    </p>
-                </div>
-
-                <div>
-                    <strong>Time</strong>
-                    <p class="text-muted"
-                       th:text="${event.time}">
-                        Time
-                    </p>
-                </div>
-
-                <div>
-                    <strong>Venue</strong>
-                    <p class="text-muted"
-                       th:text="${event.venue}">
-                        Venue
-                    </p>
-                </div>
-
-                <div>
-                    <strong>Capacity</strong>
-                    <p class="text-muted"
-                       th:text="${event.capacity}">
-                        Capacity
-                    </p>
-                </div>
-
-                <div>
-                    <strong>Event Type</strong>
-                    <p class="text-muted"
-                       th:text="${event.type}">
-                        Type
-                    </p>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================
-         STATISTICS
-    ========================== -->
-
-    <div class="dashboard-grid mt-3">
-
-        <div class="stat-card">
-
-            <h3>Registered Students</h3>
-
-            <div class="number"
-                 th:text="${registrationCount}">
-                0
-            </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <h3>Total Tickets</h3>
-
-            <div class="number"
-                 th:text="${totalTickets}">
-                0
-            </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <h3>Available Seats</h3>
-
-            <div class="number"
-                 th:text="${event.capacity - totalTickets}">
-                0
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================
-         STUDENT REGISTRATIONS
-    ========================== -->
-
-    <div class="card mt-3">
-
-        <div class="card-header">
-
-            <h2>
-                Enrolled Students
-            </h2>
-
-        </div>
-
-        <div class="card-body">
-
-
-            <!-- No registrations -->
-
-            <div class="empty-state"
-                 th:if="${#lists.isEmpty(registrations)}">
-
-                <h3>
-                    No Students Registered
-                </h3>
-
-                <p>
-                    No students have enrolled for this event yet.
-                </p>
-
-            </div>
-
-
-            <!-- Registrations Table -->
-
-            <div class="table-wrapper"
-                 th:if="${!#lists.isEmpty(registrations)}">
-
-                <table>
-
-                    <thead>
-
-                    <tr>
-
-                        <th>
-                            #
-                        </th>
-
-                        <th>
-                            Student Name
-                        </th>
-
-                        <th>
-                            Email
-                        </th>
-
-                        <th>
-                            Department
-                        </th>
-
-                        <th>
-                            Tickets
-                        </th>
-
-                    </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                    <tr th:each="registration, stat : ${registrations}">
-
-                        <td th:text="${stat.count}">
-                            1
-                        </td>
-
-                        <td>
-
-                            <strong
-                                th:text="${registration.studentName}">
-                                Student Name
-                            </strong>
-
-                        </td>
-
-                        <td th:text="${registration.email}">
-                            student@example.com
-                        </td>
-
-                        <td>
-
-                            <span class="badge badge-primary"
-                                  th:text="${registration.department}">
-                                CSE
-                            </span>
-
-                        </td>
-
-                        <td>
-
-                            <span class="badge badge-success"
-                                  th:text="${registration.tickets}">
-                                1
-                            </span>
-
-                        </td>
-
-                    </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </div>
-
 </main>
 
-
-<!-- =========================
-     FOOTER
-========================= -->
-
-<footer class="footer">
-
-    <p>
-        Department of Computer Science and Engineering
-    </p>
-
+<!-- COLLEGIATE FOOTER -->
+<footer class="university-footer">
+    <div class="container">
+        <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+            <span>© 2026 Smart Campus University. All rights reserved.</span>
+            <span>Department of Computer Science & Engineering</span>
+        </div>
+    </div>
 </footer>
 
-</body>
+<script>
+function filterRoster() {
+    const input = document.getElementById('rosterSearchInput');
+    const filter = input.value.toLowerCase();
+    const rows = document.querySelectorAll('#rosterTableBody tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+    });
+}
+</script>
 
+</body>
 </html>
