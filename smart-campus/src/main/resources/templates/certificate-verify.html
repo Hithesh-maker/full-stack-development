@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Official Certificate Verification Portal | Educare University</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .cert-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+            overflow: hidden;
+            max-width: 820px;
+            margin: 0 auto;
+        }
+        .cert-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            padding: 32px 28px;
+            text-align: center;
+            border-bottom: 4px solid #b45309;
+        }
+        .cert-seal {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        .status-badge-verified {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1.5px solid #a7f3d0;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 0.95rem;
+            letter-spacing: 0.025em;
+        }
+        .status-badge-invalid {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1.5px solid #fecaca;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 0.95rem;
+            letter-spacing: 0.025em;
+        }
+        .cert-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 16px;
+        }
+        .cert-table th {
+            text-align: left;
+            padding: 12px 16px;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid #e2e8f0;
+            width: 32%;
+        }
+        .cert-table td {
+            padding: 12px 16px;
+            color: #0f172a;
+            font-size: 0.95rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .code-box {
+            font-family: monospace;
+            font-weight: 700;
+            background: #f1f5f9;
+            border: 1px dashed #cbd5e1;
+            padding: 4px 10px;
+            border-radius: 4px;
+            letter-spacing: 0.08em;
+            color: #0f172a;
+        }
+    </style>
+</head>
+<body style="background: #f8fafc; min-height: 100vh; display: flex; flex-direction: column;">
+
+<!-- TOP HEADER -->
+<header class="navbar" style="background: var(--navy); border-bottom: 1px solid #334155;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;">
+        <a th:href="@{/}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: white;">
+            <span style="font-size: 1.5rem;">🏛️</span>
+            <div>
+                <div style="font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.05em;">EDUCARE UNIVERSITY</div>
+                <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase;">Credential Verification Registry</div>
+            </div>
+        </a>
+        <div>
+            <a th:href="@{/events}" class="btn btn-outline btn-sm" style="color: white; border-color: #64748b;">Browse Events</a>
+            <a th:href="@{/login}" class="btn btn-sm" style="background: var(--gold); border: none; color: white; margin-left: 8px;">Portal Login</a>
+        </div>
+    </div>
+</header>
+
+<!-- MAIN CONTAINER -->
+<main style="flex: 1; padding: 40px 16px;">
+    <div style="max-width: 820px; margin: 0 auto;">
+
+        <!-- SEARCH FORM -->
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px 24px; margin-bottom: 28px; box-shadow: var(--shadow-sm);">
+            <form th:action="@{/verify/certificate}" method="get" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 240px;">
+                    <label for="searchCode" style="display: block; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 4px; text-transform: uppercase;">
+                        Enter Unique Verification Code
+                    </label>
+                    <input type="text" id="searchCode" name="code" th:value="${code}" placeholder="e.g. CERT-A9F43B21E8D0"
+                           required
+                           style="width: 100%; padding: 10px 14px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 0.95rem; font-weight: 600; text-transform: uppercase;">
+                </div>
+                <button type="submit" class="btn" style="margin-top: 20px; padding: 11px 22px; font-weight: 600;">
+                    🔍 Verify Authenticity
+                </button>
+            </form>
+        </div>
+
+        <!-- RESULT SECTION -->
+        <div th:if="${searched}">
+
+            <!-- CASE 1: VERIFIED VALID -->
+            <div th:if="${found and isValid}" class="cert-card">
+                <div class="cert-header">
+                    <div class="cert-seal">🎓</div>
+                    <h1 style="font-family: 'Cinzel', serif; font-size: 1.5rem; margin: 0 0 8px 0; color: white;">
+                        Certificate of Authenticity Verified
+                    </h1>
+                    <p style="margin: 0; color: #cbd5e1; font-size: 0.88rem;">
+                        Educare University Official Record Registry Database
+                    </p>
+                </div>
+
+                <div style="padding: 28px;">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <span class="status-badge-verified">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            OFFICIALLY RECOGNIZED & VERIFIED
+                        </span>
+                    </div>
+
+                    <table class="cert-table">
+                        <tbody>
+                            <tr>
+                                <th>Conferred To</th>
+                                <td>
+                                    <strong style="font-size: 1.1rem; color: var(--navy);" th:text="${certificate.studentName}">John Doe</strong>
+                                    <span style="color: #64748b; font-size: 0.85rem; display: block;" th:text="${certificate.studentEmail}">john@campus.edu</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Academic Session / Event</th>
+                                <td>
+                                    <strong th:text="${certificate.eventName}">Annual AI Symposium 2026</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Host Department</th>
+                                <td th:text="${certificate.department}">Computer Science and Engineering</td>
+                            </tr>
+                            <tr>
+                                <th>Session Date</th>
+                                <td th:text="${certificate.eventDate}">2026-09-15</td>
+                            </tr>
+                            <tr>
+                                <th>Verification Reference</th>
+                                <td>
+                                    <span class="code-box" th:text="${certificate.verificationCode}">CERT-A9F43B21E8D0</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Certificate Number</th>
+                                <td style="font-family: monospace;" th:text="${certificate.certificateNumber}">EDU-1-42</td>
+                            </tr>
+                            <tr>
+                                <th>Issuance Record Date</th>
+                                <td th:text="${#temporals.format(certificate.issuedAt, 'MMMM d, yyyy HH:mm:ss')}">September 15, 2026 14:30:00</td>
+                            </tr>
+                            <tr>
+                                <th>Verification Authority</th>
+                                <td>
+                                    <div style="font-weight: 600; color: #0f172a;">Smart Campus Academic Affairs</div>
+                                    <div style="font-size: 0.8rem; color: #64748b;">Cryptographically validated via University Smart Records Ledger</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 24px; padding: 14px 18px; background: #f0fdf4; border-left: 4px solid #16a34a; border-radius: 4px; font-size: 0.88rem; color: #166534;">
+                        ℹ️ <strong>Tamper-Proof Guarantee:</strong> This credential was generated and signed by Educare University. The identity and completion record match official institutional archives.
+                    </div>
+
+                    <div style="margin-top: 24px; text-align: center; display: flex; gap: 12px; justify-content: center;">
+                        <button onclick="window.print()" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
+                            🖨️ Print Verification
+                        </button>
+                        <a th:href="@{/verify/certificate}" class="btn btn-secondary">
+                            Search Another Code
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CASE 2: FOUND BUT REVOKED -->
+            <div th:if="${found and !isValid}" class="cert-card" style="border-color: #fca5a5;">
+                <div class="cert-header" style="background: #7f1d1d; border-color: #ef4444;">
+                    <div class="cert-seal">⚠️</div>
+                    <h1 style="font-family: 'Cinzel', serif; font-size: 1.5rem; margin: 0 0 8px 0; color: white;">
+                        Certificate Revoked
+                    </h1>
+                </div>
+                <div style="padding: 28px; text-align: center;">
+                    <span class="status-badge-invalid">
+                        ✕ CREDENTIAL FORMERLY ISSUED HAS BEEN REVOKED
+                    </span>
+                    <p style="margin-top: 16px; color: #475569;">
+                        The credential with verification code <strong class="code-box" th:text="${code}"></strong> is no longer valid. It has been deactivated by academic administration.
+                    </p>
+                </div>
+            </div>
+
+            <!-- CASE 3: NOT FOUND -->
+            <div th:if="${!found}" class="cert-card" style="border-color: #fca5a5;">
+                <div class="cert-header" style="background: #450a0a; border-color: #dc2626;">
+                    <div class="cert-seal">❌</div>
+                    <h1 style="font-family: 'Cinzel', serif; font-size: 1.5rem; margin: 0 0 8px 0; color: white;">
+                        Credential Verification Failed
+                    </h1>
+                    <p style="margin: 0; color: #fca5a5; font-size: 0.88rem;">
+                        No record located in Educare University Official Registry
+                    </p>
+                </div>
+                <div style="padding: 28px; text-align: center;">
+                    <span class="status-badge-invalid">
+                        ✕ INVALID OR UNREGISTERED CREDENTIAL CODE
+                    </span>
+                    <p style="margin-top: 16px; color: #475569; font-size: 0.95rem;">
+                        We could not find any official certificate issued with code <strong class="code-box" th:text="${code}"></strong>.
+                    </p>
+                    <p style="color: #64748b; font-size: 0.85rem; max-width: 500px; margin: 0 auto 20px auto;">
+                        Please verify that the code was typed correctly (including hyphens). Official certificates have codes formatted like <code>CERT-XXXXXXXXXXXX</code>.
+                    </p>
+                    <a th:href="@{/verify/certificate}" class="btn">Try Another Code</a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- INITIAL STATE (NOT SEARCHED YET) -->
+        <div th:unless="${searched}" style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 36px 28px; text-align: center; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 3rem; margin-bottom: 12px;">🛡️</div>
+            <h2 style="font-family: 'Cinzel', serif; color: var(--navy); margin-bottom: 8px;">
+                Official Institutional Verification
+            </h2>
+            <p style="color: #64748b; max-width: 540px; margin: 0 auto 24px auto; line-height: 1.6;">
+                Welcome to the Educare University digital credential verification gateway. Employers, academic partners, and students can instantly verify the authenticity of event participation certificates issued by campus faculties.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; text-align: left; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 24px;">
+                <div style="max-width: 220px;">
+                    <div style="font-weight: 700; color: var(--navy); margin-bottom: 4px;">1. Scan or Type Code</div>
+                    <div style="font-size: 0.82rem; color: #64748b;">Scan the QR on any issued PDF or enter the 16-character code.</div>
+                </div>
+                <div style="max-width: 220px;">
+                    <div style="font-weight: 700; color: var(--navy); margin-bottom: 4px;">2. Real-Time Query</div>
+                    <div style="font-size: 0.82rem; color: #64748b;">Direct lookup against the official University database records.</div>
+                </div>
+                <div style="max-width: 220px;">
+                    <div style="font-weight: 700; color: var(--navy); margin-bottom: 4px;">3. Instant Validation</div>
+                    <div style="font-size: 0.82rem; color: #64748b;">Receive tamper-proof verification of recipient, faculty, and event completion.</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="university-footer">
+    <div class="container">
+        <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+            <span>© 2026 Educare University. All rights reserved.</span>
+            <span>Office of Academic Records & Credential Verification</span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

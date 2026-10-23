@@ -1,0 +1,13 @@
+# ============================================================
+# TASK 20 - GIT BRANCHING STRATEGIES & CONFLICT RESOLUTION
+# Run and Verification Guide
+# ============================================================
+
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 20 - Git Branching Strategies and Conflict Resolution"
+
+# 1. Execute Automated Branching, Conflict Generation & Resolution
+powershell -ExecutionPolicy Bypass -File .\simulate_branching_and_conflicts.ps1
+
+# 2. Inspect the sandbox repository log
+cd branching-sandbox-repo
+git log --graph --oneline --all --decorate

@@ -161,30 +161,53 @@
                     </div>
                 </div>
 
-                <div class="ticket-stub">
+                <div class="ticket-stub" style="display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; background: #ffffff; border-top: 2px dashed #cbd5e1;">
                     <div>
-                        <strong style="color: var(--navy); font-size: 0.92rem;">Smart Campus University</strong>
-                        <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0;">
-                            Official event admission credential & token
+                        <strong style="color: var(--navy); font-size: 0.95rem; display: block; margin-bottom: 2px;">Educare Smart Campus</strong>
+                        <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 6px 0;">
+                            Pass Code: <strong style="color: var(--crimson); font-family: monospace; font-size: 0.9rem;" th:text="${registered.token}">SC-E1-XXXX</strong>
                         </p>
+                        <span class="badge badge-success" style="font-size: 0.72rem; padding: 2px 8px;">✓ Door Fast-Track Enabled</span>
+                        <span th:if="${registered.paymentId != null}" class="badge badge-primary" style="font-size: 0.72rem; padding: 2px 8px;" th:text="${'Receipt: ' + registered.paymentId}">Receipt ID</span>
                     </div>
-                    <div class="qr-placeholder">
-                        <span>QR VERIFIED</span>
+                    <div style="text-align: center;">
+                        <img th:if="${qrCodeBase64 != null}" th:src="${qrCodeBase64}" alt="QR Entry Code" style="width: 90px; height: 90px; border-radius: 6px; border: 1px solid #e2e8f0; display: block; margin: 0 auto 4px auto;" />
+                        <small style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">SCAN AT ENTRY</small>
                     </div>
                 </div>
 
             </div>
 
             <!-- Action Buttons -->
-            <div class="actions mt-3" style="justify-content: center;">
-                <button onclick="window.print()" class="btn">
-                    🖨 Print / Save PDF Pass
-                </button>
+            <div class="actions mt-3" style="justify-content: center; flex-wrap: wrap; gap: 10px;">
+                <a th:href="@{/registrations/{id}/pdf(id=${registered.id})}" target="_blank" class="btn" style="background: var(--navy); color: #fff; display: inline-flex; align-items: center; gap: 6px;">
+                    📄 Download Official PDF Ticket
+                </a>
+
+                <a th:href="@{/registrations/{id}/badge(id=${registered.id})}" target="_blank" class="btn" style="background: #991b1b; color: #fff; display: inline-flex; align-items: center; gap: 6px;">
+                    🏷️ Print Conference Badge
+                </a>
+
+                <a th:if="${registered != null}"
+                   th:href="@{https://api.whatsapp.com/send(text=${'🎟️ Smart Campus Pass: ' + (event != null ? event.title : 'Event') + ' | Token: ' + registered.token + ' | Venue: ' + (event != null ? event.venue : 'Campus') + ' | Date: ' + (event != null ? event.date : '')})}"
+                   target="_blank"
+                   class="btn"
+                   style="background: #16a34a; color: #ffffff; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+                    💬 Share Pass on WhatsApp
+                </a>
+
+                <a th:if="${googleCalendarUrl != null}" th:href="${googleCalendarUrl}" target="_blank" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px;">
+                    📅 Add to Google Calendar
+                </a>
+
+                <a th:if="${event != null}" th:href="@{/events/{id}/calendar.ics(id=${event.id})}" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
+                    📥 Download .ICS
+                </a>
 
                 <a
                     th:if="${registered}"
                     th:href="@{/my-registrations(email=${registered.email})}"
-                    class="btn btn-secondary">
+                    class="btn btn-outline">
                     View My Bookings
                 </a>
 

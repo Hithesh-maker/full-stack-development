@@ -1,4 +1,4 @@
-﻿# Node / React
+# Node / React
 node_modules/
 dist/
 .env
@@ -6,7 +6,15 @@ dist/
 
 # Java / Spring Boot
 target/
+**/target/
 *.class
+
+# Git Demo Sandboxes
+Task 19 - Git Version Control Operations/sample-git-project/
+Task 20 - Git Branching Strategies and Conflict Resolution/branching-sandbox-repo/
+
+# Logs
+*.log
 
 # IDE
 .vscode/

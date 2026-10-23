@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  cloud-notification-dispatcher:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cloud-notification-dispatcher
+    ports:
+      - "8086:8086"
+    environment:
+      - SERVER_PORT=8086
+      - CLOUD_SECURITY_API_KEY=vibe-cloud-secret-key-2026
+      - SPRING_PROFILES_ACTIVE=prod
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8086/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - cloud-network
+
+networks:
+  cloud-network:
+    driver: bridge

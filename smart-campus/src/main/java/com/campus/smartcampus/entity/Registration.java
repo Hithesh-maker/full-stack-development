@@ -38,6 +38,17 @@ public class Registration {
 
     private String status = "CONFIRMED";
 
+    @Column(name = "token", length = 64)
+    private String token;
+
+    private java.time.LocalDateTime checkedInAt;
+
+    private Integer waitlistPosition;
+
+    private String paymentId;
+
+    private Double paymentAmount = 0.0;
+
     @PrePersist
     public void prePersist() {
         if (this.registeredAt == null) {
@@ -46,6 +57,35 @@ public class Registration {
         if (this.status == null) {
             this.status = "CONFIRMED";
         }
+        if (this.token == null || this.token.isBlank()) {
+            this.token = generateToken();
+        }
+    }
+
+    public String generateToken() {
+        String eventPart = this.eventId != null ? String.valueOf(this.eventId) : "0";
+        String randomSuffix = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase();
+        return "SC-E" + eventPart + "-" + randomSuffix;
+    }
+
+    public boolean isConfirmed() {
+        return "CONFIRMED".equalsIgnoreCase(this.status);
+    }
+
+    public boolean isWaitlisted() {
+        return "WAITLISTED".equalsIgnoreCase(this.status);
+    }
+
+    public boolean isCheckedIn() {
+        return "CHECKED_IN".equalsIgnoreCase(this.status);
+    }
+
+    public boolean isCancelled() {
+        return "CANCELLED".equalsIgnoreCase(this.status);
+    }
+
+    public boolean canDownloadCertificate() {
+        return isCheckedIn() || (isConfirmed() && event != null && event.isPast());
     }
 
     public Registration() {
@@ -124,5 +164,45 @@ public class Registration {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public java.time.LocalDateTime getCheckedInAt() {
+        return checkedInAt;
+    }
+
+    public void setCheckedInAt(java.time.LocalDateTime checkedInAt) {
+        this.checkedInAt = checkedInAt;
+    }
+
+    public Integer getWaitlistPosition() {
+        return waitlistPosition;
+    }
+
+    public void setWaitlistPosition(Integer waitlistPosition) {
+        this.waitlistPosition = waitlistPosition;
+    }
+
+    public String getPaymentId() {
+        return paymentId;
+    }
+
+    public void setPaymentId(String paymentId) {
+        this.paymentId = paymentId;
+    }
+
+    public Double getPaymentAmount() {
+        return paymentAmount != null ? paymentAmount : 0.0;
+    }
+
+    public void setPaymentAmount(Double paymentAmount) {
+        this.paymentAmount = paymentAmount;
     }
 }

@@ -1,0 +1,54 @@
+image: maven:3.9.6-eclipse-temurin-23
+
+stages:
+  - lint
+  - test
+  - package
+  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN"
+
+cache:
+  paths:
+    - .m2/repository
+    - node_modules/
+
+# Job 1: Node.js Linting
+node_lint:
+  stage: lint
+  image: node:20-alpine
+  script:
+    - npm ci
+    - node -c server.js db.js
+
+# Job 2: Spring Boot Microservices Tests
+microservices_test:
+  stage: test
+  script:
+    - cd "Task 18 - Microservices Unit Testing"
+    - mvn clean test
+  artifacts:
+    when: always
+    reports:
+      junit: "**/target/surefire-reports/*.xml"
+
+# Job 3: Package Executable Artifacts
+package_jars:
+  stage: package
+  script:
+    - mvn -f "Task 18 - Microservices Unit Testing/pom.xml" package -DskipTests
+    - mvn -f "Task 16 - API Gateway and Load Balancing/pom.xml" package -DskipTests
+  artifacts:
+    paths:
+      - "**/target/*.jar"
+    expire_in: 1 week
+
+# Job 4: Continuous Deployment to Staging
+deploy_staging:
+  stage: deploy
+  script:
+    - echo "Deploying build artifacts to Staging Cluster..."
+    - echo "Deployment verified: OK"
+  only:
+    - main

@@ -1,0 +1,15 @@
+# ============================================================
+# TASK 22 - CLOUD SERVICE PROVIDERS COMPARATIVE STUDY
+# Run and Exploration Guide
+# ============================================================
+
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 22 - Cloud Service Providers Comparative Study"
+
+# 1. Run Interactive Cloud Cost Calculator (Default Workload: 4 vCPUs, 16GB RAM, 100GB DB, 250GB Egress)
+python cloud_cost_calculator.py
+
+# 2. Run with Custom Workload Parameters (e.g. 8 vCPUs, 32GB RAM, 500GB DB, 1000GB Egress)
+python cloud_cost_calculator.py 8 32 500 1000
+
+# 3. Read Comprehensive Technical Report
+# Located at: CLOUD_COMPARISON_REPORT.md

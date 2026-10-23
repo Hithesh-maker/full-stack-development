@@ -17,6 +17,7 @@
             <li><a th:href="@{/}">Home</a></li>
             <li><a th:href="@{/events}">Events</a></li>
             <li><a th:href="@{/my-registrations}">Student Passes</a></li>
+            <li><a th:href="@{/verify/certificate}" style="color: #fde047; font-weight: 600;">Verify Certificate</a></li>
             <li><a th:href="@{/events?department=Computer+Science+and+Engineering}">School & Faculties</a></li>
             <li><a th:href="@{/login}">Admin Portal</a></li>
         </ul>
@@ -46,6 +47,7 @@
                 <li><a th:href="@{/}">Home</a></li>
                 <li><a th:href="@{/events}" class="active">All Events</a></li>
                 <li><a th:href="@{/my-registrations}">My Tickets</a></li>
+                <li><a th:href="@{/verify/certificate}">Verify Certificate</a></li>
                 <li><a th:href="@{/login}">Faculty / Admin</a></li>
             </ul>
 
@@ -194,6 +196,8 @@
                         <div class="event-card-title-area">
                             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                 <span class="badge badge-primary" th:text="${event.type}">Workshop</span>
+                                <span th:if="${event.isPaid()}" class="badge badge-navy" style="font-size: 0.72rem; padding: 2px 8px;" th:text="${event.formattedPrice}">₹150.00</span>
+                                <span th:if="${!event.isPaid()}" class="badge badge-success" style="font-size: 0.72rem; padding: 2px 8px;">Free</span>
                                 <span th:if="${event.averageRating > 0}" class="rating-badge" style="font-size: 0.74rem; padding: 2px 8px;">
                                     ★ <span th:text="${event.averageRating}">4.8</span> (<span th:text="${event.reviewCount}">2</span>)
                                 </span>
@@ -232,7 +236,7 @@
                             Event Completed
                         </span>
                         <span th:if="${!event.isPast() and event.isSoldOut()}" class="seats-badge seats-full">
-                            Sold Out (0 seats left)
+                            Sold Out • Waitlist Open
                         </span>
                         <span th:if="${!event.isPast() and !event.isSoldOut() and event.availableSeats le 10}" class="seats-badge seats-low" th:text="${event.availableSeats + ' seats left!'}">
                             5 seats left!
@@ -259,10 +263,25 @@
                     </a>
 
                     <a
-                        th:if="${!event.isPast() and !event.isSoldOut()}"
+                        th:if="${!event.isPast() and !event.isSoldOut() and !event.isTeamEvent()}"
                         th:href="@{/events/{id}/register(id=${event.id})}"
                         class="btn" style="flex: 1.2; padding: 7px 10px; font-size: 0.86rem;">
                         Register →
+                    </a>
+
+                    <a
+                        th:if="${!event.isPast() and !event.isSoldOut() and event.isTeamEvent()}"
+                        th:href="@{/events/{id}/register/team(id=${event.id})}"
+                        class="btn" style="flex: 1.2; padding: 7px 10px; font-size: 0.86rem; background: var(--navy); border: 1px solid var(--gold); color: #fff;">
+                        Team Reg →
+                    </a>
+
+                    <a
+                        th:if="${!event.isPast() and event.isSoldOut()}"
+                        th:href="@{/events/{id}/register(id=${event.id})}"
+                        class="btn" style="flex: 1.2; padding: 7px 10px; font-size: 0.84rem; background: #b45309; color: #fff;"
+                        title="Capacity full: Join the prioritized waitlist queue">
+                        Waitlist →
                     </a>
 
                     <button
@@ -270,13 +289,6 @@
                         disabled
                         class="btn btn-secondary" style="flex: 1.2; cursor: not-allowed; opacity: 0.65; padding: 7px 10px; font-size: 0.86rem;">
                         Ended
-                    </button>
-
-                    <button
-                        th:if="${!event.isPast() and event.isSoldOut()}"
-                        disabled
-                        class="btn btn-danger" style="flex: 1.2; cursor: not-allowed; opacity: 0.65; padding: 7px 10px; font-size: 0.86rem;">
-                        Sold Out
                     </button>
                 </div>
 
@@ -322,6 +334,7 @@
                     <li><a th:href="@{/}">Campus Home</a></li>
                     <li><a th:href="@{/events}">Event Directory</a></li>
                     <li><a th:href="@{/my-registrations}">My Student Passes</a></li>
+                    <li><a th:href="@{/verify/certificate}">Verify Certificate</a></li>
                     <li><a th:href="@{/login}">Faculty / Admin Sign In</a></li>
                 </ul>
             </div>

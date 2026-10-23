@@ -158,10 +158,13 @@
                     </div>
 
                     <div class="stat-card">
-                        <h3>Campus Venue</h3>
+                        <h3>Campus Venue & Wing</h3>
                         <p style="font-weight: 750; font-size: 1.05rem; color: var(--navy);" th:text="${event.venue}">
                             Main Auditorium
                         </p>
+                        <small style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-top: 3px;" th:text="${event.buildingBlock}">
+                            Main Academic Block
+                        </small>
                     </div>
 
                     <div class="stat-card">
@@ -172,31 +175,62 @@
                     </div>
 
                     <div class="stat-card">
-                        <h3>Student Rating</h3>
-                        <p style="font-weight: 750; font-size: 1.05rem; color: #b45309;">
-                            ★ <span th:text="${event.averageRating > 0 ? event.averageRating + ' / 5.0' : 'No reviews yet'}">4.8 / 5.0</span>
-                            <small style="display: block; font-size: 0.78rem; color: var(--text-muted); font-weight: 500;" th:if="${event.reviewCount > 0}" th:text="${'Based on ' + event.reviewCount + ' review(s)'}">Based on 2 reviews</small>
+                        <h3>Admission Fee</h3>
+                        <p style="font-weight: 750; font-size: 1.05rem; color: var(--navy);" th:text="${event.formattedPrice}">
+                            Free
                         </p>
+                        <small style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-top: 3px;" th:text="${event.isPaid() ? 'Campus UPI / Student Wallet' : 'Open Registration'}">
+                            Open Registration
+                        </small>
                     </div>
 
                 </div>
 
-                <!-- Registration & Review Actions -->
+                <!-- Registration, Calendar & Venue Actions -->
                 <div class="actions" style="padding-top: 20px; border-top: 1.5px solid var(--border); display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
 
                     <a th:href="@{/events}" class="btn btn-secondary">
                         ← Back to Directory
                     </a>
 
-                    <a th:href="@{/events/{id}/feedback(id=${event.id})}" class="btn btn-outline" style="font-size: 0.95rem; padding: 11px 20px;">
-                        ⭐ Student Reviews & Feedback (<span th:text="${event.reviewCount}">0</span>)
+                    <!-- Venue Locator Trigger -->
+                    <button type="button" class="btn btn-outline" onclick="document.getElementById('campusMapModal').style.display='flex';" style="display: inline-flex; align-items: center; gap: 6px;">
+                        📍 Campus Map & Room Locator
+                    </button>
+
+                    <!-- Calendar Integration -->
+                    <a th:if="${googleCalendarUrl != null and !event.isPast()}" th:href="${googleCalendarUrl}" target="_blank" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
+                        📅 Add to Google Calendar
+                    </a>
+
+                    <a th:if="${!event.isPast()}" th:href="@{/events/{id}/calendar.ics(id=${event.id})}" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
+                        📥 Download .ICS
+                    </a>
+
+                    <a th:href="@{/events/{id}/feedback(id=${event.id})}" class="btn btn-outline">
+                        ⭐ Reviews (<span th:text="${event.reviewCount}">0</span>)
+                    </a>
+
+                    <!-- Seat Reservation or Waitlist -->
+                    <a
+                        th:if="${!event.isPast() and !event.isSoldOut() and event.isTeamEvent()}"
+                        th:href="@{/events/{id}/register/team(id=${event.id})}"
+                        class="btn" style="background: var(--navy); border: 2px solid var(--gold); color: #fff; font-size: 1rem; padding: 12px 26px; margin-left: auto; display: inline-flex; align-items: center; gap: 8px;">
+                        👥 Register Delegation / Team (2–4 Members) →
                     </a>
 
                     <a
-                        th:if="${!event.isPast() and !event.isSoldOut()}"
+                        th:if="${!event.isPast() and !event.isSoldOut() and !event.isTeamEvent()}"
                         th:href="@{/events/{id}/register(id=${event.id})}"
                         class="btn" style="font-size: 1rem; padding: 12px 28px; margin-left: auto;">
                         Reserve Student Seat →
+                    </a>
+
+                    <a
+                        th:if="${!event.isPast() and event.isSoldOut()}"
+                        th:href="@{/events/{id}/register(id=${event.id})}"
+                        class="btn" style="background: #b45309; color: #fff; font-size: 1rem; padding: 12px 28px; margin-left: auto;">
+                        ⏳ Join Waitlist Queue →
                     </a>
 
                     <button
@@ -206,17 +240,300 @@
                         Registration Closed (Event Completed)
                     </button>
 
-                    <button
-                        th:if="${!event.isPast() and event.isSoldOut()}"
-                        disabled
-                        class="btn btn-danger" style="cursor: not-allowed; opacity: 0.7; margin-left: auto;">
-                        Registration Closed (Capacity Full)
-                    </button>
-
                 </div>
 
             </div>
 
+        </div>
+
+        <!-- Campus Venue Map & Room Locator Modal -->
+        <div id="campusMapModal" class="modal-overlay" onclick="if(event.target === this) this.style.display='none';" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+            <div class="modal-window" style="background: #ffffff; border-radius: 12px; max-width: 680px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid var(--border);">
+                
+                <div style="padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #0f172a; color: #ffffff; border-radius: 12px 12px 0 0;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.15rem; color: #ffffff;">📍 Campus Venue Locator & Floor Plan</h3>
+                        <p style="margin: 4px 0 0 0; font-size: 0.8rem; color: #94a3b8;" th:text="${event.venue + ' — ' + event.buildingBlock}">
+                            Venue Location
+                        </p>
+                    </div>
+                    <button type="button" onclick="document.getElementById('campusMapModal').style.display='none';" style="background: transparent; border: none; color: #cbd5e1; font-size: 1.5rem; cursor: pointer; line-height: 1;">&times;</button>
+                </div>
+
+                <div style="padding: 24px;">
+                    <!-- Location Summary Card -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.88rem;">
+                            <div>
+                                <span style="color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; font-weight: 700; display: block;">Designated Hall</span>
+                                <strong style="color: var(--navy); font-size: 1.05rem;" th:text="${event.venue}">Main Hall</strong>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; font-weight: 700; display: block;">Academic Building</span>
+                                <strong style="color: var(--navy); font-size: 0.95rem;" th:text="${event.buildingBlock}">Academic Block</strong>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; font-weight: 700; display: block;">Recommended Entry Gate</span>
+                                <strong style="color: #1e40af;">Main Gate A (North Avenue)</strong>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; font-weight: 700; display: block;">Nearest Parking</span>
+                                <strong style="color: #1e40af;">Student & Visitor Zone P2</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vector SVG Map of Educare Campus -->
+                    <div style="border: 2px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #f1f5f9; margin-bottom: 20px;">
+                        <svg viewBox="0 0 600 320" width="100%" height="auto" style="display: block;">
+                            <!-- Campus Grounds -->
+                            <rect width="600" height="320" fill="#e2e8f0" />
+                            <rect x="20" y="20" width="560" height="280" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+                            
+                            <!-- Internal Roads -->
+                            <path d="M 40 160 L 560 160" stroke="#cbd5e1" stroke-width="16" stroke-dasharray="8 4" />
+                            <path d="M 300 30 L 300 290" stroke="#cbd5e1" stroke-width="16" />
+
+                            <!-- Gate 1 Marker -->
+                            <rect x="250" y="16" width="100" height="20" rx="4" fill="#0f172a" />
+                            <text x="300" y="30" fill="#ffffff" font-size="10" font-family="sans-serif" font-weight="bold" text-anchor="middle">GATE 1 (MAIN)</text>
+
+                            <!-- Buildings -->
+                            <!-- Academic Block A -->
+                            <rect x="50" y="50" width="160" height="85" rx="6" fill="#1e293b" />
+                            <text x="130" y="85" fill="#ffffff" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle">MAIN ACADEMIC BLOCK</text>
+                            <text x="130" y="105" fill="#94a3b8" font-size="9" font-family="sans-serif" text-anchor="middle">Auditoriums & Admin</text>
+
+                            <!-- Tech & Computing Centre -->
+                            <rect x="50" y="195" width="160" height="85" rx="6" fill="#1e293b" />
+                            <text x="130" y="230" fill="#ffffff" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle">RAMANUJAN TECH WING</text>
+                            <text x="130" y="250" fill="#94a3b8" font-size="9" font-family="sans-serif" text-anchor="middle">CSE Labs & Servers</text>
+
+                            <!-- Central Library -->
+                            <rect x="390" y="50" width="160" height="85" rx="6" fill="#1e293b" />
+                            <text x="470" y="85" fill="#ffffff" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle">CENTRAL LIBRARY</text>
+                            <text x="470" y="105" fill="#94a3b8" font-size="9" font-family="sans-serif" text-anchor="middle">Reading Halls & Archives</text>
+
+                            <!-- Sports Pavilion & Grounds -->
+                            <rect x="390" y="195" width="160" height="85" rx="6" fill="#1e293b" />
+                            <text x="470" y="230" fill="#ffffff" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle">SPORTS & PAVILION</text>
+                            <text x="470" y="250" fill="#94a3b8" font-size="9" font-family="sans-serif" text-anchor="middle">Athletic Grounds</text>
+
+                            <!-- Central Quad Circle -->
+                            <circle cx="300" cy="160" r="30" fill="#047857" />
+                            <text x="300" y="164" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle">CAMPUS QUAD</text>
+
+                            <!-- Target Venue Pulsing Pin -->
+                            <circle cx="130" cy="92" r="14" fill="#ef4444" opacity="0.4" />
+                            <circle cx="130" cy="92" r="8" fill="#991b1b" stroke="#ffffff" stroke-width="2" />
+                            <text x="130" y="125" fill="#991b1b" font-size="10" font-family="sans-serif" font-weight="bold" text-anchor="middle">★ YOUR VENUE</text>
+                        </svg>
+                    </div>
+
+                    <!-- Walking Directions -->
+                    <div style="font-size: 0.85rem; color: #475569; line-height: 1.6;">
+                        <strong style="color: var(--navy); display: block; margin-bottom: 4px;">Walking Directions from Main Gate:</strong>
+                        <ol style="padding-left: 20px; margin: 0;">
+                            <li>Enter via <strong>Campus Gate 1 (North Avenue)</strong> and proceed along Central Walkway.</li>
+                            <li>At Central Quad, turn right towards the signposted Academic Block.</li>
+                            <li>Elevator and staircase access are located at the North Lobby.</li>
+                            <li>Volunteers at the ground floor information desk are available for assistance.</li>
+                        </ol>
+                    </div>
+
+                    <div style="text-align: right; margin-top: 20px;">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('campusMapModal').style.display='none';">Close Map</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Multi-Session Event Agenda & Interactive Chronological Timeline (Feature D) -->
+        <div th:if="${!#lists.isEmpty(sessions)}" class="card mb-3" style="margin-top: 30px;">
+            <div class="card-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border-radius: 8px 8px 0 0; padding: 18px 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <span class="meta-tag" style="background: rgba(255,255,255,0.15); color: #fef08a; font-weight: 700; text-transform: uppercase;">
+                            Program Schedule
+                        </span>
+                        <h3 style="margin: 6px 0 0 0; font-size: 1.25rem; color: #ffffff; font-family: 'Cinzel', Georgia, serif;">
+                            ⏱️ Event Agenda & Session Timeline
+                        </h3>
+                    </div>
+                    <span class="badge" style="background: var(--gold); color: white; font-weight: 700;" th:text="${#lists.size(sessions) + ' Scheduled Tracks'}">
+                        3 Tracks
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-body" style="padding: 24px;">
+                <div class="timeline-container" style="position: relative; padding-left: 28px; border-left: 3px solid #cbd5e1; margin-left: 14px;">
+                    <div th:each="sess, iterStat : ${sessions}" style="position: relative; margin-bottom: 24px;">
+                        <!-- Timeline Bullet Node -->
+                        <div style="position: absolute; left: -37px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--navy); border: 3px solid #ffffff; box-shadow: 0 0 0 2px var(--gold);"></div>
+                        
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;">
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                        <span class="badge" th:classappend="${sess.sessionType == 'KEYNOTE' ? 'badge-primary' : (sess.sessionType == 'WORKSHOP' ? 'badge-secondary' : 'badge-warning')}"
+                                              style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;"
+                                              th:text="${sess.sessionType}">
+                                            KEYNOTE
+                                        </span>
+                                        <span style="font-family: monospace; font-size: 0.88rem; font-weight: 700; color: #0f172a;">
+                                            <span th:text="${sess.startTime}">09:30</span>
+                                            <span th:if="${sess.endTime != null}"> - <span th:text="${sess.endTime}">11:00</span></span>
+                                        </span>
+                                    </div>
+                                    <h4 style="margin: 0; font-size: 1.1rem; color: var(--navy);" th:text="${sess.sessionTitle}">
+                                        Keynote Title
+                                    </h4>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span th:if="${sess.roomVenue != null and !sess.roomVenue.isBlank()}"
+                                          style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.82rem; background: #ffffff; border: 1px solid #cbd5e1; padding: 4px 10px; border-radius: 4px; color: #475569; font-weight: 600;">
+                                        📍 <span th:text="${sess.roomVenue}">Hall A</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div th:if="${sess.speaker != null and !sess.speaker.isBlank()}" style="margin-top: 8px; font-size: 0.88rem; color: #64748b; display: flex; align-items: center; gap: 6px;">
+                                <span>🎙️ Speaker / Chair:</span>
+                                <strong style="color: var(--navy);" th:text="${sess.speaker}">Dr. Vance</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Distinguished Speaker Profile Card (Enterprise Feature) -->
+        <div th:if="${event.hasSpeaker()}" class="card mb-3" style="margin-top: 30px; border-left: 4px solid var(--primary);">
+            <div class="card-header" style="background: #fdfbf7; border-bottom: 1px solid #f1f5f9;">
+                <span class="meta-tag" style="background: #fef2f2; color: #991b1b; font-weight: 700;">Keynote Speaker Profile</span>
+                <h3 style="margin: 4px 0 0 0; font-size: 1.2rem; color: var(--navy);">🎙️ Meet the Speaker</h3>
+            </div>
+            <div class="card-body" style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+                <div style="flex-shrink: 0;">
+                    <img th:if="${event.speakerAvatarUrl != null and !event.speakerAvatarUrl.isBlank()}"
+                         th:src="${event.speakerAvatarUrl}"
+                         alt="Speaker Avatar"
+                         style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+                    <div th:if="${event.speakerAvatarUrl == null or event.speakerAvatarUrl.isBlank()}"
+                         style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #0f172a, #334155); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; border: 3px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.08);"
+                         th:text="${#strings.substring(event.speakerName, 0, 1)}">
+                        S
+                    </div>
+                </div>
+                <div style="flex: 1; min-width: 260px;">
+                    <h3 style="margin: 0 0 4px 0; font-size: 1.3rem; color: #0f172a;" th:text="${event.speakerName}">Speaker Name</h3>
+                    <div style="font-weight: 600; color: #991b1b; font-size: 0.95rem; margin-bottom: 2px;" th:text="${event.speakerTitle}">
+                        Academic / Industry Title
+                    </div>
+                    <div th:if="${event.speakerCompany != null and !event.speakerCompany.isBlank()}"
+                         style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;"
+                         th:text="'🏛️ ' + ${event.speakerCompany}">
+                        Organization
+                    </div>
+                    <p th:if="${event.speakerBio != null and !event.speakerBio.isBlank()}"
+                       style="font-size: 0.92rem; color: #334155; line-height: 1.6; margin: 0;"
+                       th:text="${event.speakerBio}">
+                        Speaker biography and research highlights.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Student Q&A and Interactive Discussion Desk (Enterprise Feature) -->
+        <div class="card mb-3" style="margin-top: 30px;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <span class="meta-tag" style="background: #e0e7ff; color: #3730a3; font-weight: 700;">Interactive Audience Participation</span>
+                    <h3 style="margin: 4px 0 0 0; font-size: 1.25rem; color: var(--navy);">💬 Live Q&A & Speaker Inquiries</h3>
+                </div>
+                <span id="questionCountBadge" class="badge badge-primary" style="font-size: 0.85rem;">0 Questions</span>
+            </div>
+            <div class="card-body">
+                <p style="color: #64748b; font-size: 0.92rem; margin-top: 0; margin-bottom: 18px;">
+                    Ask questions for the speaker or session chair. Attendees can upvote questions to prioritize them during the live Q&A segment.
+                </p>
+
+                <!-- Post Question Box -->
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; margin-bottom: 24px;">
+                    <div class="grid grid-2" style="margin-bottom: 12px;">
+                        <input type="text" id="askerNameInput" placeholder="Your Name (or leave blank for Anonymous)"
+                               style="padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem;">
+                        <input type="text" id="askerDeptInput" placeholder="Department (e.g. CSE, ECE, MBA)"
+                               style="padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem;">
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <textarea id="questionTextInput" rows="2" placeholder="Type your question for the speaker or moderator..."
+                                  style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; resize: vertical;"></textarea>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end;">
+                        <button type="button" onclick="submitQuestion()" class="btn btn-primary btn-sm" style="padding: 8px 20px;">
+                            🚀 Post Question
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Questions List Container -->
+                <div id="questionsContainer" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="text-align: center; color: #64748b; padding: 20px;">
+                        Loading live questions...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart Event Recommendations ("Related Campus Sessions") -->
+        <div th:if="${relatedEvents != null and !#lists.isEmpty(relatedEvents)}" style="margin-top: 50px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
+                <div>
+                    <span class="badge badge-primary" style="font-size: 0.78rem;">Smart Recommendations</span>
+                    <h2 style="font-size: 1.45rem; color: var(--navy); font-weight: 800; margin-top: 4px;">
+                        Related Campus Sessions You Might Like
+                    </h2>
+                </div>
+                <a th:href="@{/events(department=${event.department})}" class="btn btn-outline btn-sm">
+                    View More in <span th:text="${event.department}">Department</span> →
+                </a>
+            </div>
+
+            <div class="grid grid-3">
+                <div th:each="rel : ${relatedEvents}" class="event-card">
+                    <div class="event-card-header">
+                        <div class="calendar-tile">
+                            <div class="cal-month" th:text="${#temporals.format(rel.date, 'MMM')}">OCT</div>
+                            <div class="cal-day" th:text="${#temporals.format(rel.date, 'dd')}">15</div>
+                        </div>
+                        <div style="flex: 1;">
+                            <span class="badge badge-primary" th:text="${rel.type}">Type</span>
+                            <span th:if="${rel.isPaid()}" class="badge badge-navy" style="font-size: 0.7rem;" th:text="${rel.formattedPrice}">Paid</span>
+                            <span th:if="${!rel.isPaid()}" class="badge badge-success" style="font-size: 0.7rem;">Free</span>
+                        </div>
+                    </div>
+                    <div class="event-card-body">
+                        <h3 class="event-card-title">
+                            <a th:href="@{/events/{id}(id=${rel.id})}" th:text="${rel.title}" style="color: var(--navy); text-decoration: none;">
+                                Related Title
+                            </a>
+                        </h3>
+                        <p class="event-card-desc" th:text="${rel.description}">Description</p>
+                        <div class="event-card-meta">
+                            <span>🏛 <span th:text="${rel.department}">Dept</span></span>
+                            <span>📍 <span th:text="${rel.venue}">Venue</span></span>
+                            <span>🎟 <span th:text="${rel.availableSeats + ' seats left'}">Seats</span></span>
+                        </div>
+                    </div>
+                    <div class="event-card-footer" style="padding: 12px 18px; border-top: 1px solid var(--border); text-align: right;">
+                        <a th:href="@{/events/{id}(id=${rel.id})}" class="btn btn-sm">
+                            View Details →
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -274,6 +591,111 @@
         </div>
     </div>
 </footer>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+    const qEventId = /*[[${event.id}]]*/ 1;
+
+    async function loadQuestions() {
+        try {
+            const resp = await fetch('/api/events/' + qEventId + '/questions');
+            if (!resp.ok) return;
+            const questions = await resp.json();
+
+            const countBadge = document.getElementById('questionCountBadge');
+            if (countBadge) countBadge.innerText = questions.length + ' Questions';
+
+            const container = document.getElementById('questionsContainer');
+            if (!container) return;
+
+            if (questions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #64748b; padding: 25px; background: #fdfbf7; border: 1px dashed #cbd5e1; border-radius: 8px;">
+                        💭 No questions submitted yet. Be the first to ask!
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = questions.map(q => 
+                '<div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">' +
+                    '<button type="button" onclick="upvoteQuestion(' + q.id + ')"' +
+                            ' style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 52px; padding: 8px 6px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; transition: all 0.15s ease;">' +
+                        '<span style="font-size: 1.1rem; line-height: 1;">▲</span>' +
+                        '<strong style="color: #0f172a; font-size: 0.95rem; margin-top: 2px;">' + q.upvotes + '</strong>' +
+                    '</button>' +
+                    '<div style="flex: 1;">' +
+                        '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">' +
+                            '<div style="font-size: 0.82rem; color: #64748b;">' +
+                                '<strong style="color: #0f172a;">' + escapeHtml(q.studentName || 'Anonymous Student') + '</strong>' +
+                                (q.department ? '• <span class="meta-tag" style="font-size: 0.72rem; padding: 1px 6px;">' + escapeHtml(q.department) + '</span>' : '') +
+                            '</div>' +
+                            (q.isAnswered ? '<span class="badge badge-success" style="font-size: 0.72rem;">✓ Answered</span>' : '') +
+                        '</div>' +
+                        '<p style="margin: 0; color: #1e293b; font-size: 0.95rem; line-height: 1.5;">' + escapeHtml(q.content) + '</p>' +
+                    '</div>' +
+                '</div>'
+            ).join('');
+
+        } catch (e) {
+            console.error('Error loading questions:', e);
+        }
+    }
+
+    async function submitQuestion() {
+        const textInput = document.getElementById('questionTextInput');
+        const nameInput = document.getElementById('askerNameInput');
+        const deptInput = document.getElementById('askerDeptInput');
+
+        const content = textInput.value.trim();
+        if (!content) {
+            alert('Please enter a question before submitting.');
+            return;
+        }
+
+        try {
+            const resp = await fetch('/api/events/' + qEventId + '/questions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    studentName: nameInput.value.trim(),
+                    department: deptInput.value.trim(),
+                    content: content
+                })
+            });
+
+            if (resp.ok) {
+                textInput.value = '';
+                await loadQuestions();
+            } else {
+                alert('Could not post question. Please try again.');
+            }
+        } catch (e) {
+            alert('Failed to post question: ' + e.message);
+        }
+    }
+
+    async function upvoteQuestion(qId) {
+        try {
+            const resp = await fetch('/api/events/' + qEventId + '/questions/' + qId + '/upvote', {
+                method: 'POST'
+            });
+            if (resp.ok) {
+                await loadQuestions();
+            }
+        } catch (e) {
+            console.error('Failed to upvote question:', e);
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadQuestions);
+/*]]>*/
+</script>
 
 </body>
 </html>

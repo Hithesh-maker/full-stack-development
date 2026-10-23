@@ -1,230 +1,109 @@
-# 💳 Task 5: Transaction-Based Payment Simulation
+# Task 5: Transaction-Based Payment Simulation
 
-## 📌 Description
-
-This project simulates a basic online payment transaction using a relational database.
-
-The system demonstrates how digital payment applications transfer money between a **user account** and a **merchant account** while maintaining data consistency using database transactions.
-
-The application performs the following operations:
-
-* Deducts the payment amount from the user's account
-* Adds the payment amount to the merchant's account
-* Uses **COMMIT** when the transaction is successful
-* Uses **ROLLBACK** when the transaction fails
-* Displays the transaction status to the user
+## Overview
+A financial transaction simulation demonstrating **ACID (Atomicity, Consistency, Isolation, Durability)** compliance in relational database management systems. Implements atomic fund transfers between accounts with balance validation, debiting, crediting, transaction logging, and automatic rollback on failure.
 
 ---
 
-## 🎯 Objective
+## Transaction Lifecycle Diagram
 
-To understand and implement **database transactions** in a real-world payment scenario.
-
-The main objective is to ensure that a payment is processed completely or not processed at all.
-
-For example:
-
-> If ₹500 is deducted from the user's account but cannot be added to the merchant's account, the entire transaction should be cancelled using **ROLLBACK**.
-
----
-
-## 🛠️ Technologies Used
-
-* HTML5
-* CSS3
-* JavaScript
-* Supabase
-* PostgreSQL
-* SQL Transactions
-
----
-
-## ⚙️ Key Features
-
-### 👤 User Account
-
-Stores the user's account information and available balance.
-
-### 🏪 Merchant Account
-
-Stores the merchant's account information and available balance.
-
-### 💰 Payment Processing
-
-Allows the user to enter a payment amount and process a transaction.
-
-### ✅ COMMIT
-
-If all payment operations are completed successfully, the transaction is committed and the updated balances are permanently saved.
-
-### ❌ ROLLBACK
-
-If an error occurs during the transaction, the changes are rolled back to prevent partial payment updates.
-
-### 📊 Transaction Status
-
-Displays whether the payment was successful or failed.
-
----
-
-## 🔄 Transaction Flow
-
-```text
-User enters payment amount
-          ↓
-Check user balance
-          ↓
-Check payment validity
-          ↓
-Deduct amount from user
-          ↓
-Add amount to merchant
-          ↓
-      Transaction
-       successful?
-       ↙        ↘
-     YES         NO
-      ↓           ↓
-   COMMIT      ROLLBACK
-      ↓           ↓
-Payment       No balance
-successful    changes saved
+```
+       [START TRANSACTION]
+                |
+                v
+     [Verify Sender Balance]  ---- Insufficient Funds ---> [ROLLBACK & RETURN ERROR]
+                |
+                v (Sufficient)
+     [Debit Sender Account]
+                |
+                v
+     [Credit Receiver Account]
+                |
+                v
+    [Insert Transaction Log]  ---- Any Error Occurs -----> [ROLLBACK TO INITIAL STATE]
+                |
+                v (All Succeeded)
+            [COMMIT]
 ```
 
 ---
 
-## 🗄️ Database Structure
-
-The project uses database tables to manage account and transaction information.
-
-### Accounts Table
-
-| Column       | Description             |
-| ------------ | ----------------------- |
-| id           | Unique account ID       |
-| name         | Account holder name     |
-| account_type | User or Merchant        |
-| balance      | Current account balance |
-
-### Transactions Table
-
-| Column      | Description               |
-| ----------- | ------------------------- |
-| id          | Unique transaction ID     |
-| sender_id   | User account ID           |
-| receiver_id | Merchant account ID       |
-| amount      | Payment amount            |
-| status      | Transaction status        |
-| created_at  | Transaction date and time |
-
----
-
-## 🔐 Transaction Management
-
-Database transactions are important in payment systems because multiple database operations must be treated as a single unit.
-
-### COMMIT
-
-When the payment succeeds:
+## SQL Transaction Logic Preserved
 
 ```sql
+START TRANSACTION;
+
+-- 1. Check & Debit Sender
+UPDATE accounts 
+SET balance = balance - 500.00 
+WHERE account_id = 101 AND balance >= 500.00;
+
+-- 2. Credit Receiver
+UPDATE accounts 
+SET balance = balance + 500.00 
+WHERE account_id = 102;
+
+-- 3. Record Audit Transaction
+INSERT INTO transactions (from_account_id, to_account_id, amount, status, timestamp)
+VALUES (101, 102, 500.00, 'SUCCESS', NOW());
+
 COMMIT;
 ```
 
-All changes made during the transaction are permanently saved.
+---
 
-### ROLLBACK
+## API Specification
 
-When the payment fails:
-
-```sql
-ROLLBACK;
-```
-
-All changes made during the transaction are cancelled.
-
-This prevents problems such as money being deducted from the user without reaching the merchant.
+### Execute Transfer
+- **Endpoint**: `POST /api/payments/transfer`
+- **Request Body**:
+  ```json
+  {
+    "fromAccountId": 101,
+    "toAccountId": 102,
+    "amount": 250.00
+  }
+  ```
+- **Success (`200 OK`)**:
+  ```json
+  {
+    "success": true,
+    "message": "Transfer completed successfully",
+    "transactionId": "TXN-89421",
+    "debited": 250.00
+  }
+  ```
+- **Failure - Insufficient Funds (`400 Bad Request`)**:
+  ```json
+  {
+    "success": false,
+    "message": "Transaction failed: Insufficient funds in source account. Rollback executed."
+  }
+  ```
 
 ---
 
-## 💡 Real-Time Application
-
-Transaction management is widely used in:
-
-* Online banking
-* UPI payments
-* Credit and debit card payments
-* E-commerce applications
-* Digital wallets
-* Payment gateways
-* Financial management systems
-
----
-
-## 🚀 How It Works
-
-1. Enter the payment amount.
-2. The system checks whether the user has sufficient balance.
-3. The payment transaction begins.
-4. The amount is deducted from the user's account.
-5. The same amount is added to the merchant's account.
-6. If all operations succeed, the transaction is **COMMITTED**.
-7. If any operation fails, the transaction is **ROLLED BACK**.
-8. The updated account balances and transaction status are displayed.
-
----
-
-## 📂 Project Structure
+## Project Structure
 
 ```text
-Task 5 - Transaction-Based Payment Simulation/
-│
-├── index.html
-├── style.css
-├── script.js
-├── README.md
-└── database/
-    └── transaction.sql
+Task 5 - Transaction Based Payment Simulation/
+├── index.html       # Transfer simulation interface with balance cards
+├── style.css        # Banking UI styling with status badges
+├── script.js        # Transaction submission and live balance update handler
+└── README.md        # Comprehensive task documentation
 ```
 
 ---
 
-## 📸 Expected Result
+## Execution Guide
 
-The application provides a simple payment interface where the user can:
-
-* View account balances
-* Enter a payment amount
-* Initiate a payment
-* View transaction status
-* Verify updated balances
-
----
-
-## 🎓 Learning Outcomes
-
-Through this task, the following concepts are demonstrated:
-
-* Database transactions
-* COMMIT operation
-* ROLLBACK operation
-* Data consistency
-* Atomicity
-* Relational database operations
-* Payment processing logic
-* SQL-based transaction management
-
----
-
-## 👨‍💻 Project Information
-
-**Task:** 5 — Transaction-Based Payment Simulation
-**Domain:** Full Stack Development
-**Database:** Supabase PostgreSQL
-**Focus:** Database Transactions and Payment Processing
-
----
-
-## 📄 Conclusion
-
-This project demonstrates how transaction management can be used to build a reliable payment system. By using **COMMIT** and **ROLLBACK**, the system ensures that payment operations remain consistent and prevents incomplete or incorrect financial transactions.
+1. **Launch Express API Server**:
+   ```bash
+   cd "C:\Games\Project\Full Stack Development\full-stack-development"
+   node server.js
+   ```
+2. **Open Front-End**:
+   - Open `Task 5 - Transaction Based Payment Simulation/index.html`.
+3. **Simulate Scenarios**:
+   - Transfer an amount lower than balance: Verify `COMMIT` and balance deduction.
+   - Transfer an amount exceeding balance: Verify `ROLLBACK` and error message without data corruption.

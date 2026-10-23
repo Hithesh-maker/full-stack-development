@@ -19,6 +19,7 @@
             <li><a th:href="@{/}">Home</a></li>
             <li><a th:href="@{/events}">Events</a></li>
             <li><a th:href="@{/my-registrations}">Student Passes</a></li>
+            <li><a th:href="@{/verify/certificate}" style="color: #fde047; font-weight: 600;">Verify Certificate</a></li>
             <li><a th:href="@{/events?department=Computer+Science+and+Engineering}">School & Faculties</a></li>
             <li><a th:href="@{/login}">Admin Portal</a></li>
         </ul>
@@ -50,6 +51,7 @@
                 <li><a th:href="@{/}" class="active">Home</a></li>
                 <li><a th:href="@{/events}">All Events</a></li>
                 <li><a th:href="@{/my-registrations}">My Tickets</a></li>
+                <li><a th:href="@{/verify/certificate}">Verify Certificate</a></li>
                 <li><a th:href="@{/login}">Faculty / Admin</a></li>
             </ul>
 
@@ -253,7 +255,7 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="actions" style="margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border);">
+                <div class="actions" style="margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border); gap: 6px;">
                     <a
                         th:href="@{/events/{id}(id=${event.id})}"
                         class="btn btn-outline" style="flex: 1;">
@@ -261,10 +263,24 @@
                     </a>
 
                     <a
-                        th:if="${!event.isPast() and !event.isSoldOut()}"
+                        th:if="${!event.isPast() and !event.isSoldOut() and !event.isTeamEvent()}"
                         th:href="@{/events/{id}/register(id=${event.id})}"
-                        class="btn" style="flex: 1;">
+                        class="btn" style="flex: 1.2;">
                         Register →
+                    </a>
+
+                    <a
+                        th:if="${!event.isPast() and !event.isSoldOut() and event.isTeamEvent()}"
+                        th:href="@{/events/{id}/register/team(id=${event.id})}"
+                        class="btn" style="flex: 1.2; background: var(--navy); border: 1px solid var(--gold); color: #fff;">
+                        Team Reg →
+                    </a>
+
+                    <a
+                        th:if="${!event.isPast() and event.isSoldOut()}"
+                        th:href="@{/events/{id}/register(id=${event.id})}"
+                        class="btn" style="flex: 1.2; background: #b45309; color: #fff;">
+                        Waitlist →
                     </a>
 
                     <button
@@ -272,13 +288,6 @@
                         disabled
                         class="btn btn-secondary" style="flex: 1; cursor: not-allowed; opacity: 0.65;">
                         Ended
-                    </button>
-
-                    <button
-                        th:if="${!event.isPast() and event.isSoldOut()}"
-                        disabled
-                        class="btn btn-danger" style="flex: 1; cursor: not-allowed; opacity: 0.65;">
-                        Full
                     </button>
                 </div>
 
@@ -324,6 +333,7 @@
                     <li><a th:href="@{/}">Campus Home</a></li>
                     <li><a th:href="@{/events}">Event Directory</a></li>
                     <li><a th:href="@{/my-registrations}">My Student Passes</a></li>
+                    <li><a th:href="@{/verify/certificate}">Verify Certificate</a></li>
                     <li><a th:href="@{/login}">Faculty / Admin Sign In</a></li>
                 </ul>
             </div>

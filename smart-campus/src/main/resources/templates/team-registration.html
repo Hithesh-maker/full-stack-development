@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Registration | Smart Campus University</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .member-block {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .member-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--navy);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- TOP UTILITY BAR -->
+<div class="top-utility-bar">
+    <div class="container">
+        <ul class="utility-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/events}">Events</a></li>
+            <li><a th:href="@{/my-registrations}">Student Passes</a></li>
+            <li><a th:href="@{/login}">Admin Portal</a></li>
+        </ul>
+        <div class="utility-quick">
+            <span>Hackathon & Team Registration Portal</span>
+        </div>
+    </div>
+</div>
+
+<!-- BRAND HEADER BAR -->
+<header class="main-header-bar">
+    <div class="container">
+        <a th:href="@{/}" class="brand-container">
+            <div class="brand-logo-badge">EDU</div>
+            <div class="brand-text-block">
+                <h1>Smart Campus</h1>
+                <span>University Event Portal</span>
+            </div>
+        </a>
+        <div class="header-nav-group">
+            <ul class="main-nav-links">
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/events}" class="active">All Events</a></li>
+                <li><a th:href="@{/my-registrations}">My Tickets</a></li>
+                <li><a th:href="@{/login}">Faculty / Admin</a></li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+<main style="padding: 40px 0 80px 0;">
+    <div class="container" style="max-width: 840px;">
+
+        <div style="margin-bottom: 24px;">
+            <a th:href="@{/events/{id}(id=${event.id})}" style="color: var(--navy); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                ← Back to Event Details
+            </a>
+        </div>
+
+        <div class="card" style="border: 2px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+            <div style="background: linear-gradient(135deg, var(--navy) 0%, #1e293b 100%); color: white; padding: 24px 28px; border-bottom: 4px solid var(--gold);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <span class="badge" style="background: rgba(255,255,255,0.15); color: white; margin-bottom: 8px;">
+                            👥 Team Registration (2–4 Members)
+                        </span>
+                        <h1 style="font-family: 'Cinzel', serif; font-size: 1.5rem; margin: 0; color: white;" th:text="${event.title}">
+                            Campus Hackathon 2026
+                        </h1>
+                        <p style="margin: 6px 0 0 0; color: #cbd5e1; font-size: 0.9rem;">
+                            Organized by <span th:text="${event.department}">CSE</span> • Date: <span th:text="${event.date}">2026-10-15</span>
+                        </p>
+                    </div>
+                    <div style="text-align: right;">
+                        <span th:if="${event.isPaid}" class="badge badge-warning" style="font-size: 0.9rem;" th:text="${event.formattedPrice}">$10.00</span>
+                        <span th:unless="${event.isPaid}" class="badge badge-success" style="font-size: 0.9rem;">Free Registration</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 28px;">
+
+                <!-- Error Message -->
+                <div th:if="${errorMessage}" class="alert alert-danger" style="margin-bottom: 20px; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; padding: 12px 16px; border-radius: 6px;">
+                    <strong>Registration Error:</strong> <span th:text="${errorMessage}"></span>
+                </div>
+
+                <div style="background: #f0fdf4; border-left: 4px solid #16a34a; padding: 12px 16px; margin-bottom: 24px; border-radius: 4px; font-size: 0.88rem; color: #166534;">
+                    ℹ️ <strong>Individual Pass Guarantee:</strong> When your team registers, an independent verifiable QR admission pass and confirmation alert are minted for each member.
+                </div>
+
+                <form th:action="@{/events/{id}/register/team(id=${event.id})}" th:object="${teamForm}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <!-- TEAM NAME -->
+                    <div class="form-group" style="margin-bottom: 24px;">
+                        <label for="teamName" style="font-weight: 700; color: var(--navy); display: block; margin-bottom: 6px;">
+                            Official Team / Delegation Name *
+                        </label>
+                        <input type="text" id="teamName" th:field="*{teamName}" placeholder="e.g. ByteRunners, CodeCrafters, NeuralNet" required
+                               style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 1rem; font-weight: 600;">
+                        <div th:if="${#fields.hasErrors('teamName')}" th:errors="*{teamName}" style="color: #dc2626; font-size: 0.82rem; margin-top: 4px;"></div>
+                    </div>
+
+                    <!-- MEMBER 1: TEAM LEADER (REQUIRED) -->
+                    <div class="member-block" style="border-left: 4px solid var(--navy);">
+                        <div class="member-title">
+                            <span>👑 Team Leader (Primary Contact) *</span>
+                            <span class="badge badge-primary" style="font-size: 0.75rem;">Leader Pass</span>
+                        </div>
+                        <div class="grid grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569;">Full Name *</label>
+                                <input type="text" th:field="*{leaderName}" placeholder="Leader Name" required
+                                       style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                                <div th:if="${#fields.hasErrors('leaderName')}" th:errors="*{leaderName}" style="color: #dc2626; font-size: 0.8rem;"></div>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569;">Student Email *</label>
+                                <input type="email" th:field="*{leaderEmail}" placeholder="leader@campus.edu" required
+                                       style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                                <div th:if="${#fields.hasErrors('leaderEmail')}" th:errors="*{leaderEmail}" style="color: #dc2626; font-size: 0.8rem;"></div>
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569;">Department</label>
+                                <input type="text" th:field="*{leaderDepartment}" placeholder="e.g. CSE, ECE"
+                                       style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MEMBER 2 (REQUIRED for min team size 2) -->
+                    <div class="member-block" style="border-left: 4px solid var(--gold);">
+                        <div class="member-title">
+                            <span>👤 Team Member 2 *</span>
+                            <span class="badge" style="background: #fef3c7; color: #92400e; font-size: 0.75rem;">Required Member</span>
+                        </div>
+                        <div class="grid grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569;">Full Name *</label>
+                                <input type="text" th:field="*{members[0].name}" placeholder="Member 2 Name" required
+                                       style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569;">Student Email *</label>
+                                <input type="email" th:field="*{members[0].email}" placeholder="member2@campus.edu" required
+                                       style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569;">Department</label>
+                                <input type="text" th:field="*{members[0].department}" placeholder="e.g. IT, Mechanical"
+                                       style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MEMBER 3 (OPTIONAL) -->
+                    <div class="member-block">
+                        <div class="member-title">
+                            <span>👤 Team Member 3 (Optional)</span>
+                            <span class="badge" style="background: #e2e8f0; color: #475569; font-size: 0.75rem;">Optional</span>
+                        </div>
+                        <div class="grid grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569;">Full Name</label>
+                                <input type="text" th:field="*{members[1].name}" placeholder="Member 3 Name"
+                                       style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569;">Student Email</label>
+                                <input type="email" th:field="*{members[1].email}" placeholder="member3@campus.edu"
+                                       style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569;">Department</label>
+                                <input type="text" th:field="*{members[1].department}" placeholder="e.g. EEE, Civil"
+                                       style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MEMBER 4 (OPTIONAL) -->
+                    <div class="member-block">
+                        <div class="member-title">
+                            <span>👤 Team Member 4 (Optional)</span>
+                            <span class="badge" style="background: #e2e8f0; color: #475569; font-size: 0.75rem;">Optional</span>
+                        </div>
+                        <div class="grid grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569;">Full Name</label>
+                                <input type="text" th:field="*{members[2].name}" placeholder="Member 4 Name"
+                                       style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569;">Student Email</label>
+                                <input type="email" th:field="*{members[2].email}" placeholder="member4@campus.edu"
+                                       style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.82rem; font-weight: 600; color: #475569;">Department</label>
+                                <input type="text" th:field="*{members[2].department}" placeholder="e.g. AI & DS"
+                                       style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUBMIT BUTTON -->
+                    <div style="margin-top: 28px; text-align: center;">
+                        <button type="submit" class="btn" style="padding: 14px 32px; font-size: 1rem; font-weight: 700; width: 100%; max-width: 400px;">
+                            🚀 Register Team & Generate Member Passes
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer class="university-footer">
+    <div class="container">
+        <div class="footer-bottom" style="border-top: none; padding-top: 0;">
+            <span>© 2026 Smart Campus University. All rights reserved.</span>
+            <span>Hackathon & Team Event Administration</span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

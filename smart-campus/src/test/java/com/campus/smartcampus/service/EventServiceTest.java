@@ -88,7 +88,8 @@ class EventServiceTest {
     void testSearchEvents() {
         when(eventRepository.searchEvents("AI", "Computer Science and Engineering", "Seminar", null))
                 .thenReturn(List.of(testEvent));
-        when(registrationRepository.sumTicketsByEventId(1L)).thenReturn(0L);
+        when(registrationRepository.sumTicketsGroupedByEventId())
+                .thenReturn(java.util.Collections.singletonList(new Object[]{1L, 0L}));
 
         List<Event> results = eventService.searchEvents("AI", "Computer Science and Engineering", "Seminar");
 
@@ -111,7 +112,8 @@ class EventServiceTest {
         LocalDate eventDate = testEvent.getDate();
         when(eventRepository.searchEvents("AI", "Computer Science and Engineering", "Seminar", eventDate))
                 .thenReturn(List.of(testEvent));
-        when(registrationRepository.sumTicketsByEventId(1L)).thenReturn(10L);
+        when(registrationRepository.sumTicketsGroupedByEventId())
+                .thenReturn(java.util.Collections.singletonList(new Object[]{1L, 10L}));
 
         List<Event> results = eventService.searchEvents("AI", "Computer Science and Engineering", "Seminar", eventDate);
 

@@ -11,6 +11,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.campus.smartcampus.config.CampusSecurityService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,13 +25,19 @@ public class EventController {
 
     private final EventService eventService;
     private final RegistrationService registrationService;
+    private final CampusSecurityService campusSecurityService;
+    private final com.campus.smartcampus.service.EventSessionService eventSessionService;
 
     public EventController(
             EventService eventService,
-            RegistrationService registrationService) {
+            RegistrationService registrationService,
+            CampusSecurityService campusSecurityService,
+            com.campus.smartcampus.service.EventSessionService eventSessionService) {
 
         this.eventService = eventService;
         this.registrationService = registrationService;
+        this.campusSecurityService = campusSecurityService;
+        this.eventSessionService = eventSessionService;
     }
 
     // =========================================================
@@ -86,8 +98,30 @@ public class EventController {
         Event event = eventService.getEventById(id);
         model.addAttribute("event", event);
         model.addAttribute("availableSeats", event.getAvailableSeats());
+        model.addAttribute("relatedEvents", eventService.getRelatedEvents(id));
+        model.addAttribute("googleCalendarUrl", buildGoogleCalendarUrl(event));
+        model.addAttribute("sessions", eventSessionService.getSessionsByEventId(id));
 
         return "event-details";
+    }
+
+    private String buildGoogleCalendarUrl(Event event) {
+        if (event == null || event.getDate() == null) return "#";
+        try {
+            var startDt = java.time.LocalDateTime.of(event.getDate(),
+                    event.getTime() != null ? event.getTime() : java.time.LocalTime.of(9, 0));
+            var endDt = startDt.plusHours(2);
+            var dtf = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
+            String dates = startDt.format(dtf) + "/" + endDt.format(dtf);
+
+            return "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+                    "&text=" + java.net.URLEncoder.encode(event.getTitle(), java.nio.charset.StandardCharsets.UTF_8) +
+                    "&dates=" + dates +
+                    "&details=" + java.net.URLEncoder.encode(event.getDescription() != null ? event.getDescription() : "", java.nio.charset.StandardCharsets.UTF_8) +
+                    "&location=" + java.net.URLEncoder.encode(event.getVenue() + " - " + event.getBuildingBlock(), java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return "#";
+        }
     }
 
     // =========================================================
@@ -124,6 +158,19 @@ public class EventController {
         model.addAttribute("totalRegistrations", eventService.getTotalRegistrationsCount());
         model.addAttribute("totalTickets", eventService.getTotalTicketsSold());
 
+        // RBAC Context for Template
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = campusSecurityService.isAdmin(auth);
+        boolean isCoordinator = campusSecurityService.isCoordinator(auth);
+        String userDept = campusSecurityService.getUserDepartment(auth);
+
+        model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("isCoordinator", isCoordinator);
+        model.addAttribute("userDept", userDept);
+        model.addAttribute("coordinators", campusSecurityService.getAllCoordinators());
+        model.addAttribute("campusSecurityService", campusSecurityService);
+        model.addAttribute("currentAuth", auth);
+
         return "admin-events";
     }
 
@@ -137,6 +184,12 @@ public class EventController {
             Model model) {
 
         Event event = eventService.getEventById(id);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (!campusSecurityService.canManageEvent(auth, event)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Access Denied: You cannot view registrations for an event from another department (" + event.getDepartment() + ").");
+        }
 
         model.addAttribute("event", event);
         model.addAttribute("registrations", registrationService.getRegistrationsByEvent(id));
@@ -152,7 +205,20 @@ public class EventController {
 
     @GetMapping("/admin/events/add")
     public String addEventForm(Model model) {
-        model.addAttribute("event", new Event());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Event event = new Event();
+
+        if (campusSecurityService.isCoordinator(auth)) {
+            String dept = campusSecurityService.getUserDepartment(auth);
+            event.setDepartment(dept);
+            model.addAttribute("isCoordinator", true);
+            model.addAttribute("lockedDepartment", dept);
+        } else {
+            model.addAttribute("isCoordinator", false);
+            model.addAttribute("lockedDepartment", null);
+        }
+
+        model.addAttribute("event", event);
         return "event-form";
     }
 
@@ -165,6 +231,16 @@ public class EventController {
             @Valid @ModelAttribute("event") Event event,
             BindingResult result,
             RedirectAttributes redirectAttributes) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // Enforce department lockdown for coordinators
+        if (campusSecurityService.isCoordinator(auth)) {
+            String dept = campusSecurityService.getUserDepartment(auth);
+            if (dept != null) {
+                event.setDepartment(dept);
+            }
+        }
 
         if (result.hasErrors()) {
             return "event-form";
@@ -185,7 +261,18 @@ public class EventController {
             @PathVariable Long id,
             Model model) {
 
-        model.addAttribute("event", eventService.getEventById(id));
+        Event event = eventService.getEventById(id);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (!campusSecurityService.canManageEvent(auth, event)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Access Denied: You cannot modify an event belonging to another department (" + event.getDepartment() + ").");
+        }
+
+        boolean isCoord = campusSecurityService.isCoordinator(auth);
+        model.addAttribute("isCoordinator", isCoord);
+        model.addAttribute("lockedDepartment", isCoord ? campusSecurityService.getUserDepartment(auth) : null);
+        model.addAttribute("event", event);
         return "event-form";
     }
 
@@ -199,6 +286,19 @@ public class EventController {
             @Valid @ModelAttribute("event") Event event,
             BindingResult result,
             RedirectAttributes redirectAttributes) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Event existing = eventService.getEventById(id);
+
+        if (!campusSecurityService.canManageEvent(auth, existing)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Access Denied: You cannot modify an event belonging to another department (" + existing.getDepartment() + ").");
+        }
+
+        if (campusSecurityService.isCoordinator(auth)) {
+            // Coordinator cannot reassign event department
+            event.setDepartment(existing.getDepartment());
+        }
 
         if (result.hasErrors()) {
             return "event-form";
@@ -219,21 +319,25 @@ public class EventController {
             @PathVariable Long id,
             RedirectAttributes redirectAttributes) {
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (!campusSecurityService.canDeleteEvent(auth)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Access Denied: Coordinators are not authorized to delete campus events. Only Super Administrators can delete events.");
+        }
+
         eventService.deleteEvent(id);
         redirectAttributes.addFlashAttribute("successMessage", "Event deleted successfully!");
 
         return "redirect:/admin/events";
     }
 
-    // Backward compatible GET delete fallback
+    // Deprecated GET delete route: Rejects mutating GET requests for RFC 7231 & CSRF safety
     @GetMapping("/admin/events/delete/{id}")
     public String deleteEventGet(
             @PathVariable Long id,
             RedirectAttributes redirectAttributes) {
-
-        eventService.deleteEvent(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Event deleted successfully!");
-
+        redirectAttributes.addFlashAttribute("errorMessage", "Security Notice: Events cannot be deleted via a direct link. Please use the administrative delete button.");
         return "redirect:/admin/events";
     }
 }

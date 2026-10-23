@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Door Scanner & Check-In | Smart Campus</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="manifest" th:href="@{/manifest.json}">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="_csrf" th:content="${_csrf?.token}">
+    <meta name="_csrf_parameterName" th:content="${_csrf?.parameterName}">
+    <!-- Html5Qrcode Library for Camera Scanner (Local Bundle + CDN Fallback) -->
+    <script th:src="@{/js/html5-qrcode.min.js}"></script>
+    <script>
+        if (typeof Html5Qrcode === 'undefined') {
+            document.write('<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"><\/script>');
+        }
+    </script>
+    <style>
+        .scanner-card {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+        }
+        #reader {
+            width: 100%;
+            min-height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px dashed #cbd5e1;
+            background: #0b1120;
+            position: relative;
+        }
+        #reader video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            border-radius: 8px;
+        }
+        #reader canvas {
+            display: none;
+        }
+        #readerPlaceholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #0b1120;
+            border-radius: 8px;
+            text-align: center;
+            padding: 16px;
+            z-index: 4;
+            overflow-y: auto;
+        }
+        .scan-result-card {
+            display: none;
+            padding: 18px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        .scan-success {
+            background: #ecfdf5;
+            border: 1.5px solid #a7f3d0;
+            color: #065f46;
+        }
+        .scan-error {
+            background: #fef2f2;
+            border: 1.5px solid #fecaca;
+            color: #991b1b;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- TOP UTILITY BAR -->
+<div class="top-utility-bar">
+    <div class="container">
+        <ul class="utility-links">
+            <li><a th:href="@{/admin/events}">Admin Dashboard</a></li>
+            <li><a th:href="@{/admin/scanner}" style="color: #fde047; font-weight: 700;">★ Live Door Scanner</a></li>
+            <li><a th:href="@{/events}">Public Portal</a></li>
+        </ul>
+        <div class="utility-quick">
+            <span>Fast-Track Door Verification</span>
+            <span>•</span>
+            <span>Role: University Staff / Coordinator</span>
+        </div>
+    </div>
+</div>
+
+<!-- BRAND HEADER BAR -->
+<header class="main-header-bar">
+    <div class="container">
+        <a th:href="@{/admin/events}" class="brand-container">
+            <div class="brand-logo-badge">EDU</div>
+            <div class="brand-text-block">
+                <h1>Smart Campus</h1>
+                <span>Live Event Check-in Station</span>
+            </div>
+        </a>
+
+        <div class="header-nav-group">
+            <ul class="main-nav-links">
+                <li><a th:href="@{/admin/events}">Events Manager</a></li>
+                <li><a th:href="@{/admin/analytics}">📊 Analytics</a></li>
+                <li><a th:href="@{/admin/notifications}">✉️ Outbox</a></li>
+                <li><a th:href="@{/admin/scanner}" class="active">QR Door Scanner</a></li>
+                <li><a th:href="@{/events}">Live Site</a></li>
+            </ul>
+            <form th:action="@{/logout}" method="post" style="margin: 0;">
+                <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--danger); border-color: #fecaca;">
+                    Sign Out
+                </button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<main style="padding: 30px 0 60px 0;">
+    <div class="container">
+
+        <div class="page-header">
+            <div>
+                <span class="badge badge-success" style="font-size: 0.82rem; padding: 4px 12px;">Active Entry Station</span>
+                <h1 style="margin-top: 6px;">Live Camera QR Scanner & Admission Check-In</h1>
+                <p>Point camera at student admission passes or type token code manually to grant verified venue entry.</p>
+            </div>
+            <div>
+                <a th:href="@{/admin/events}" class="btn btn-secondary">
+                    ← Back to Events List
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-2" style="grid-template-columns: 1.1fr 0.9fr; gap: 24px;">
+
+            <!-- Left Column: Camera Viewfinder & Manual Input -->
+            <div class="scanner-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.15rem; color: var(--navy);">📷 High-Speed Optical Scanner</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">
+                            HD camera capture with hardware BarcodeDetector acceleration
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <button id="pwaInstallBtn" type="button" class="btn btn-secondary btn-sm" onclick="installPwa()" style="display: none; background: #0f172a; color: #10b981; border: 1px solid #10b981;">
+                            📲 Install Scanner App
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="simulateCameraScan('SC-E1-4E1CFE')" style="display: inline-flex; align-items: center; gap: 5px; background: #0f172a; color: #fde047; border: 1px solid #334155; font-weight: 600;" title="Simulate real-time camera door scan with admission pass">
+                            ⚡ Simulate Scan
+                        </button>
+                        <input type="file" id="qrImageFileInput" accept="image/*" style="display: none;" onchange="handleImageFileScan(this)">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('qrImageFileInput').click()" style="display: inline-flex; align-items: center; gap: 4px;" title="Scan a QR code pass from a photo or screenshot">
+                            📁 Scan Image
+                        </button>
+                        <button id="startScanBtn" class="btn btn-sm" onclick="startScanner()">▶ Start Camera</button>
+                        <button id="stopScanBtn" class="btn btn-secondary btn-sm" onclick="stopScanner()" style="display: none;">⏹ Stop Camera</button>
+                    </div>
+                </div>
+
+                <!-- High-Clarity Viewport Wrapper with Optical Reticle & Laser Sweep -->
+                <div class="scanner-viewport-wrapper" style="position: relative; min-height: 400px;">
+                    <!-- Dedicated element for camera video feed -->
+                    <div id="reader" style="width: 100%; min-height: 400px; background: #0b1120;"></div>
+
+                    <!-- Standby / Loading Placeholder (Permanent overlay, never destroyed by html5-qrcode clear) -->
+                    <div id="readerPlaceholder">
+                        <p style="font-size: 2.4rem; margin-bottom: 8px;">📷</p>
+                        <strong style="color: #cbd5e1; font-size: 1rem;">Camera Standby</strong>
+                        <p style="font-size: 0.84rem; color: #94a3b8; margin: 4px 0 14px 0; max-width: 340px;">
+                            Click below to launch the optical QR scanner. Works on mobile, laptop, and desktop webcams.
+                        </p>
+                        <button type="button" class="btn btn-sm" onclick="startScanner()" style="display: inline-flex; align-items: center; gap: 6px;">
+                            <span>▶</span> Activate Optical Scanner
+                        </button>
+                    </div>
+
+                    <!-- Reticle & Laser Overlay (Active when camera is running) -->
+                    <div id="scannerReticleOverlay" class="scanner-reticle-overlay" style="z-index: 6;">
+                        <div class="corner-bracket corner-tl"></div>
+                        <div class="corner-bracket corner-tr"></div>
+                        <div class="corner-bracket corner-bl"></div>
+                        <div class="corner-bracket corner-br"></div>
+                        <div class="scanner-laser-line"></div>
+                        <div style="position: absolute; bottom: 12px; left: 0; right: 0; text-align: center;">
+                            <span style="background: rgba(15, 23, 42, 0.75); color: #34d399; font-size: 0.72rem; font-weight: 750; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(52, 211, 153, 0.3);">
+                                ⚡ FAST-TRACK RANGE: 1 - 8 FT
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Camera Tools & Optical Settings Toolbar -->
+                <div class="scanner-controls-strip" id="scannerToolsStrip" style="display: none;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label for="cameraSelect" style="font-weight: 600;">Lens:</label>
+                        <select id="cameraSelect" onchange="switchCamera(this.value)" style="background: #1e293b; color: #f8fafc; border: 1px solid #334155; border-radius: 4px;">
+                            <option value="">Default Environment Lens</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <!-- Torch / Flashlight Button (if supported) -->
+                        <button type="button" id="torchBtn" class="btn btn-secondary btn-sm" onclick="toggleTorch()" style="display: none; background: #1e293b; color: #fde047; border-color: #334155;">
+                            🔦 Flashlight
+                        </button>
+
+                        <!-- Sound Mute/Unmute -->
+                        <button type="button" id="soundBtn" class="btn btn-secondary btn-sm" onclick="toggleSound()" style="background: #1e293b; color: #cbd5e1; border-color: #334155;">
+                            🔔 Chime: On
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Manual Token Entry Fallback -->
+                <div style="margin-top: 20px; padding-top: 18px; border-top: 1.5px solid var(--border);">
+                    <label for="manualTokenInput" style="font-weight: 750; color: var(--navy); display: block; margin-bottom: 8px; font-size: 0.9rem;">
+                        ⌨️ Manual Token Entry / Barcode Gun
+                    </label>
+                    <div style="display: flex; gap: 10px;">
+                        <input
+                            type="text"
+                            id="manualTokenInput"
+                            placeholder="Enter Code (e.g. SC-E1-A8F2)"
+                            style="flex: 1; font-family: monospace; font-size: 1rem; text-transform: uppercase; font-weight: 700; padding: 10px 14px;"
+                            onkeydown="if(event.key === 'Enter') handleManualCheckIn()">
+                        <button type="button" class="btn" onclick="handleManualCheckIn()" style="white-space: nowrap;">
+                            Verify & Admit
+                        </button>
+                    </div>
+                    <small class="text-muted" style="display: block; margin-top: 6px;">
+                        Press Enter to quickly admit student when using a physical USB/Bluetooth handheld barcode reader.
+                    </small>
+
+                    <!-- 1-Click Demo Tokens for Live Demonstration -->
+                    <div style="margin-top: 14px; padding: 10px 14px; background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 8px;">
+                        <div style="font-size: 0.78rem; font-weight: 750; color: var(--navy); margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px;">
+                            <span>⚡ Quick Demo Passes (Instant Test Scenarios):</span>
+                            <span style="font-size: 0.72rem; color: var(--text-muted);">Click to simulate door scan</span>
+                        </div>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="setManualToken('SC-E2-60ACF3')" style="font-size: 0.74rem; padding: 3px 8px; font-family: monospace; font-weight: 650; background: #ffffff; color: #059669; border-color: #a7f3d0;" title="Valid Confirmed Pass">
+                                ✓ Valid: SC-E2-60ACF3
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="setManualToken('SC-E1-4E1CFE')" style="font-size: 0.74rem; padding: 3px 8px; font-family: monospace; font-weight: 650; background: #ffffff; color: #059669; border-color: #a7f3d0;" title="Valid Confirmed Pass">
+                                ✓ Valid: SC-E1-4E1CFE
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="setManualToken('SC-E2-CCE55D')" style="font-size: 0.74rem; padding: 3px 8px; font-family: monospace; font-weight: 650; background: #fff1f2; color: #e11d48; border-color: #fecdd3;" title="Test Duplicate Scan Rejection">
+                                🔁 Duplicate: SC-E2-CCE55D
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="setManualToken('SC-E2-028793')" style="font-size: 0.74rem; padding: 3px 8px; font-family: monospace; font-weight: 650; background: #fef2f2; color: #991b1b; border-color: #fecaca;" title="Test Cancelled Security Rejection">
+                                ⛔ Cancelled: SC-E2-028793
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Result Notice Box -->
+                <div id="scanResultBox" class="scan-result-card">
+                    <div id="resultContent"></div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Scanned & Checked-In History Feed -->
+            <div class="scanner-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.15rem; color: var(--navy);">📋 Scanned Attendees History</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 2px 0 0 0;">
+                            Persistent door verification log from database
+                        </p>
+                    </div>
+                    <span id="sessionCountBadge" class="badge badge-success" style="font-size: 0.82rem; padding: 5px 12px; display: inline-flex; align-items: center; gap: 6px;">
+                        <span class="pulse-dot"></span>
+                        <span id="countNumber" th:text="${totalCheckedInCount}">0</span> Verified Scans
+                    </span>
+                </div>
+
+                <!-- Event Filter Dropdown -->
+                <form method="get" th:action="@{/admin/scanner}" id="eventFilterForm" style="margin-bottom: 12px;">
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <label for="eventSelect" style="font-size: 0.82rem; font-weight: 750; color: var(--navy); white-space: nowrap;">Event Target:</label>
+                        <select id="eventSelect" name="eventId" onchange="document.getElementById('eventFilterForm').submit()" style="flex: 1; font-size: 0.84rem; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border);">
+                            <option value="">All Events (Global Door Feed)</option>
+                            <option th:each="ev : ${events}"
+                                    th:value="${ev.id}"
+                                    th:text="${ev.title + ' (' + #temporals.format(ev.date, 'MMM dd') + ')'}"
+                                    th:selected="${selectedEventId != null and ev.id == selectedEventId}"></option>
+                        </select>
+                        <a th:if="${selectedEventId != null}" th:href="@{/admin/scanner}" class="btn btn-secondary btn-sm" style="padding: 7px 10px; font-size: 0.78rem;" title="Reset to All Events">✕</a>
+                    </div>
+                </form>
+
+                <!-- Real-time Filter Search Bar -->
+                <div style="margin-bottom: 14px; position: relative;">
+                    <input
+                        type="search"
+                        id="scanHistorySearch"
+                        oninput="filterScanHistory()"
+                        placeholder="🔍 Filter history by name, token, dept, or event..."
+                        style="width: 100%; font-size: 0.84rem; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); background: #f8fafc;">
+                </div>
+
+                <!-- Scrollable Scanned Attendees Feed -->
+                <div id="recentScansList" style="max-height: 500px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
+                    
+                    <!-- Preloaded from Database -->
+                    <div th:each="reg : ${checkedInHistory}" class="scan-history-item"
+                         th:id="${'scan-reg-' + reg.id}"
+                         th:data-student="${reg.studentName}"
+                         th:data-token="${reg.token}"
+                         th:data-dept="${reg.department}"
+                         th:data-email="${reg.email}"
+                         th:data-event="${reg.event != null ? reg.event.title : ''}">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                    <strong style="color: var(--navy); font-size: 0.95rem;" th:text="${reg.studentName}">Student Name</strong>
+                                    <span class="badge badge-success" style="font-size: 0.68rem; padding: 2px 6px;">✓ Scanned</span>
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                    <span th:text="${reg.department}">CSE</span>
+                                    <span>•</span>
+                                    <span class="token-pill" th:text="${reg.token}">SC-E1-ABCD</span>
+                                </div>
+                                <div th:if="${reg.event != null}" style="font-size: 0.78rem; color: var(--primary); font-weight: 600; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    📍 <span th:text="${reg.event.title}">Event Title</span>
+                                    <span th:if="${reg.tickets != null and reg.tickets > 1}" class="badge badge-primary" style="font-size: 0.65rem; margin-left: 4px;" th:text="${reg.tickets + ' Passes'}">2 Passes</span>
+                                </div>
+                            </div>
+                            <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
+                                <span style="font-size: 0.74rem; color: #059669; font-weight: 700; white-space: nowrap;"
+                                      th:text="${reg.checkedInAt != null ? #temporals.format(reg.checkedInAt, 'hh:mm a, MMM dd') : 'Logged'}">
+                                    04:30 PM
+                                </span>
+                                <form th:action="@{/admin/registrations/{id}/toggle-checkin(id=${reg.id})}" method="post" style="margin: 0;">
+                                    <input type="hidden" name="returnTo" value="scanner">
+                                    <input type="hidden" name="eventId" th:value="${selectedEventId}">
+                                    <button type="submit" class="btn btn-secondary btn-sm" style="font-size: 0.68rem; padding: 2px 7px; color: #64748b;" title="Undo Check-In and restore pass to Confirmed">
+                                        Undo
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty Notice (hidden if history exists) -->
+                    <div id="emptyFeedNotice" th:style="${#lists.isEmpty(checkedInHistory)} ? 'text-align: center; padding: 40px 10px; color: var(--text-muted); background: #f8fafc; border-radius: 8px;' : 'display: none;'">
+                        <span style="font-size: 1.8rem; display: block; margin-bottom: 6px;">🎟️</span>
+                        <strong th:text="${selectedEventId != null ? 'No Attendees Scanned For This Event Yet' : 'No Scanned Attendees In History Yet'}">No Attendees Scanned Yet</strong>
+                        <p style="font-size: 0.8rem; margin-top: 4px;">Verified attendees will appear here in real time as their QR passes are scanned.</p>
+                    </div>
+
+                    <!-- No Search Results Notice -->
+                    <div id="noMatchesNotice" style="display: none; text-align: center; padding: 30px 10px; color: var(--text-muted); background: #f8fafc; border-radius: 8px;">
+                        <span style="font-size: 1.6rem; display: block; margin-bottom: 4px;">🔍</span>
+                        <strong>No Scanned Records Match</strong>
+                        <p style="font-size: 0.8rem; margin-top: 4px;">Try searching with a different name or token code.</p>
+                    </div>
+
+                </div>
+
+                <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                    <small class="text-muted" style="font-size: 0.78rem;">Records stay synced with college database.</small>
+                    <a th:href="@{/admin/scanner(eventId=${selectedEventId})}" class="btn btn-secondary btn-sm" style="font-size: 0.76rem; padding: 4px 10px;">
+                        🔄 Refresh Feed
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</main>
+
+<script th:inline="javascript">
+    let html5QrcodeScanner = null;
+    let isProcessing = false;
+    let checkedInCount = /*[[${totalCheckedInCount}]]*/ 0;
+    const currentEventId = /*[[${selectedEventId}]]*/ null;
+
+    let soundEnabled = true;
+    let isTorchOn = false;
+    let activeCameraId = null;
+    let availableCameras = [];
+
+    // Synthesized Web Audio feedback (Zero latency)
+    function playSuccessBeep() {
+        if (!soundEnabled) return;
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.09);
+            gain.gain.setValueAtTime(0.18, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.16);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.16);
+        } catch(e) {}
+    }
+
+    function playErrorBeep() {
+        if (!soundEnabled) return;
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(260, ctx.currentTime);
+            osc.frequency.setValueAtTime(160, ctx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.22, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.28);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.28);
+        } catch(e) {}
+    }
+
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        const btn = document.getElementById('soundBtn');
+        if (btn) {
+            btn.innerHTML = soundEnabled ? '🔔 Chime: On' : '🔕 Chime: Off';
+            btn.style.color = soundEnabled ? '#cbd5e1' : '#f87171';
+        }
+    }
+
+    // High performance optical configuration with safe, non-crashing bounds
+    const scanConfig = {
+        fps: 20, // 20 frames per second for smooth, reliable decoding
+        qrbox: function(viewfinderWidth, viewfinderHeight) {
+            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+            if (!minEdge || minEdge < 60) {
+                return { width: 50, height: 50 };
+            }
+            const size = Math.max(50, Math.min(Math.floor(minEdge * 0.70), minEdge - 10));
+            return { width: size, height: size };
+        },
+        aspectRatio: 1.0,
+        disableFlip: false,
+        experimentalFeatures: {
+            useBarCodeDetectorIfSupported: false // Disabled: experimental Chrome detector causes crashes on some systems
+        }
+    };
+
+    async function initCameraDevices() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+            return;
+        }
+        try {
+            const devices = await Html5Qrcode.getCameras();
+            if (devices && devices.length > 0) {
+                availableCameras = devices;
+                const select = document.getElementById('cameraSelect');
+                if (select) {
+                    select.innerHTML = '';
+                    let defaultIndex = 0;
+                    devices.forEach((cam, idx) => {
+                        const opt = document.createElement('option');
+                        opt.value = cam.id;
+                        opt.text = cam.label || ('Camera Lens ' + (idx + 1));
+                        const labelLower = (cam.label || '').toLowerCase();
+                        if (labelLower.includes('back') || labelLower.includes('rear') || labelLower.includes('environment')) {
+                            defaultIndex = idx;
+                        }
+                        if (activeCameraId && cam.id === activeCameraId) {
+                            defaultIndex = idx;
+                        }
+                        select.appendChild(opt);
+                    });
+                    select.selectedIndex = defaultIndex;
+                    if (!activeCameraId) {
+                        activeCameraId = devices[defaultIndex].id;
+                    }
+                }
+            }
+        } catch (e) {
+            console.log("Camera enumeration deferred:", e);
+        }
+    }
+
+    async function resetScannerInstance() {
+        if (html5QrcodeScanner) {
+            try {
+                if (html5QrcodeScanner.isScanning) {
+                    await html5QrcodeScanner.stop();
+                }
+                await html5QrcodeScanner.clear();
+            } catch (e) {}
+        }
+        html5QrcodeScanner = new Html5Qrcode("reader");
+    }
+
+    async function safeStopScanner() {
+        if (html5QrcodeScanner) {
+            try {
+                if (html5QrcodeScanner.isScanning) {
+                    await html5QrcodeScanner.stop();
+                }
+                await html5QrcodeScanner.clear();
+            } catch (e) {
+                console.warn("Notice during scanner stop:", e);
+            }
+            html5QrcodeScanner = null;
+        }
+    }
+
+    async function startScanner() {
+        // Clear any previous error box
+        const errBox = document.getElementById('scanResultBox');
+        if (errBox) errBox.style.display = 'none';
+
+        // Check for secure context
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            showError("🛡️ Secure Context Required: Browsers block camera access unless accessed via 'http://localhost:8080' or HTTPS. If accessing over Wi-Fi/LAN IP, please use 'http://localhost:8080' on the host machine or use the '📁 Scan Image' button.");
+            return;
+        }
+
+        // Check mediaDevices support
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showError("Browser does not support camera mediaDevices API. Please use '📁 Scan Image' or manual token entry.");
+            return;
+        }
+
+        // UI state: show loading spinner in placeholder
+        const placeholder = document.getElementById('readerPlaceholder');
+        if (placeholder) {
+            placeholder.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
+                    <div style="width: 38px; height: 38px; border: 3px solid #334155; border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                    <strong style="color: #cbd5e1; font-size: 0.95rem;">Starting Optical Camera...</strong>
+                    <p style="font-size: 0.82rem; color: #94a3b8; margin: 0; max-width: 320px;">Please click "Allow" if your browser prompts for camera permission.</p>
+                </div>
+            `;
+            placeholder.style.display = 'flex';
+        }
+        document.getElementById('startScanBtn').style.display = 'none';
+        document.getElementById('stopScanBtn').style.display = 'inline-block';
+
+        // Clean up any previous instance
+        await safeStopScanner();
+
+        // Create fresh Html5Qrcode instance
+        html5QrcodeScanner = new Html5Qrcode("reader");
+
+        let started = false;
+        let lastError = null;
+
+        // TIER 1: Use specific enumerated activeCameraId if available
+        if (activeCameraId) {
+            try {
+                console.log("Tier 1: Starting with activeCameraId:", activeCameraId);
+                await html5QrcodeScanner.start(activeCameraId, scanConfig, onScanSuccess, onScanFailure);
+                started = true;
+            } catch (errTier1) {
+                console.warn("Tier 1 failed:", errTier1);
+                lastError = errTier1;
+                await resetScannerInstance();
+            }
+        }
+
+        // TIER 2: Environment camera (string constraint, ideal for smartphones)
+        if (!started) {
+            try {
+                console.log("Tier 2: Starting with facingMode: environment");
+                await html5QrcodeScanner.start({ facingMode: "environment" }, scanConfig, onScanSuccess, onScanFailure);
+                started = true;
+            } catch (errTier2) {
+                console.warn("Tier 2 failed:", errTier2);
+                lastError = errTier2;
+                await resetScannerInstance();
+            }
+        }
+
+        // TIER 3: User camera (front / laptop webcam)
+        if (!started) {
+            try {
+                console.log("Tier 3: Starting with facingMode: user");
+                await html5QrcodeScanner.start({ facingMode: "user" }, scanConfig, onScanSuccess, onScanFailure);
+                started = true;
+            } catch (errTier3) {
+                console.warn("Tier 3 failed:", errTier3);
+                lastError = errTier3;
+                await resetScannerInstance();
+            }
+        }
+
+        // TIER 4: Unconstrained video constraints (Universal fallback for Windows DirectShow/MediaFoundation & USB webcams)
+        if (!started) {
+            try {
+                console.log("Tier 4: Starting with unconstrained videoConstraints: {}");
+                const unconstrainedConfig = {
+                    ...scanConfig,
+                    videoConstraints: {}
+                };
+                await html5QrcodeScanner.start({ facingMode: "user" }, unconstrainedConfig, onScanSuccess, onScanFailure);
+                started = true;
+            } catch (errTier4) {
+                console.warn("Tier 4 failed:", errTier4);
+                lastError = errTier4;
+                await resetScannerInstance();
+            }
+        }
+
+        // TIER 5: Fallback via direct navigator.mediaDevices enumeration
+        if (!started) {
+            try {
+                console.log("Tier 5: Fallback to direct device enumeration");
+                const rawDevices = await navigator.mediaDevices.enumerateDevices();
+                const videoInputs = rawDevices.filter(d => d.kind === 'videoinput' && d.deviceId);
+                if (videoInputs.length > 0) {
+                    const fallbackId = videoInputs[0].deviceId;
+                    await html5QrcodeScanner.start(fallbackId, scanConfig, onScanSuccess, onScanFailure);
+                    activeCameraId = fallbackId;
+                    started = true;
+                }
+            } catch (errTier5) {
+                console.warn("Tier 5 failed:", errTier5);
+                lastError = errTier5;
+            }
+        }
+
+        if (started) {
+            // Hide standby placeholder and reveal scanner reticle overlay
+            if (placeholder) placeholder.style.display = 'none';
+            document.getElementById('scannerReticleOverlay').style.display = 'block';
+            document.getElementById('scannerToolsStrip').style.display = 'flex';
+
+            // Now that camera permissions are active, enumerate real device labels
+            await initCameraDevices();
+            checkTorchSupport();
+        } else {
+            console.error("All camera startup attempts failed:", lastError);
+            await safeStopScanner();
+            handleCameraError(lastError);
+        }
+    }
+
+    function handleCameraError(err) {
+        document.getElementById('startScanBtn').style.display = 'inline-block';
+        document.getElementById('stopScanBtn').style.display = 'none';
+        document.getElementById('scannerReticleOverlay').style.display = 'none';
+        document.getElementById('scannerToolsStrip').style.display = 'none';
+
+        const msg = err ? ((err.name || "") + " " + (err.message || err.toString())) : "";
+        let title = "Camera Not Detected / Hardware Switched Off";
+        let detail = "No active webcam was detected by your browser.";
+        let icon = "📷";
+
+        if (msg.includes('NotAllowed') || msg.includes('PermissionDenied') || msg.includes('Permission denied')) {
+            title = "Camera Permission Blocked";
+            detail = "Your browser denied camera access. Please click the camera/tune icon in the browser address bar next to localhost:8080, change Camera to 'Allow', and refresh.";
+            icon = "🔒";
+        } else if (msg.includes('NotReadable') || msg.includes('TrackStart') || msg.includes('Could not start video source') || msg.includes('in use')) {
+            title = "Camera In Use by Another Application";
+            detail = "Another app (Zoom, MS Teams, Skype) or another browser tab is currently using the camera. Please close it and retry.";
+            icon = "⚠️";
+        } else if (msg.includes('Overconstrained')) {
+            title = "Video Resolution Mismatch";
+            detail = "Camera driver did not accept default resolution constraints. Try switching lens or use image scan.";
+            icon = "⚙️";
+        } else {
+            title = "Webcam Hardware Disconnected or Switched Off";
+            detail = "The camera device is not responding or its hardware privacy switch is disabled.";
+            icon = "📷";
+        }
+
+        const placeholder = document.getElementById('readerPlaceholder');
+        if (placeholder) {
+            placeholder.innerHTML = 
+                '<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 18px 16px; max-width: 440px; box-sizing: border-box;">' +
+                    '<span style="font-size: 2.2rem; margin-bottom: 6px;">' + icon + '</span>' +
+                    '<strong style="color: #f87171; font-size: 0.98rem; margin-bottom: 4px;">' + title + '</strong>' +
+                    '<p style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.45; margin: 0 0 12px 0;">' + detail + '</p>' +
+                    '<div style="background: rgba(30, 41, 59, 0.92); border: 1.5px solid #475569; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; text-align: left; width: 100%; box-sizing: border-box;">' +
+                        '<div style="font-size: 0.78rem; font-weight: 700; color: #fde047; margin-bottom: 5px;">💡 Fix & Diagnostic Options:</div>' +
+                        '<ul style="font-size: 0.75rem; color: #cbd5e1; margin: 0; padding-left: 18px; line-height: 1.5;">' +
+                            '<li><strong>MSI Keyboard:</strong> Key <kbd style="background: #0f172a; color: #f87171; padding: 2px 6px; border-radius: 4px; border: 1px solid #334155; font-weight: 700;">F4</kbd> is the <em>Microphone</em> (with the LED light). The <em>Webcam</em> is on <kbd style="background: #0f172a; color: #38bdf8; padding: 2px 6px; border-radius: 4px; border: 1px solid #334155; font-weight: 700;">Fn + F6</kbd> (two keys to the right, with the 📷 camera icon)!</li>' +
+                            '<li><strong>MSI Center App:</strong> Open <em>MSI Center</em> &rarr; <em>Features / General Settings</em> &rarr; toggle <strong>WebCam</strong> to <strong>ON</strong>.</li>' +
+                            '<li><strong>Browser:</strong> Click the lock/tune icon next to <code>localhost:8080</code> in the address bar and set Camera to <strong>Allow</strong>.</li>' +
+                        '</ul>' +
+                    '</div>' +
+                    '<div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">' +
+                        '<button type="button" class="btn btn-sm" onclick="startScanner()" style="font-size: 0.78rem; padding: 6px 12px; background: #0284c7; color: #ffffff;">🔄 Retry Camera (After Fn+F6)</button>' +
+                        '<button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById(\'qrImageFileInput\').click()" style="font-size: 0.78rem; padding: 6px 12px; background: #1e293b; color: #34d399; border-color: #334155;">📁 Scan Pass Image</button>' +
+                        '<button type="button" class="btn btn-secondary btn-sm" onclick="simulateCameraScan(\'SC-E1-4E1CFE\')" style="font-size: 0.78rem; padding: 6px 12px; background: #1e293b; color: #fde047; border-color: #334155;">⚡ Simulate Optical Scan</button>' +
+                    '</div>' +
+                '</div>';
+            placeholder.style.display = 'flex';
+        }
+
+        showError(title + ": " + detail);
+    }
+
+    // Optical Scan Simulation (Runs the real-time optical check-in workflow even without a webcam)
+    function simulateCameraScan(token) {
+        const placeholder = document.getElementById('readerPlaceholder');
+        if (placeholder) {
+            placeholder.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 30px 20px;">
+                    <div style="font-size: 2.2rem;">🎯</div>
+                    <strong style="color: #34d399; font-size: 0.96rem;">Optical Reticle Locked on Pass...</strong>
+                    <span class="token-pill" style="font-size: 0.88rem;">Decoding: ${escapeHtml(token)}</span>
+                    <div style="width: 160px; height: 4px; background: #1e293b; border-radius: 2px; overflow: hidden; margin-top: 4px;">
+                        <div style="width: 100%; height: 100%; background: #10b981; animation: laserScanSweep 1s infinite alternate;"></div>
+                    </div>
+                </div>
+            `;
+            placeholder.style.display = 'flex';
+        }
+        document.getElementById('scannerReticleOverlay').style.display = 'block';
+
+        setTimeout(() => {
+            onScanSuccess(token, null);
+            setTimeout(() => {
+                if (placeholder) placeholder.style.display = 'none';
+            }, 300);
+        }, 1100);
+    }
+
+    async function stopScanner() {
+        await safeStopScanner();
+
+        document.getElementById('startScanBtn').style.display = 'inline-block';
+        document.getElementById('stopScanBtn').style.display = 'none';
+
+        const placeholder = document.getElementById('readerPlaceholder');
+        if (placeholder) {
+            placeholder.innerHTML = `
+                <p style="font-size: 2.4rem; margin-bottom: 8px;">📷</p>
+                <strong style="color: #cbd5e1; font-size: 1rem;">Camera Standby</strong>
+                <p style="font-size: 0.84rem; color: #94a3b8; margin: 4px 0 14px 0; max-width: 340px;">
+                    Click below to launch the optical QR scanner. Works on mobile, laptop, and desktop webcams.
+                </p>
+                <button type="button" class="btn btn-sm" onclick="startScanner()" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span>▶</span> Activate Optical Scanner
+                </button>
+            `;
+            placeholder.style.display = 'flex';
+        }
+
+        document.getElementById('scannerReticleOverlay').style.display = 'none';
+        document.getElementById('scannerToolsStrip').style.display = 'none';
+        isTorchOn = false;
+        updateTorchBtn();
+    }
+
+    async function switchCamera(cameraId) {
+        if (!cameraId || cameraId === activeCameraId) return;
+        activeCameraId = cameraId;
+        if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+            try {
+                await html5QrcodeScanner.stop();
+                await html5QrcodeScanner.start(
+                    activeCameraId,
+                    scanConfig,
+                    onScanSuccess,
+                    onScanFailure
+                );
+                checkTorchSupport();
+            } catch (e) {
+                console.warn("Camera switch error:", e);
+                showError("Could not switch to selected lens: " + (e.message || e));
+            }
+        }
+    }
+
+    // Direct Image / Photo file QR scanner (Works even without webcam hardware)
+    async function handleImageFileScan(input) {
+        if (!input.files || input.files.length === 0) return;
+        const file = input.files[0];
+
+        await safeStopScanner();
+        document.getElementById('startScanBtn').style.display = 'inline-block';
+        document.getElementById('stopScanBtn').style.display = 'none';
+        document.getElementById('scannerReticleOverlay').style.display = 'none';
+
+        const placeholder = document.getElementById('readerPlaceholder');
+        if (placeholder) {
+            placeholder.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
+                    <div style="width: 32px; height: 32px; border: 3px solid #334155; border-top-color: #10b981; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                    <strong style="color: #cbd5e1; font-size: 0.92rem;">Analyzing Pass Image...</strong>
+                    <span style="font-size: 0.8rem; color: #94a3b8;">${escapeHtml(file.name)}</span>
+                </div>
+            `;
+            placeholder.style.display = 'flex';
+        }
+
+        html5QrcodeScanner = new Html5Qrcode("reader");
+
+        try {
+            const decodedText = await html5QrcodeScanner.scanFile(file, true);
+            if (placeholder) placeholder.style.display = 'none';
+            onScanSuccess(decodedText, null);
+        } catch (err) {
+            showError("Could not detect a valid QR code in the selected file: " + (err.message || err));
+            await stopScanner();
+        } finally {
+            input.value = '';
+        }
+    }
+
+    function checkTorchSupport() {
+        try {
+            const videoElem = document.querySelector("#reader video");
+            if (videoElem && videoElem.srcObject) {
+                const track = videoElem.srcObject.getVideoTracks()[0];
+                if (track && track.getCapabilities) {
+                    const capabilities = track.getCapabilities();
+                    if (capabilities.torch) {
+                        document.getElementById('torchBtn').style.display = 'inline-block';
+                        return;
+                    }
+                }
+            }
+        } catch(e) {}
+        document.getElementById('torchBtn').style.display = 'none';
+    }
+
+    async function toggleTorch() {
+        try {
+            const videoElem = document.querySelector("#reader video");
+            if (videoElem && videoElem.srcObject) {
+                const track = videoElem.srcObject.getVideoTracks()[0];
+                if (track) {
+                    isTorchOn = !isTorchOn;
+                    await track.applyConstraints({
+                        advanced: [{ torch: isTorchOn }]
+                    });
+                    updateTorchBtn();
+                }
+            }
+        } catch(e) {
+            console.warn("Torch toggle not supported:", e);
+        }
+    }
+
+    function updateTorchBtn() {
+        const btn = document.getElementById('torchBtn');
+        if (btn) {
+            btn.innerHTML = isTorchOn ? '🔦 Torch: ON' : '🔦 Flashlight';
+            btn.style.color = isTorchOn ? '#10b981' : '#fde047';
+        }
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+        if (isProcessing) return;
+        isProcessing = true;
+
+        // Visual flash & sound
+        const overlay = document.getElementById('scannerReticleOverlay');
+        if (overlay) {
+            overlay.style.boxShadow = 'inset 0 0 50px rgba(16, 185, 129, 0.8)';
+            setTimeout(() => { if (overlay) overlay.style.boxShadow = 'none'; }, 350);
+        }
+
+        sendCheckIn(decodedText);
+
+        // Fast reset (1100ms) for high-speed door clearance
+        setTimeout(() => {
+            isProcessing = false;
+        }, 1100);
+    }
+
+    function onScanFailure(error) {
+        // Continuous search, ignore unread frames
+    }
+
+    function setManualToken(token) {
+        const input = document.getElementById('manualTokenInput');
+        if (input) {
+            input.value = token;
+            handleManualCheckIn();
+        }
+    }
+
+    function handleManualCheckIn() {
+        const input = document.getElementById('manualTokenInput');
+        const token = input.value.trim();
+        if (!token) return;
+        input.value = '';
+        sendCheckIn(token);
+    }
+
+    function sendCheckIn(token) {
+        if (!token) return;
+        let cleanToken = token.trim();
+
+        // Extract token if scanned QR contains a URL or query parameter
+        if (cleanToken.includes('token=')) {
+            const m = cleanToken.match(/token=([A-Za-z0-9\-_]+)/i);
+            if (m) cleanToken = m[1];
+        } else if (cleanToken.includes('/verify/certificate/')) {
+            const parts = cleanToken.split('/verify/certificate/');
+            cleanToken = parts[1].split('?')[0].split('#')[0].trim();
+        } else if (cleanToken.startsWith('http://') || cleanToken.startsWith('https://')) {
+            try {
+                const url = new URL(cleanToken);
+                const pathParts = url.pathname.split('/').filter(Boolean);
+                if (pathParts.length > 0) {
+                    cleanToken = pathParts[pathParts.length - 1];
+                }
+            } catch(e) {}
+        }
+
+        fetch('/api/admin/checkin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: cleanToken })
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.message || 'Check-in failed');
+            }
+            return data;
+        })
+        .then(data => {
+            playSuccessBeep();
+            showSuccess(data);
+            addToFeed(data);
+        })
+        .catch(err => {
+            playErrorBeep();
+            showError(err.message);
+        });
+    }
+
+    function showSuccess(data) {
+        const box = document.getElementById('scanResultBox');
+        box.className = 'scan-result-card scan-success';
+        box.style.display = 'block';
+
+        box.innerHTML = 
+            '<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">' +
+                '<div>' +
+                    '<span class="badge badge-success" style="font-size: 0.74rem; padding: 2px 8px; margin-bottom: 4px;">✓ ENTRY GRANTED</span>' +
+                    '<div style="font-size: 1.15rem; font-weight: 800; color: #065f46; margin-top: 4px;">' + escapeHtml(data.studentName) + '</div>' +
+                    '<div style="font-size: 0.85rem; color: #047857; margin-top: 2px;">' +
+                        escapeHtml(data.department) + ' • ' + escapeHtml(data.email) +
+                    '</div>' +
+                    '<div style="margin-top: 6px; font-size: 0.85rem; color: #065f46;">' +
+                        'Event: <strong>' + escapeHtml(data.eventTitle) + '</strong> • Passes: <span class="badge badge-success">' + data.tickets + '</span>' +
+                    '</div>' +
+                    '<div style="margin-top: 6px;">' +
+                        'Token: <span class="token-pill">' + escapeHtml(data.token) + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<span style="font-size: 2.2rem;">🎟️</span>' +
+            '</div>';
+    }
+
+    function showError(message) {
+        const box = document.getElementById('scanResultBox');
+        const isDuplicate = message && message.toLowerCase().includes('duplicate');
+        box.className = 'scan-result-card scan-error';
+        box.style.display = 'block';
+
+        const icon = isDuplicate ? '⛔' : '⚠️';
+        const title = isDuplicate ? 'DUPLICATE ENTRY DETECTED' : 'ACCESS DENIED / ALERT';
+
+        box.innerHTML = 
+            '<div style="display: flex; gap: 12px; align-items: flex-start;">' +
+                '<span style="font-size: 2rem;">' + icon + '</span>' +
+                '<div style="flex: 1;">' +
+                    '<strong style="font-size: 1.05rem; display: block; color: #991b1b;">' + title + '</strong>' +
+                    '<p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #7f1d1d; font-weight: 600;">' + escapeHtml(message) + '</p>' +
+                    (isDuplicate ? '<div style="margin-top: 8px; font-size: 0.82rem; background: #fee2e2; border: 1px solid #fecaca; padding: 6px 10px; border-radius: 6px; color: #991b1b;">This admission pass was already scanned and verified. Check the history log on the right to view previous check-in time.</div>' : '') +
+                '</div>' +
+            '</div>';
+
+        const reader = document.getElementById('reader');
+        if (reader) {
+            reader.style.border = '3px solid #ef4444';
+            setTimeout(() => { if (reader) reader.style.border = '2px dashed #cbd5e1'; }, 1800);
+        }
+    }
+
+    function addToFeed(data) {
+        const emptyNotice = document.getElementById('emptyFeedNotice');
+        if (emptyNotice) emptyNotice.style.display = 'none';
+
+        checkedInCount++;
+        const countNum = document.getElementById('countNumber');
+        if (countNum) countNum.innerText = checkedInCount;
+
+        const list = document.getElementById('recentScansList');
+        const item = document.createElement('div');
+        item.className = 'scan-history-item';
+        item.id = 'scan-reg-' + (data.id || Date.now());
+        item.setAttribute('data-student', data.studentName || '');
+        item.setAttribute('data-token', data.token || '');
+        item.setAttribute('data-dept', data.department || '');
+        item.setAttribute('data-email', data.email || '');
+        item.setAttribute('data-event', data.eventTitle || '');
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || '';
+        const undoForm = data.id ? 
+            '<form action="/admin/registrations/' + data.id + '/toggle-checkin" method="post" style="margin: 0;">' +
+                '<input type="hidden" name="_csrf" value="' + csrfToken + '">' +
+                '<input type="hidden" name="returnTo" value="scanner">' +
+                (currentEventId ? '<input type="hidden" name="eventId" value="' + currentEventId + '">' : '') +
+                '<button type="submit" class="btn btn-secondary btn-sm" style="font-size: 0.68rem; padding: 2px 7px; color: #64748b;" title="Undo Check-In">' +
+                    'Undo' +
+                '</button>' +
+            '</form>' : '';
+
+        item.innerHTML = 
+            '<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">' +
+                '<div style="flex: 1; min-width: 0;">' +
+                    '<div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">' +
+                        '<strong style="color: var(--navy); font-size: 0.95rem;">' + escapeHtml(data.studentName) + '</strong>' +
+                        '<span class="badge badge-success" style="font-size: 0.68rem; padding: 2px 6px;">✓ Scanned</span>' +
+                    '</div>' +
+                    '<div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">' +
+                        '<span>' + escapeHtml(data.department) + '</span>' +
+                        '<span>•</span>' +
+                        '<span class="token-pill">' + escapeHtml(data.token) + '</span>' +
+                    '</div>' +
+                    '<div style="font-size: 0.78rem; color: var(--primary); font-weight: 600; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' +
+                        '📍 ' + escapeHtml(data.eventTitle) +
+                        (data.tickets > 1 ? '<span class="badge badge-primary" style="font-size: 0.65rem; margin-left: 4px;">' + data.tickets + ' Passes</span>' : '') +
+                    '</div>' +
+                '</div>' +
+                '<div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">' +
+                    '<span style="font-size: 0.74rem; color: #059669; font-weight: 700; white-space: nowrap;">' +
+                        (data.checkedInAt || 'Just now') +
+                    '</span>' +
+                    undoForm +
+                '</div>' +
+            '</div>';
+
+        list.insertBefore(item, list.firstChild);
+    }
+
+    function filterScanHistory() {
+        const query = document.getElementById('scanHistorySearch').value.toLowerCase().trim();
+        const items = document.querySelectorAll('#recentScansList .scan-history-item');
+        let visibleCount = 0;
+
+        items.forEach(item => {
+            const student = (item.getAttribute('data-student') || '').toLowerCase();
+            const token = (item.getAttribute('data-token') || '').toLowerCase();
+            const dept = (item.getAttribute('data-dept') || '').toLowerCase();
+            const email = (item.getAttribute('data-email') || '').toLowerCase();
+            const eventTitle = (item.getAttribute('data-event') || '').toLowerCase();
+
+            if (!query || student.includes(query) || token.includes(query) || dept.includes(query) || email.includes(query) || eventTitle.includes(query)) {
+                item.style.display = 'block';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        const noMatches = document.getElementById('noMatchesNotice');
+        if (noMatches) {
+            noMatches.style.display = (visibleCount === 0 && query.length > 0) ? 'block' : 'none';
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // PWA Support & Service Worker
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const pwaBtn = document.getElementById('pwaInstallBtn');
+        if (pwaBtn) pwaBtn.style.display = 'inline-flex';
+    });
+
+    function installPwa() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => {
+                deferredPrompt = null;
+                const pwaBtn = document.getElementById('pwaInstallBtn');
+                if (pwaBtn) pwaBtn.style.display = 'none';
+            });
+        }
+    }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(err => {
+                console.log('ServiceWorker registration skipped (soft):', err);
+            });
+        });
+    }
+
+    // Listen for hardware plug/unplug or MSI Fn+F6 webcam toggle events
+    if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+        navigator.mediaDevices.addEventListener('devicechange', async () => {
+            console.log("Hardware devicechange detected (e.g. Fn+F6 webcam toggled). Updating cameras...");
+            activeCameraId = null;
+            await initCameraDevices();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Enumerate without prompting if permissions already exist
+        if (navigator.permissions && navigator.permissions.query) {
+            navigator.permissions.query({ name: 'camera' }).then(res => {
+                if (res.state === 'granted') {
+                    initCameraDevices();
+                }
+            }).catch(() => {});
+        }
+    });
+</script>
+
+</body>
+</html>

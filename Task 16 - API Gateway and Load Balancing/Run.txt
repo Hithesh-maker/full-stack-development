@@ -1,0 +1,33 @@
+# ============================================================
+# TASK 16 - API GATEWAY AND LOAD BALANCING
+# Execution and Verification Run Guide
+# ============================================================
+
+# Step 1: Start Eureka Discovery Registry (Task 15)
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 15 - Service Discovery\eureka-server"
+mvn spring-boot:run
+
+# Step 2: Start First Instance of Product Service (Port 8081)
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 14 - Microservices\product-service"
+mvn spring-boot:run
+
+# Step 3: Start Second Instance of Product Service (Port 8083) for Load Balancing
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 14 - Microservices\product-service"
+mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=8083"
+
+# Step 4: Start Order Service (Port 8082)
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 14 - Microservices\order-service"
+mvn spring-boot:run
+
+# Step 5: Start API Gateway (Port 8080)
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 16 - API Gateway and Load Balancing"
+mvn spring-boot:run
+
+# Step 6: Test Load Balancing Through API Gateway
+# Notice how requests to port 8080 are dynamically routed across Product Service instances:
+Invoke-RestMethod -Uri "http://localhost:8080/products" -Method Get
+Invoke-RestMethod -Uri "http://localhost:8080/products" -Method Get
+Invoke-RestMethod -Uri "http://localhost:8080/orders" -Method Get
+
+# Step 7: Inspect Actuator Gateway Routes
+Invoke-RestMethod -Uri "http://localhost:8080/actuator/gateway/routes" -Method Get

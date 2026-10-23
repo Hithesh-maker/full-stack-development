@@ -1,0 +1,38 @@
+# ============================================================
+# TASK 24 - VIBE CODING CLOUD FEATURE
+# Run and Verification Guide
+# ============================================================
+
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 24 - Vibe Coding Cloud Feature"
+
+# 1. Run Automated Unit Tests
+mvn clean test
+
+# 2. Start Application Locally
+mvn spring-boot:run
+
+# 3. Test Authorized Request (With valid X-API-KEY header)
+$headers = @{
+    "Content-Type" = "application/json"
+    "X-API-KEY" = "vibe-cloud-secret-key-2026"
+}
+
+$body = @{
+    recipient = "hithesh@studenthub.edu"
+    subject = "Academic Registration Alert"
+    messageBody = "Your registration for Distributed Systems has been approved."
+    priority = "HIGH"
+    channel = "EMAIL"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8086/api/v1/notifications" -Method Post -Headers $headers -Body $body
+
+# 4. Test Unauthorized Request (Missing or invalid X-API-KEY)
+# Observe: Returns HTTP 401 Unauthorized
+Invoke-RestMethod -Uri "http://localhost:8086/api/v1/notifications" -Method Get
+
+# 5. Test Querying Notifications with Priority Filter
+Invoke-RestMethod -Uri "http://localhost:8086/api/v1/notifications?priority=HIGH" -Method Get -Headers $headers
+
+# 6. Test Kubernetes Health Probe
+Invoke-RestMethod -Uri "http://localhost:8086/actuator/health" -Method Get

@@ -43,6 +43,9 @@
 
         <ul class="main-nav-links">
             <li><a th:href="@{/admin/events}">Manage Events</a></li>
+            <li><a th:href="@{/admin/analytics}">📊 Visual Analytics</a></li>
+            <li><a th:href="@{/admin/notifications}">✉️ Outbox</a></li>
+            <li><a th:href="@{/admin/scanner}" style="color: #fde047; font-weight: 700;">★ QR Door Scanner</a></li>
             <li><a th:href="@{/admin/events/add}" class="active">+ Add New Event</a></li>
             <li><a th:href="@{/}">View Public Site</a></li>
             <li>
@@ -111,7 +114,16 @@
                     <div class="grid grid-2">
                         <div class="form-group">
                             <label for="department">Host Department / Faculty *</label>
-                            <select id="department" th:field="*{department}" required>
+                            <!-- Locked view for Department Coordinators -->
+                            <div th:if="${isCoordinator}">
+                                <input type="text" class="form-control" th:value="${lockedDepartment}" readonly style="background: #f1f5f9; cursor: not-allowed; font-weight: 600; color: var(--navy); border: 1px solid #cbd5e1; padding: 10px 12px; border-radius: 6px; width: 100%;" />
+                                <input type="hidden" th:field="*{department}" th:value="${lockedDepartment}" />
+                                <small class="text-muted" style="display: block; margin-top: 4px; font-size: 0.8rem; color: #64748b;">
+                                    🔒 Faculty allocation locked to <strong th:text="${lockedDepartment}"></strong> by collegiate policy.
+                                </small>
+                            </div>
+                            <!-- Unrestricted selection for Super Admin -->
+                            <select id="department" th:field="*{department}" required th:unless="${isCoordinator}">
                                 <option value="">Select organizing faculty</option>
                                 <option value="Computer Science and Engineering">Computer Science and Engineering</option>
                                 <option value="Information Technology">Information Technology</option>
@@ -140,6 +152,25 @@
                                 <option value="Other">Other Academic Activity</option>
                             </select>
                             <div th:if="${#fields.hasErrors('type')}" th:errors="*{type}" class="error"></div>
+                        </div>
+                    </div>
+
+                    <!-- Registration Mode & Team Configuration -->
+                    <div class="grid grid-3" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="registrationType" style="font-weight: 600;">Enrollment Mode *</label>
+                            <select id="registrationType" th:field="*{registrationType}">
+                                <option value="INDIVIDUAL">Individual Student Enrollment</option>
+                                <option value="TEAM">Team Delegation (2–4 Members)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="minTeamSize" style="font-weight: 600;">Min Team Size</label>
+                            <input type="number" id="minTeamSize" th:field="*{minTeamSize}" min="1" max="10" value="2">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="maxTeamSize" style="font-weight: 600;">Max Team Size</label>
+                            <input type="number" id="maxTeamSize" th:field="*{maxTeamSize}" min="2" max="10" value="4">
                         </div>
                     </div>
 
@@ -189,6 +220,60 @@
                                 min="1"
                                 required>
                             <div th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}" class="error"></div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing & Admission Fee -->
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label for="price">Admission Fee (₹ INR)</label>
+                            <input
+                                type="number"
+                                step="1"
+                                min="0"
+                                id="price"
+                                th:field="*{price}"
+                                placeholder="0 (Leave 0 for Free admission)">
+                            <small class="text-muted">Enter 0 for free student admission, or set an amount for paid workshops.</small>
+                        </div>
+
+                        <div class="form-group" style="display: flex; flex-direction: column; justify-content: center;">
+                            <label style="cursor: pointer; display: flex; align-items: center; gap: 10px; margin-top: 20px;">
+                                <input type="checkbox" id="isPaid" th:field="*{isPaid}" style="width: 18px; height: 18px;">
+                                <span style="font-weight: 700; color: var(--navy);">Enable Paid Event Gateway</span>
+                            </label>
+                            <small class="text-muted">Enabling this requires students to clear the campus payment gateway.</small>
+                        </div>
+                    </div>
+
+                    <!-- Speaker & Guest Lecturer Profile (Enterprise Feature) -->
+                    <div style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed #cbd5e1;">
+                        <h3 style="font-size: 1.05rem; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            🎙️ Keynote Speaker / Distinguished Guest Lecturer (Optional)
+                        </h3>
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label for="speakerName">Speaker Full Name</label>
+                                <input type="text" id="speakerName" th:field="*{speakerName}" placeholder="e.g. Dr. Jane Doe / Prof. Alan Smith">
+                            </div>
+                            <div class="form-group">
+                                <label for="speakerTitle">Speaker Title / Academic Role</label>
+                                <input type="text" id="speakerTitle" th:field="*{speakerTitle}" placeholder="e.g. Principal AI Research Scientist">
+                            </div>
+                        </div>
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label for="speakerCompany">Affiliated Organization / Institution</label>
+                                <input type="text" id="speakerCompany" th:field="*{speakerCompany}" placeholder="e.g. DeepMind / Stanford University">
+                            </div>
+                            <div class="form-group">
+                                <label for="speakerAvatarUrl">Speaker Photo / Avatar URL</label>
+                                <input type="url" id="speakerAvatarUrl" th:field="*{speakerAvatarUrl}" placeholder="https://... (or leave blank for generated avatar)">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="speakerBio">Speaker Bio / Achievements</label>
+                            <textarea id="speakerBio" th:field="*{speakerBio}" rows="3" placeholder="Brief biography, research focus, industry experience..."></textarea>
                         </div>
                     </div>
 

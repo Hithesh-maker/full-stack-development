@@ -1,0 +1,31 @@
+# ============================================================
+# TASK 17 - RESILIENT INTER-SERVICE COMMUNICATION
+# Run and Verification Guide
+# ============================================================
+
+# Step 1: Start Eureka Server (Task 15)
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 15 - Service Discovery\eureka-server"
+mvn spring-boot:run
+
+# Step 2: Start Product Service (Task 14)
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 14 - Microservices\product-service"
+mvn spring-boot:run
+
+# Step 3: Start Resilient Order Service (Port 8084)
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 17 - Resilient Inter-Service Communication"
+mvn spring-boot:run
+
+# Step 4: Verify Success Scenario (Product Service is UP)
+# Call the resilient order endpoint:
+Invoke-RestMethod -Uri "http://localhost:8084/resilient-orders/101" -Method Get
+# Note: serviceStatus returns "LIVE_INTEGRATED_SERVICE" with live product details.
+
+# Step 5: Verify Fault Tolerance & Fallback Scenario (Product Service is DOWN)
+# Stop the Product Service process (Ctrl+C in terminal 2).
+# Now query the same endpoint again:
+Invoke-RestMethod -Uri "http://localhost:8084/resilient-orders/101" -Method Get
+# Observe: Instead of returning HTTP 500 Internal Server Error, the service returns HTTP 200 OK
+# with serviceStatus: "DEGRADED_SERVICE_FALLBACK" and clear fallback explanation!
+
+# Step 6: Inspect Circuit Breaker Metrics in Actuator
+Invoke-RestMethod -Uri "http://localhost:8084/actuator/health" -Method Get

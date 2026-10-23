@@ -1,10 +1,12 @@
 package com.campus.smartcampus.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -44,7 +46,33 @@ public class Event {
     private String type;
 
     @NotNull(message = "Capacity is required")
+    @Min(value = 1, message = "Capacity must be at least 1")
     private Integer capacity;
+
+    @Min(value = 0, message = "Price cannot be negative")
+    private Double price = 0.0;
+
+    private Boolean isPaid = false;
+
+    @Column(name = "registration_type", length = 32)
+    private String registrationType = "INDIVIDUAL";
+
+    @Column(name = "min_team_size")
+    private Integer minTeamSize = 2;
+
+    @Column(name = "max_team_size")
+    private Integer maxTeamSize = 4;
+
+    private String speakerName;
+
+    private String speakerTitle;
+
+    private String speakerCompany;
+
+    @Column(length = 1000)
+    private String speakerBio;
+
+    private String speakerAvatarUrl;
 
     @jakarta.persistence.Transient
     private Integer availableSeats;
@@ -178,11 +206,132 @@ public class Event {
         this.reviewCount = reviewCount;
     }
 
+    public Double getPrice() {
+        return price != null ? price : 0.0;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+        this.isPaid = price != null && price > 0.0;
+    }
+
+    public Boolean getIsPaid() {
+        return isPaid != null ? isPaid : false;
+    }
+
+    public void setIsPaid(Boolean isPaid) {
+        this.isPaid = isPaid;
+    }
+
+    public boolean isPaid() {
+        return Boolean.TRUE.equals(this.isPaid) && this.price != null && this.price > 0.0;
+    }
+
+    @jakarta.persistence.Transient
+    public String getFormattedPrice() {
+        if (!isPaid()) {
+            return "Free";
+        }
+        return String.format("₹%.2f", price);
+    }
+
+    @jakarta.persistence.Transient
+    public String getBuildingBlock() {
+        if (venue == null || venue.isBlank()) {
+            return "Main University Campus";
+        }
+        String lower = venue.toLowerCase();
+        if (lower.contains("auditorium")) {
+            return "Sir M. Visvesvaraya Hall (Main Academic Block, Floor 1)";
+        } else if (lower.contains("lab") || lower.contains("tech")) {
+            return "Ramanujan Computing Complex (Lab Wing, Floor 2)";
+        } else if (lower.contains("seminar") || lower.contains("hall")) {
+            return "Dr. APJ Abdul Kalam Seminar Hall (Block B, Floor 1)";
+        } else if (lower.contains("ground") || lower.contains("open") || lower.contains("stadium")) {
+            return "University Central Grounds & Sports Pavilion";
+        } else if (lower.contains("library")) {
+            return "Rabindranath Tagore Central Library (Reading Hall A)";
+        }
+        return venue + " (University Campus Zone)";
+    }
+
     @jakarta.persistence.Transient
     public String getStarsDisplay() {
         if (averageRating == null || averageRating < 0.5) return "☆☆☆☆☆";
         int fullStars = (int) Math.round(averageRating);
         fullStars = Math.min(5, Math.max(1, fullStars));
         return "★".repeat(fullStars) + "☆".repeat(5 - fullStars);
+    }
+
+    public boolean hasSpeaker() {
+        return speakerName != null && !speakerName.isBlank();
+    }
+
+    public String getSpeakerName() {
+        return speakerName;
+    }
+
+    public void setSpeakerName(String speakerName) {
+        this.speakerName = speakerName;
+    }
+
+    public String getSpeakerTitle() {
+        return speakerTitle;
+    }
+
+    public void setSpeakerTitle(String speakerTitle) {
+        this.speakerTitle = speakerTitle;
+    }
+
+    public String getSpeakerCompany() {
+        return speakerCompany;
+    }
+
+    public void setSpeakerCompany(String speakerCompany) {
+        this.speakerCompany = speakerCompany;
+    }
+
+    public String getSpeakerBio() {
+        return speakerBio;
+    }
+
+    public void setSpeakerBio(String speakerBio) {
+        this.speakerBio = speakerBio;
+    }
+
+    public String getSpeakerAvatarUrl() {
+        return speakerAvatarUrl;
+    }
+
+    public void setSpeakerAvatarUrl(String speakerAvatarUrl) {
+        this.speakerAvatarUrl = speakerAvatarUrl;
+    }
+
+    public String getRegistrationType() {
+        return registrationType != null ? registrationType : "INDIVIDUAL";
+    }
+
+    public void setRegistrationType(String registrationType) {
+        this.registrationType = registrationType;
+    }
+
+    public Integer getMinTeamSize() {
+        return minTeamSize != null ? minTeamSize : 2;
+    }
+
+    public void setMinTeamSize(Integer minTeamSize) {
+        this.minTeamSize = minTeamSize;
+    }
+
+    public Integer getMaxTeamSize() {
+        return maxTeamSize != null ? maxTeamSize : 4;
+    }
+
+    public void setMaxTeamSize(Integer maxTeamSize) {
+        this.maxTeamSize = maxTeamSize;
+    }
+
+    public boolean isTeamEvent() {
+        return "TEAM".equalsIgnoreCase(this.registrationType) || "Hackathon".equalsIgnoreCase(this.type);
     }
 }

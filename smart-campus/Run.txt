@@ -1,22 +1,36 @@
+# 1. Navigate to the project folder
 cd "C:\Games\Project\Full Stack Development\full-stack-development\smart-campus"
 
+# 2. Set Java 23 Environment Variables (if not already globally configured)
 $env:JAVA_HOME="C:\Program Files\Java\jdk-23"
 $env:Path="$env:JAVA_HOME\bin;$env:Path"
 
-# Run tests
-mvn test
-
-# Run application
+# 3. Start the Spring Boot application
 mvn spring-boot:run
 
-# URLs
-# Public Portal:        http://localhost:8080/
-# Events Directory:     http://localhost:8080/events  (Filters: date, department, type, keyword)
-# Student Feedback UI:  http://localhost:8080/events/1/feedback
-# My Tickets & Passes:  http://localhost:8080/my-registrations
-# Admin Login:          http://localhost:8080/login  (User: admin / Password: admin123)
-# Admin Dashboard:      http://localhost:8080/admin/events
-# Admin Reviews View:   http://localhost:8080/admin/events/1/feedback
-# REST API Events:      http://localhost:8080/api/events  (Search: /api/events/search?date=&department=&type=)
-# REST API Feedback:    http://localhost:8080/api/feedback/event/{id}/stats
-# REST API Tickets:     http://localhost:8080/api/registrations
+# URLs & Demonstration Guide
+# 1. Public Portal & Home:           http://localhost:8080/
+# 2. Events Directory & Filters:     http://localhost:8080/events  (Search by title, dept, category, date)
+# 3. Live Event Details & Q&A:       http://localhost:8080/events/1 (Keynote speaker profile + live voting Q&A)
+# 4. Student Registration:           http://localhost:8080/events/1/register
+# 5. Student Passes / Lookup:        http://localhost:8080/my-registrations
+# 6. Printable Conference Badge:     http://localhost:8080/registrations/1/badge
+# 7. Admission Pass PDF:             http://localhost:8080/registrations/1/pdf
+# 8. Student Feedback & Reviews:     http://localhost:8080/events/1/feedback
+#
+# Administrative Portal:
+# Login URL:                         http://localhost:8080/login
+# - Super Admin Credentials:         admin / admin123
+# - Coordinator Credentials:         coordinator / coord123
+#
+# 9. Admin Events Management:        http://localhost:8080/admin/events
+# 10. Visual Analytics Dashboard:    http://localhost:8080/admin/analytics (Chart.js turnout & department charts)
+# 11. Door Gatekeeper QR Scanner:    http://localhost:8080/admin/scanner (PWA installable + camera & image scan)
+# 12. Transactional Email Outbox:    http://localhost:8080/admin/notifications (Live modal preview)
+# 13. Event Attendee Roster & CSV:   http://localhost:8080/admin/events/1/registrations (CSV export & bulk upload)
+# 14. Event Feedback Management:     http://localhost:8080/admin/events/1/feedback
+#
+# REST API Endpoints:
+# - Events Catalog API:              http://localhost:8080/api/events
+# - Interactive Q&A REST API:        http://localhost:8080/api/events/1/questions
+# - Feedback & Sentiment API:        http://localhost:8080/api/feedback/event/1/stats

@@ -1,61 +1,50 @@
-# Task 07 — Interactive Web Form with Events & Functions
+# Task 7: Interactive Web Form with Events & Functions
 
-## Project Overview
-
-StudentHub Task 07 demonstrates an interactive customer feedback form using HTML5, CSS3, and JavaScript.
-
-The project focuses on JavaScript Events and reusable Functions to create a responsive and interactive web form.
-
-The form validates user input while typing, highlights fields when the mouse moves over them, and displays a confirmation message when the submit button is double-clicked.
+## Overview
+An interactive front-end web application demonstrating dynamic DOM manipulation, real-time event-driven programming, and modular JavaScript functions. Features client-side input masking, reactive validation on `input`, `blur`, and `change` events, and accessible UI feedback.
 
 ---
 
-## Objective
+## Technical Specifications
 
-The main objectives of this task are:
-
-- Build an interactive feedback form
-- Validate form inputs using JavaScript
-- Validate inputs while the user types
-- Use mouse hover events to highlight form fields
-- Use double-click events for form submission confirmation
-- Create reusable JavaScript validation functions
-- Display real-time validation messages
-- Provide a user-friendly feedback experience
+- **HTML5**: Semantic form elements (`<fieldset>`, `<legend>`, `<input>`, `<select>`, `<button>`).
+- **CSS3**: Mobile-first responsive styling, micro-interactions, CSS custom properties (variables), accessible focus rings.
+- **JavaScript**:
+  - Event Listeners: `addEventListener('input')`, `addEventListener('change')`, `addEventListener('submit')`.
+  - Regular Expressions for complex pattern matching (Postal codes, phone numbers, email validation).
+  - Dynamic DOM updates: live character counters, dynamic fee calculation, dependent dropdown options.
 
 ---
 
-## Technologies Used
+## Key Features
 
-- HTML5
-- CSS3
-- JavaScript
-- JavaScript Events
-- JavaScript Functions
-- DOM Manipulation
-
----
-
-## Form Features
-
-### 1. Full Name Validation
-
-The name field validates the user's input while typing.
-
-The validation checks whether:
-
-- The field is not empty
-- The name contains a valid number of characters
+1. **Reactive Event Listeners**:
+   - `input`: Instant character counter and password strength estimator.
+   - `blur`: Validation trigger highlighting missing or invalid fields.
+   - `change`: Dynamically repopulates dependent course/subject choices based on selected major.
+2. **Form Reset & State Preservation**:
+   - Programmatic form resetting with confirmation modal and feedback toast.
+3. **Async Submission Simulation**:
+   - Simulates AJAX submission with loading spinner, disabled submit buttons to prevent double submission, and animated success confirmation.
 
 ---
 
-### 2. Email Validation
-
-The email field validates the entered email address.
-
-The validation checks whether the email follows a valid format.
-
-Example:
+## Project Structure
 
 ```text
-student@example.com
+Task 7 - Interactive Web Form with Events & Functions/
+├── index.html       # Interactive form interface
+├── style.css        # Modern, responsive UI with state transitions
+├── script.js        # Event handlers, validators, and dynamic calculators
+└── README.md        # Comprehensive task documentation
+```
+
+---
+
+## Execution Guide
+
+1. Open `Task 7 - Interactive Web Form with Events & Functions/index.html` directly in any modern browser.
+2. Test interactive behaviors:
+   - Type in the password field to see real-time strength indicators.
+   - Change the department dropdown to observe dynamic updates in dependent course lists.
+   - Submit invalid data to see immediate feedback tooltips.

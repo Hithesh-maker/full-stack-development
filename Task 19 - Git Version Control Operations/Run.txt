@@ -1,0 +1,23 @@
+# ============================================================
+# TASK 19 - GIT VERSION CONTROL OPERATIONS
+# Run and Demonstration Guide
+# ============================================================
+
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 19 - Git Version Control Operations"
+
+# Option 1: Run Automated Simulation Script
+powershell -ExecutionPolicy Bypass -File .\demonstrate_git_basics.ps1
+
+# Option 2: Run Step-by-Step Manual Commands
+# 1. Initialize
+mkdir my-demo-repo
+cd my-demo-repo
+git init
+
+# 2. Stage and Commit
+echo "Hello Git" > README.md
+git add README.md
+git commit -m "chore: initial commit"
+
+# 3. Log History
+git log --oneline --graph --decorate

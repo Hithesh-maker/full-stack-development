@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Portal Notice | Smart Campus University</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<!-- TOP UTILITY BAR -->
+<div class="top-utility-bar">
+    <div class="container">
+        <ul class="utility-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/events}">Events</a></li>
+            <li><a th:href="@{/my-registrations}">Student Passes</a></li>
+            <li><a th:href="@{/login}">Admin Portal</a></li>
+        </ul>
+        <div class="utility-quick">
+            <span>Academic Year 2026–2027</span>
+            <span>•</span>
+            <span>Support: +91 80 2345 6789</span>
+        </div>
+    </div>
+</div>
+
+<!-- BRAND HEADER BAR -->
+<header class="main-header-bar">
+    <div class="container">
+        <a th:href="@{/}" class="brand-container">
+            <div class="brand-logo-badge">EDU</div>
+            <div class="brand-text-block">
+                <h1>Smart Campus</h1>
+                <span>University Event Portal</span>
+            </div>
+        </a>
+    </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="container" style="padding: 60px 20px; max-width: 800px; min-height: 55vh; display: flex; align-items: center; justify-content: center;">
+    <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.06); padding: 48px; text-align: center; width: 100%;">
+        <h1 style="color: var(--navy); font-size: 2.2rem; font-weight: 800; margin-bottom: 12px;"
+            th:text="${status != null} ? 'Notice (' + ${status} + ')' : 'Portal Notice'">
+            Portal Notice
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.6; max-width: 580px; margin: 0 auto 24px;"
+           th:text="${message != null && !message.isEmpty()} ? ${message} : 'An error or unexpected condition occurred.'">
+            An error occurred while processing your request.
+        </p>
+
+        <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+            <a th:href="@{/}" class="btn btn-primary" style="padding: 12px 24px; font-weight: 600;">
+                Return to Campus Home
+            </a>
+            <a th:href="@{/events}" class="btn btn-secondary" style="padding: 12px 24px; font-weight: 600;">
+                View Events
+            </a>
+        </div>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-bottom" style="border: none; padding-top: 0;">
+            <span>© 2026 Smart Campus University. All rights reserved.</span>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

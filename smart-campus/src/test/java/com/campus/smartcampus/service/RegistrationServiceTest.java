@@ -139,4 +139,129 @@ class RegistrationServiceTest {
         assertTrue(csv.contains("johndoe@campus.edu"));
         assertTrue(csv.contains("Hackathon 2026"));
     }
+
+    @Test
+    void testCheckInStudent_Success() {
+        registration.setId(101L);
+        registration.setToken("SC-E1-TESTTOKEN");
+        registration.setStatus("CONFIRMED");
+
+        when(registrationRepository.findByToken("SC-E1-TESTTOKEN")).thenReturn(Optional.of(registration));
+        when(registrationRepository.save(any(Registration.class))).thenAnswer(i -> i.getArgument(0));
+
+        Registration checkedIn = registrationService.checkInStudent("SC-E1-TESTTOKEN");
+
+        assertNotNull(checkedIn);
+        assertEquals("CHECKED_IN", checkedIn.getStatus());
+        assertNotNull(checkedIn.getCheckedInAt());
+        verify(registrationRepository, times(1)).save(checkedIn);
+    }
+
+    @Test
+    void testCheckInStudent_AlreadyCheckedIn_ThrowsException() {
+        registration.setId(101L);
+        registration.setToken("SC-E1-TESTTOKEN");
+        registration.setStatus("CHECKED_IN");
+        registration.setCheckedInAt(java.time.LocalDateTime.now());
+
+        when(registrationRepository.findByToken("SC-E1-TESTTOKEN")).thenReturn(Optional.of(registration));
+
+        Exception ex = assertThrows(RuntimeException.class, () -> registrationService.checkInStudent("SC-E1-TESTTOKEN"));
+        assertTrue(ex.getMessage().contains("Duplicate Entry"));
+    }
+
+    @Test
+    void testCancelRegistration_PromotesWaitlistCandidate() {
+        registration.setId(101L);
+        registration.setEventId(1L);
+        registration.setStatus("CONFIRMED");
+
+        Registration waitlisted = new Registration();
+        waitlisted.setId(202L);
+        waitlisted.setEventId(1L);
+        waitlisted.setStatus("WAITLISTED");
+        waitlisted.setWaitlistPosition(1);
+
+        when(registrationRepository.findById(101L)).thenReturn(Optional.of(registration));
+        when(registrationRepository.save(any(Registration.class))).thenAnswer(i -> i.getArgument(0));
+        when(registrationRepository.findFirstByEventIdAndStatusOrderByIdAsc(1L, "WAITLISTED"))
+                .thenReturn(Optional.of(waitlisted));
+
+        registrationService.cancelRegistration(101L, "johndoe@campus.edu");
+
+        assertEquals("CANCELLED", registration.getStatus());
+        assertEquals("CONFIRMED", waitlisted.getStatus());
+        assertNull(waitlisted.getWaitlistPosition());
+        assertNotNull(waitlisted.getToken());
+    }
+
+    @Test
+    void testJoinWaitlist_Success() {
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(upcomingEvent));
+        when(registrationRepository.existsActiveRegistration(1L, "johndoe@campus.edu")).thenReturn(false);
+        when(registrationRepository.countByEventIdAndStatus(1L, "WAITLISTED")).thenReturn(2L);
+        when(registrationRepository.save(any(Registration.class))).thenAnswer(i -> i.getArgument(0));
+
+        Registration result = registrationService.joinWaitlist(registration);
+
+        assertNotNull(result);
+        assertEquals("WAITLISTED", result.getStatus());
+        assertEquals(3, result.getWaitlistPosition());
+        assertEquals(1, result.getTickets());
+    }
+
+    @Test
+    void testGetCheckedInHistory_All() {
+        Registration r1 = new Registration();
+        r1.setId(10L);
+        r1.setStatus("CHECKED_IN");
+        r1.setCheckedInAt(java.time.LocalDateTime.now());
+
+        when(registrationRepository.findByStatusOrderByCheckedInAtDesc("CHECKED_IN"))
+                .thenReturn(java.util.List.of(r1));
+
+        var history = registrationService.getCheckedInHistory(null);
+
+        assertEquals(1, history.size());
+        assertEquals("CHECKED_IN", history.get(0).getStatus());
+        verify(registrationRepository, times(1)).findByStatusOrderByCheckedInAtDesc("CHECKED_IN");
+    }
+
+    @Test
+    void testGetCheckedInHistory_ByEvent() {
+        Registration r1 = new Registration();
+        r1.setId(11L);
+        r1.setEventId(1L);
+        r1.setStatus("CHECKED_IN");
+        r1.setCheckedInAt(java.time.LocalDateTime.now());
+
+        when(registrationRepository.findByEventIdAndStatusOrderByCheckedInAtDesc(1L, "CHECKED_IN"))
+                .thenReturn(java.util.List.of(r1));
+
+        var history = registrationService.getCheckedInHistory(1L);
+
+        assertEquals(1, history.size());
+        assertEquals(1L, history.get(0).getEventId());
+        verify(registrationRepository, times(1)).findByEventIdAndStatusOrderByCheckedInAtDesc(1L, "CHECKED_IN");
+    }
+
+    @Test
+    void testBulkRegisterFromCsv() {
+        String csvContent = "Name,Email,Department\n" +
+                "Kunal Sen,kunal.s@campus.edu,Computer Science\n" +
+                "Priya Nair,priya.n@campus.edu,Information Technology\n";
+        java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(csvContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(upcomingEvent));
+        when(registrationRepository.existsActiveRegistration(1L, "kunal.s@campus.edu")).thenReturn(false);
+        when(registrationRepository.existsActiveRegistration(1L, "priya.n@campus.edu")).thenReturn(false);
+        when(registrationRepository.save(any(Registration.class))).thenAnswer(i -> i.getArgument(0));
+
+        RegistrationService.BulkUploadResult result = registrationService.bulkRegisterFromCsv(1L, in);
+
+        assertNotNull(result);
+        assertEquals(2, result.getSuccessCount());
+        assertEquals(0, result.getDuplicateCount());
+        assertEquals(0, result.getErrorCount());
+    }
 }

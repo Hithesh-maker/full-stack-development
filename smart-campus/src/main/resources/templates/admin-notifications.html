@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Notification Center | Smart Campus Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-card {
+            background: #ffffff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 680px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            border: 1px solid #cbd5e1;
+            overflow: hidden;
+            animation: modalFadeIn 0.2s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-header {
+            background: #0f172a;
+            color: #ffffff;
+            padding: 16px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+            background: #f8fafc;
+        }
+        .email-meta-strip {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+        .email-preview-container {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- TOP UTILITY BAR -->
+<div class="top-utility-bar">
+    <div class="container">
+        <ul class="utility-links">
+            <li><a th:href="@{/admin/events}">Administration Hub</a></li>
+            <li><a th:href="@{/}">Public Portal</a></li>
+            <li><a th:href="@{/events}">Directory</a></li>
+        </ul>
+        <div class="utility-quick">
+            <span>Logged in as: <strong>Administrator</strong></span>
+            <span>•</span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: inherit; font-weight: 600; padding: 0;">
+                    Sign Out
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- BRAND HEADER BAR -->
+<header class="main-header-bar">
+    <div class="container">
+        <a th:href="@{/admin/events}" class="brand-container">
+            <div class="brand-logo-badge">EDU</div>
+            <div class="brand-text-block">
+                <h1>Smart Campus</h1>
+                <span>Administrator Dashboard</span>
+            </div>
+        </a>
+
+        <ul class="main-nav-links">
+            <li><a th:href="@{/admin/events}">Manage Events</a></li>
+            <li><a th:href="@{/admin/analytics}">📊 Visual Analytics</a></li>
+            <li><a th:href="@{/admin/notifications}" class="active">✉️ Outbox</a></li>
+            <li><a th:href="@{/admin/scanner}" style="color: #fde047; font-weight: 700;">★ QR Door Scanner</a></li>
+            <li><a th:href="@{/admin/events/add}">+ Add New Event</a></li>
+            <li><a th:href="@{/}">View Public Site</a></li>
+            <li>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--danger); border-color: #fecaca;">
+                        Sign Out
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</header>
+
+<main style="padding: 40px 0 80px 0;">
+    <div class="container">
+
+        <!-- Header Row -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <span class="meta-tag" style="background: #fef3c7; color: #92400e; margin-bottom: 6px;">Transactional Outbox</span>
+                <h2 style="margin: 0; color: #0f172a; font-size: 1.85rem;">Email Notification Center</h2>
+                <p style="color: #64748b; margin: 4px 0 0 0; font-size: 0.95rem;">
+                    Simulated high-deliverability transactional email audit log for passes, waitlist promotions, and door welcomes.
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="notifSearch" placeholder="🔍 Search email or subject..." onkeyup="filterNotifications()"
+                       style="padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.88rem; width: 240px;">
+                <a th:href="@{/admin/events}" class="btn btn-secondary btn-sm">← Back to Event Hub</a>
+            </div>
+        </div>
+
+        <!-- Channel Filter Tabs -->
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; flex-wrap: wrap;">
+            <a th:href="@{/admin/notifications(channel='ALL')}"
+               class="btn btn-sm"
+               th:style="${activeChannel == 'ALL' ? 'background: #0f172a; color: #ffffff;' : 'background: #ffffff; color: #475569; border: 1px solid #cbd5e1;'}">
+                🌐 All Outbox (<span th:text="${totalCount}">0</span>)
+            </a>
+            <a th:href="@{/admin/notifications(channel='EMAIL')}"
+               class="btn btn-sm"
+               th:style="${activeChannel == 'EMAIL' ? 'background: #1e40af; color: #ffffff;' : 'background: #ffffff; color: #475569; border: 1px solid #cbd5e1;'}">
+                📧 Email (<span th:text="${emailCount}">0</span>)
+            </a>
+            <a th:href="@{/admin/notifications(channel='WHATSAPP')}"
+               class="btn btn-sm"
+               th:style="${activeChannel == 'WHATSAPP' ? 'background: #166534; color: #ffffff;' : 'background: #ffffff; color: #475569; border: 1px solid #cbd5e1;'}">
+                💬 WhatsApp (<span th:text="${whatsappCount}">0</span>)
+            </a>
+            <a th:href="@{/admin/notifications(channel='SMS')}"
+               class="btn btn-sm"
+               th:style="${activeChannel == 'SMS' ? 'background: #854d0e; color: #ffffff;' : 'background: #ffffff; color: #475569; border: 1px solid #cbd5e1;'}">
+                📱 SMS (<span th:text="${smsCount}">0</span>)
+            </a>
+        </div>
+
+        <!-- Notification Table -->
+        <div class="table-container">
+            <table id="notificationsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">Log ID</th>
+                        <th style="width: 110px;">Channel</th>
+                        <th>Type / Trigger</th>
+                        <th>Recipient</th>
+                        <th>Subject Line</th>
+                        <th>Dispatched At</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(notifications)}">
+                        <td colspan="8" style="text-align: center; color: #64748b; padding: 40px;">
+                            No notifications match the selected channel filter.
+                        </td>
+                    </tr>
+                    <tr th:each="n : ${notifications}">
+                        <td style="font-family: monospace; font-size: 0.85rem; color: #64748b;" th:text="'#' + ${n.id}">#1</td>
+                        <td>
+                            <span th:if="${n.channel == 'WHATSAPP'}" class="badge" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">💬 WhatsApp</span>
+                            <span th:if="${n.channel == 'SMS'}" class="badge" style="background: #fefce8; color: #854d0e; border: 1px solid #fef08a;">📱 SMS</span>
+                            <span th:if="${n.channel == 'EMAIL' or n.channel == null}" class="badge" style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;">📧 Email</span>
+                        </td>
+                        <td>
+                            <span th:if="${n.eventType == 'CONFIRMATION'}" class="badge badge-success">BOOKING PASS</span>
+                            <span th:if="${n.eventType == 'WAITLIST_PROMOTION'}" class="badge badge-warning">WAITLIST PROMOTED</span>
+                            <span th:if="${n.eventType == 'CHECK_IN_WELCOME'}" class="badge badge-info" style="background: #e0e7ff; color: #3730a3;">GATE CHECK-IN</span>
+                            <span th:if="${n.eventType == 'CERTIFICATE'}" class="badge" style="background: #fdf4ff; color: #86198f;">CERTIFICATE</span>
+                            <span th:if="${n.eventType != 'CONFIRMATION' and n.eventType != 'WAITLIST_PROMOTION' and n.eventType != 'CHECK_IN_WELCOME' and n.eventType != 'CERTIFICATE'}"
+                                  class="badge badge-secondary" th:text="${n.eventType}">OTHER</span>
+                        </td>
+                        <td>
+                            <div><strong th:text="${n.studentName}">Student Name</strong></div>
+                            <div style="font-size: 0.8rem; color: #64748b;" th:text="${n.recipientEmail}">student@campus.edu</div>
+                        </td>
+                        <td>
+                            <span th:text="${n.subject}" style="color: #0f172a; font-weight: 500;">Subject Line</span>
+                        </td>
+                        <td>
+                            <span class="meta-tag" th:text="${#temporals.format(n.sentAt, 'MMM dd, yyyy HH:mm')}">Date Time</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-success" th:text="${n.status}">SENT</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn btn-secondary btn-sm" th:onclick="'previewEmail(' + ${n.id} + ')'" style="font-size: 0.8rem;">
+                                👁️ View Email
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</main>
+
+<!-- EMAIL PREVIEW MODAL -->
+<div id="emailModal" class="modal-overlay" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>✉️ Transactional Email Preview</h3>
+            <button onclick="closeEmailModal()" style="background: none; border: none; color: #ffffff; font-size: 1.4rem; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="email-meta-strip">
+                <div><strong>From:</strong> Smart Campus Events &lt;noreply@campus.edu&gt;</div>
+                <div><strong>To:</strong> <span id="modalRecipient">student@campus.edu</span></div>
+                <div><strong>Subject:</strong> <span id="modalSubject" style="font-weight: 600; color: #0f172a;">Subject</span></div>
+                <div><strong>Date Sent:</strong> <span id="modalDate" style="color: #64748b;">Timestamp</span></div>
+            </div>
+            <div class="email-preview-container">
+                <iframe id="emailFrame" style="width: 100%; height: 380px; border: none; background: #ffffff;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- UNIVERSITY BRAND FOOTER -->
+<footer class="university-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="footer-seal-block">
+                    <div class="footer-seal-emblem">EDU</div>
+                    <div>
+                        <div class="footer-seal-title">Smart Campus University</div>
+                        <div class="footer-seal-subtitle">Office of Academic & Campus Events</div>
+                    </div>
+                </div>
+                <p class="footer-desc">
+                    Official automated student communication and transactional pass dispatch system.
+                </p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Navigation</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/admin/events}">Event Administration</a></li>
+                    <li><a th:href="@{/admin/analytics}">Visual Analytics</a></li>
+                    <li><a th:href="@{/admin/notifications}">Email Outbox</a></li>
+                    <li><a th:href="@{/admin/scanner}">QR Gatekeeper Scanner</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 Smart Campus University. Official Administrative System.</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function filterNotifications() {
+        const query = document.getElementById('notifSearch').value.toLowerCase();
+        const rows = document.querySelectorAll('#notificationsTable tbody tr');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+    }
+
+    async function previewEmail(id) {
+        try {
+            const resp = await fetch('/api/admin/notifications/' + id);
+            if (!resp.ok) throw new Error('Could not load email notification');
+            const data = await resp.json();
+
+            document.getElementById('modalRecipient').innerText = data.studentName + ' <' + data.recipientEmail + '>';
+            document.getElementById('modalSubject').innerText = data.subject;
+            document.getElementById('modalDate').innerText = data.sentAt;
+
+            const frame = document.getElementById('emailFrame');
+            const doc = frame.contentWindow.document;
+            doc.open();
+            doc.write(data.bodyHtml);
+            doc.close();
+
+            document.getElementById('emailModal').style.display = 'flex';
+        } catch (e) {
+            alert('Failed to preview email: ' + e.message);
+        }
+    }
+
+    function closeEmailModal() {
+        document.getElementById('emailModal').style.display = 'none';
+    }
+
+    function closeModalOnBackdrop(e) {
+        if (e.target.id === 'emailModal') {
+            closeEmailModal();
+        }
+    }
+</script>
+
+</body>
+</html>

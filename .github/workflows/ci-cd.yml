@@ -1,0 +1,130 @@
+name: Full Stack Continuous Integration & Continuous Deployment (CI/CD)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  # ========================================================
+  # JOB 1: Node.js & Web Backend Testing
+  # ========================================================
+  test-node-backend:
+    name: Node.js Backend CI (Tasks 1-7)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Syntax & Lint Validation
+        run: node -c server.js db.js
+
+  # ========================================================
+  # JOB 2: Java Spring Boot Microservices Build & Test
+  # ========================================================
+  test-spring-microservices:
+    name: Spring Boot Microservices CI (Tasks 14-18)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - 'Task 14 - Microservices/product-service'
+          - 'Task 14 - Microservices/order-service'
+          - 'Task 15 - Service Discovery/eureka-server'
+          - 'Task 16 - API Gateway and Load Balancing'
+          - 'Task 17 - Resilient Inter-Service Communication'
+          - 'Task 18 - Microservices Unit Testing'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 23
+        uses: actions/setup-java@v4
+        with:
+          java-version: '23'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build and Run Automated Tests
+        run: |
+          cd "${{ matrix.service }}"
+          mvn clean test
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports-${{ strategy.job-index }}
+          path: ${{ matrix.service }}/target/surefire-reports/
+          retention-days: 5
+
+  # ========================================================
+  # JOB 3: Package Artifacts (Continuous Delivery)
+  # ========================================================
+  package-and-deliver:
+    name: Package Deployable Artifacts
+    needs: [test-node-backend, test-spring-microservices]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 23
+        uses: actions/setup-java@v4
+        with:
+          java-version: '23'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Package API Gateway & Microservices
+        run: |
+          mvn -f "Task 16 - API Gateway and Load Balancing/pom.xml" clean package -DskipTests
+          mvn -f "Task 17 - Resilient Inter-Service Communication/pom.xml" clean package -DskipTests
+          mvn -f "Task 18 - Microservices Unit Testing/pom.xml" clean package -DskipTests
+
+      - name: Upload Packaged Production JARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: microservices-production-jars
+          path: '**/target/*.jar'
+          retention-days: 14
+
+  # ========================================================
+  # JOB 4: Continuous Deployment (Simulated Cloud Deploy)
+  # ========================================================
+  deploy-staging:
+    name: Deploy to Staging Environment
+    needs: [package-and-deliver]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: staging
+    steps:
+      - name: Download Packaged Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: microservices-production-jars
+
+      - name: Simulate Cloud Container Rollout
+        run: |
+          echo "Simulating zero-downtime rolling deployment to cloud cluster..."
+          echo "Deploying API Gateway :8080..."
+          echo "Deploying Eureka Server :8761..."
+          echo "Deploying Product Service & Order Service..."
+          echo "✓ Continuous Deployment successfully completed to staging."

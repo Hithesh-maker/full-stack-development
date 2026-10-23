@@ -1,0 +1,12 @@
+# ============================================================
+# TASK 23 - VIBE CODING & PROMPT ENGINEERING
+# Run and Evaluation Guide
+# ============================================================
+
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 23 - Vibe Coding and Prompt Engineering"
+
+# 1. Run the Quantitative Benchmark Evaluation
+python evaluate_prompts.py
+
+# 2. Study the Enterprise Laboratory Manual
+# Located at: PROMPT_ENGINEERING_LAB.md

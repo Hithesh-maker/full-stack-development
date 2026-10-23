@@ -1,0 +1,21 @@
+# ============================================================
+# TASK 18 - MICROSERVICES UNIT TESTING
+# Test Execution and Verification Guide
+# ============================================================
+
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 18 - Microservices Unit Testing"
+
+# 1. Execute All Unit and Slice Tests
+mvn clean test
+
+# 2. Run Only Service Layer Unit Tests (Mockito)
+mvn test -Dtest=ProductServiceTest
+
+# 3. Run Only Controller Web Layer Slice Tests (MockMvc)
+mvn test -Dtest=ProductControllerTest
+
+# 4. Run Only Repository Persistence Slice Tests (DataJpaTest + H2)
+mvn test -Dtest=ProductRepositoryTest
+
+# 5. Generate Maven Surefire Test Report
+mvn surefire-report:report

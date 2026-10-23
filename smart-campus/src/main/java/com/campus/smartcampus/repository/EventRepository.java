@@ -49,5 +49,16 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         return searchEvents(keyword, department, type, null);
     }
 
+    // Smart recommendations: related events by same department or type
+    @Query("SELECT e FROM Event e WHERE e.id != :id AND e.date >= :date AND " +
+           "(LOWER(e.department) = LOWER(:department) OR LOWER(e.type) = LOWER(:type)) " +
+           "ORDER BY e.date ASC")
+    List<Event> findRelatedEvents(
+            @Param("id") Long id,
+            @Param("department") String department,
+            @Param("type") String type,
+            @Param("date") LocalDate date
+    );
+
     long countByDateGreaterThanEqual(LocalDate date);
 }

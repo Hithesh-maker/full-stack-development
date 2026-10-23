@@ -1,0 +1,18 @@
+# ============================================================
+# TASK 21 - CI/CD PIPELINE IMPLEMENTATION
+# Run and Verification Guide
+# ============================================================
+
+cd "C:\Games\Project\Full Stack Development\full-stack-development\Task 21 - CI-CD Pipeline Implementation"
+
+# 1. Run Local CI/CD Pipeline Simulator
+powershell -ExecutionPolicy Bypass -File .\test_ci_pipeline.ps1
+
+# 2. View GitHub Actions Workflow Definition
+# Located at: .github/workflows/ci-cd.yml
+
+# 3. View Enterprise Jenkinsfile
+# Located at: Task 21 - CI-CD Pipeline Implementation/Jenkinsfile
+
+# 4. View GitLab CI Definition
+# Located at: Task 21 - CI-CD Pipeline Implementation/.gitlab-ci.yml

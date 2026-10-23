@@ -27,4 +27,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
     // Check if a student already submitted feedback for an event
     boolean existsByEventIdAndEmailIgnoreCase(Long eventId, String email);
+
+    @Query("SELECT f.eventId, COALESCE(AVG(f.rating), 0.0), COUNT(f) FROM Feedback f GROUP BY f.eventId")
+    List<Object[]> getRatingStatsGroupedByEventId();
 }

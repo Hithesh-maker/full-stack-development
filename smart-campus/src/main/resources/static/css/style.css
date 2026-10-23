@@ -1610,6 +1610,369 @@ tbody tr:last-child td {
 }
 
 /* =========================================================
+   COLLEGIATE BADGES, PILLS & STATUS BUBBLES
+   ========================================================= */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 3px 9px;
+    font-size: 0.76rem;
+    font-weight: 750;
+    line-height: 1.25;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    border: 1px solid transparent;
+    vertical-align: middle;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.badge-primary {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    border-color: var(--primary-border);
+}
+
+.badge-navy {
+    background-color: #0f172a;
+    color: #ffffff;
+    border-color: #1e293b;
+}
+
+.badge-success {
+    background-color: #ecfdf5;
+    color: #065f46;
+    border-color: #a7f3d0;
+}
+
+.badge-warning {
+    background-color: #fffbeb;
+    color: #92400e;
+    border-color: #fde68a;
+}
+
+.badge-danger {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+
+.badge-outline {
+    background-color: transparent;
+    color: var(--text-muted);
+    border-color: var(--border-dark);
+}
+
+/* Capacity & Availability Seat Badges (Pill Bubbles) */
+.seats-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    font-size: 0.82rem;
+    font-weight: 750;
+    border-radius: var(--radius-full);
+    line-height: 1.2;
+    border: 1.5px solid transparent;
+    white-space: nowrap;
+}
+
+.seats-badge::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.seats-available {
+    background-color: #ecfdf5;
+    color: #065f46;
+    border-color: #a7f3d0;
+}
+.seats-available::before {
+    background-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+}
+
+.seats-low {
+    background-color: #fff7ed;
+    color: #9a3412;
+    border-color: #fed7aa;
+}
+.seats-low::before {
+    background-color: #f97316;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.25);
+}
+
+.seats-full {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+.seats-full::before {
+    background-color: #ef4444;
+}
+
+.seats-past {
+    background-color: #f1f5f9;
+    color: #475569;
+    border-color: #cbd5e1;
+}
+.seats-past::before {
+    background-color: #94a3b8;
+}
+
+/* Rating Badge Pill */
+.rating-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    font-size: 0.78rem;
+    font-weight: 750;
+    color: #b45309;
+    background-color: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: var(--radius-full);
+    letter-spacing: 0.2px;
+}
+
+/* Feedback Speech Bubble */
+.speech-bubble {
+    position: relative;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 0.92rem;
+    color: #334155;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+.speech-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 24px;
+    border-width: 8px 8px 0;
+    border-style: solid;
+    border-color: #e2e8f0 transparent;
+    display: block;
+    width: 0;
+}
+
+/* Modal Popup Smooth Motion */
+.modal-overlay {
+    animation: modalFadeIn 0.2s ease forwards;
+}
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.modal-window {
+    animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes modalSlideUp {
+    from { opacity: 0; transform: scale(0.96) translateY(12px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Announcement Marquee Pill */
+.marquee-badge {
+    background-color: #0f172a;
+    color: #fde047;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 0.76rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-right: 6px;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Ticket Event Type Badge */
+.ticket-badge {
+    display: inline-block;
+    padding: 3px 9px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    background-color: var(--primary);
+    color: #ffffff;
+    border-radius: var(--radius-sm);
+}
+
+/* Monospace Admission Token Pill */
+.token-pill {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 0.82rem;
+    font-weight: 750;
+    background: #f1f5f9;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+/* Live Door Scanner History Items */
+.scan-history-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    border-left: 4px solid #10b981;
+    transition: all 0.2s ease;
+    animation: scanSlideIn 0.3s ease;
+}
+.scan-history-item:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.08);
+}
+@keyframes scanSlideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.pulse-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: pulseRing 1.8s infinite;
+}
+@keyframes pulseRing {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+/* =========================================================
+   HIGH-SPEED OPTICAL SCANNER RETICLE & VIEWFINDER
+   ========================================================= */
+
+.scanner-viewport-wrapper {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #090d16;
+    border: 2px solid #1e293b;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.scanner-reticle-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    display: none;
+}
+
+.scanner-laser-line {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #10b981 20%, #34d399 50%, #10b981 80%, transparent);
+    box-shadow: 0 0 16px 4px rgba(16, 185, 129, 0.9);
+    animation: laserScanSweep 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes laserScanSweep {
+    0% { top: 10%; opacity: 0.85; }
+    50% { opacity: 1; }
+    100% { top: 90%; opacity: 0.85; }
+}
+
+.corner-bracket {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-color: #10b981;
+    border-style: solid;
+    filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.6));
+}
+
+.corner-tl { top: 16px; left: 16px; border-width: 4px 0 0 4px; border-top-left-radius: 8px; }
+.corner-tr { top: 16px; right: 16px; border-width: 4px 4px 0 0; border-top-right-radius: 8px; }
+.corner-bl { bottom: 16px; left: 16px; border-width: 0 0 4px 4px; border-bottom-left-radius: 8px; }
+.corner-br { bottom: 16px; right: 16px; border-width: 0 4px 4px 0; border-bottom-right-radius: 8px; }
+
+.scanner-controls-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #0f172a;
+    border-radius: 8px;
+    margin-top: 12px;
+    color: #cbd5e1;
+    font-size: 0.82rem;
+    flex-wrap: wrap;
+}
+
+.scanner-controls-strip button,
+.scanner-controls-strip select {
+    font-size: 0.78rem;
+    padding: 5px 10px;
+}
+
+/* =========================================================
+   ENTERPRISE FEATURES: MODALS, LIVE Q&A, AND BADGE STYLES
+   ========================================================= */
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.qa-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.qa-card:hover {
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.qa-upvote-btn {
+    transition: all 0.15s ease;
+}
+
+.qa-upvote-btn:hover {
+    background: #e2e8f0 !important;
+    transform: translateY(-1px);
+}
+
+.qa-upvote-btn:active {
+    transform: translateY(1px);
+}
+
+/* =========================================================
    PRINT STYLES
    ========================================================= */
 
@@ -1620,7 +1983,9 @@ tbody tr:last-child td {
     .dark-announcement-strip,
     .university-footer,
     .btn,
-    .actions {
+    .actions,
+    .scanner-controls-strip,
+    .modal-overlay {
         display: none !important;
     }
     body {

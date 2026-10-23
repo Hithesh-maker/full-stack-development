@@ -1,0 +1,54 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # Route to Product Service instances with client-side load balancing
+        - id: product-service-route
+          uri: lb://product-service
+          predicates:
+            - Path=/products/**
+          filters:
+            - AddResponseHeader=X-Gateway-Route, product-service-loadbalanced
+            - AddResponseHeader=X-Served-By, Spring-Cloud-Gateway
+
+        # Route to Order Service instances with client-side load balancing
+        - id: order-service-route
+          uri: lb://order-service
+          predicates:
+            - Path=/orders/**
+          filters:
+            - AddResponseHeader=X-Gateway-Route, order-service-loadbalanced
+            - AddResponseHeader=X-Served-By, Spring-Cloud-Gateway
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,metrics
+  endpoint:
+    gateway:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG

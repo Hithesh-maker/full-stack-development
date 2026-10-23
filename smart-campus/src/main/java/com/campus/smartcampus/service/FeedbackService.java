@@ -40,6 +40,9 @@ public class FeedbackService {
         }
         if (feedback.getEmail() != null) {
             feedback.setEmail(feedback.getEmail().trim().toLowerCase());
+            if (!feedback.getEmail().isBlank() && hasStudentReviewed(feedback.getEventId(), feedback.getEmail())) {
+                throw new IllegalStateException("You have already submitted feedback for this event.");
+            }
         }
         if (feedback.getComments() != null) {
             feedback.setComments(feedback.getComments().trim());

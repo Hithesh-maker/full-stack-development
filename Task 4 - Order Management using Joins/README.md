@@ -1,131 +1,98 @@
-# Task 4 - Order Management Using Joins
+# Task 4: Order Management using SQL Joins
 
-## 📌 Description
-
-This project implements an Order Management System using a relational database.
-
-The application manages:
-
-- Customers
-- Products
-- Orders
-- Customer order history
-- Highest-value order
-- Most-active customer
-
-The project demonstrates relational database concepts such as:
-
-- JOIN
-- Subqueries
-- ORDER BY
-- GROUP BY
-- Foreign Keys
-- Relational Database Queries
+## Overview
+A comprehensive order management system demonstrating relational database operations across multiple normalized tables (`customers`, `orders`, and `products`). Features complex SQL multi-table joins (INNER JOIN, LEFT JOIN) and aggregate summary metrics.
 
 ---
 
-## 🎯 Objective
+## Relational Schema Diagram
 
-To create a web-based order management dashboard that retrieves and displays customer order information using relational database queries.
-
-The system connects Customers, Orders, and Products using foreign-key relationships.
-
----
-
-## ✨ Features
-
-### Customer Order History
-
-Displays:
-
-- Order ID
-- Customer Name
-- Product Name
-- Product Category
-- Quantity
-- Total Amount
-- Order Date
-
-### Highest Value Order
-
-Finds the order with the highest total amount using a subquery.
-
-### Most Active Customer
-
-Identifies the customer who has placed the highest number of orders.
-
-### Order Sorting
-
-Orders can be sorted by:
-
-- Newest Order
-- Oldest Order
-- Highest Amount
-- Lowest Amount
-- Customer Name
-
-### Dashboard Statistics
-
-The dashboard displays:
-
-- Total Orders
-- Total Customers
-- Highest Value Order
-- Most Active Customer
+```
++--------------------+            +--------------------+            +--------------------+
+|     customers      | 1        * |       orders       | *        1 |      products      |
++--------------------+------------+--------------------+------------+--------------------+
+| customer_id (PK)   |            | order_id (PK)      |            | product_id (PK)    |
+| name               |            | customer_id (FK)   |            | name               |
+| email              |            | product_id (FK)    |            | price              |
+| city               |            | quantity           |            | stock_quantity     |
++--------------------+            | total_amount       |            +--------------------+
+                                  | order_date         |
+                                  | status             |
+                                  +--------------------+
+```
 
 ---
 
-## 🗄️ Database Structure
+## Core SQL Queries Preserved
 
-The project uses three main tables.
+### 1. Multi-Table Inner Join (Order Details with Customer & Product)
+```sql
+SELECT 
+    o.order_id,
+    c.name AS customer_name,
+    c.email,
+    c.city,
+    p.name AS product_name,
+    o.quantity,
+    p.price,
+    o.total_amount,
+    o.order_date,
+    o.status
+FROM orders o
+INNER JOIN customers c ON o.customer_id = c.customer_id
+INNER JOIN products p ON o.product_id = p.product_id
+ORDER BY o.order_date DESC;
+```
 
-### 1. Customers
-
-Stores customer information.
-
-| Column | Description |
-|---|---|
-| id | Primary Key |
-| name | Customer Name |
-| email | Customer Email |
-
-### 2. Products
-
-Stores product information.
-
-| Column | Description |
-|---|---|
-| id | Primary Key |
-| name | Product Name |
-| category | Product Category |
-| price | Product Price |
-
-### 3. Orders
-
-Stores order information.
-
-| Column | Description |
-|---|---|
-| id | Primary Key |
-| customer_id | Foreign Key → Customers |
-| product_id | Foreign Key → Products |
-| quantity | Ordered Quantity |
-| order_date | Date of Order |
-| total_amount | Total Order Amount |
+### 2. Left Outer Join (All Customers with Order History)
+```sql
+SELECT 
+    c.customer_id,
+    c.name AS customer_name,
+    c.city,
+    COUNT(o.order_id) AS total_orders,
+    COALESCE(SUM(o.total_amount), 0) AS total_spent
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.name, c.city
+ORDER BY total_spent DESC;
+```
 
 ---
 
-## 🔗 Relationships
+## API Endpoints
 
-The database follows this relationship:
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/orders` | Retrieves all orders joined with customer and product data |
+| `GET` | `/api/orders/summary` | Aggregate order statistics (total revenue, order counts) |
+| `GET` | `/api/customers` | Retrieves all customers |
+| `GET` | `/api/products` | Retrieves all available products |
+
+---
+
+## Project Structure
 
 ```text
-Customers
-    │
-    │ customer_id
-    ▼
-  Orders
-    │
-    │ product_id
-    ▼
- Products
+Task 4 - Order Management using Joins/
+├── index.html       # Order dashboard UI with tabular views
+├── style.css        # Clean grid layout for master-detail records
+├── script.js        # Dynamic table generation and join data presentation
+├── Csv Files/       # Sample seed datasets for customers, orders, products
+└── README.md        # Comprehensive task documentation
+```
+
+---
+
+## Execution Guide
+
+1. **Start Backend**:
+   ```bash
+   cd "C:\Games\Project\Full Stack Development\full-stack-development"
+   node server.js
+   ```
+2. **Open Front-End**:
+   - Open `Task 4 - Order Management using Joins/index.html` in your browser.
+3. **Verify Queries**:
+   - Inspect table joining customer names with purchased product lines.
+   - Verify aggregate metrics showing total revenue and orders per customer.

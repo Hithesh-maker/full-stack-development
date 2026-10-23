@@ -43,6 +43,9 @@
 
         <ul class="main-nav-links">
             <li><a th:href="@{/admin/events}" class="active">Manage Events</a></li>
+            <li><a th:href="@{/admin/analytics}">📊 Visual Analytics</a></li>
+            <li><a th:href="@{/admin/notifications}">✉️ Outbox</a></li>
+            <li><a th:href="@{/admin/scanner}" style="color: #fde047; font-weight: 700;">★ QR Door Scanner</a></li>
             <li><a th:href="@{/admin/events/add}">+ Add New Event</a></li>
             <li><a th:href="@{/}">View Public Site</a></li>
             <li>
@@ -90,9 +93,14 @@
                 <h1>Campus Event Administration</h1>
                 <p>Manage, schedule, and review attendee capacity across academic faculties.</p>
             </div>
-            <a th:href="@{/admin/events/add}" class="btn">
-                + Create New Event
-            </a>
+            <div style="display: flex; gap: 10px;">
+                <a th:href="@{/admin/scanner}" class="btn" style="background: var(--navy); border: 1px solid #334155; display: inline-flex; align-items: center; gap: 6px;">
+                    📷 Open Door Scanner
+                </a>
+                <a th:href="@{/admin/events/add}" class="btn">
+                    + Create New Event
+                </a>
+            </div>
         </div>
 
         <!-- Search & Filter Card (Date, Department, Type, Keyword) -->
@@ -229,14 +237,25 @@
                                     Reviews
                                 </a>
 
+                                <!-- Edit allowed if Admin or Coordinator of this department -->
                                 <a
+                                    th:if="${isAdmin or (userDept != null and userDept.equalsIgnoreCase(event.department))}"
                                     th:href="@{/admin/events/edit/{id}(id=${event.id})}"
                                     class="btn btn-secondary btn-sm"
                                     title="Edit event details">
                                     Edit
                                 </a>
+                                <span
+                                    th:unless="${isAdmin or (userDept != null and userDept.equalsIgnoreCase(event.department))}"
+                                    class="badge"
+                                    style="background: #f1f5f9; color: #94a3b8; font-size: 0.72rem; padding: 5px 8px; border: 1px solid #e2e8f0;"
+                                    title="Restricted: Belongs to another academic department">
+                                    Read-Only
+                                </span>
 
+                                <!-- Delete button strictly reserved for Super Admin -->
                                 <form
+                                    th:if="${isAdmin}"
                                     th:action="@{/admin/events/delete/{id}(id=${event.id})}"
                                     method="post"
                                     style="display: inline;">
@@ -261,6 +280,76 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Coordinator Access & Role-Based Scope Directory (Collegiate Governance) -->
+        <div class="card mt-4" style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; box-shadow: var(--shadow-sm); margin-top: 32px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px;">
+                <div>
+                    <h3 style="font-family: 'Cinzel', Georgia, serif; color: var(--navy); margin: 0; font-size: 1.25rem;">
+                        🏛️ Department Coordinator Governance & Access Matrix
+                    </h3>
+                    <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.88rem;">
+                        Active faculty allocations, role hierarchy, and operational scope boundaries.
+                    </p>
+                </div>
+                <div>
+                    <span th:if="${isAdmin}" class="badge" style="background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; font-weight: 600; padding: 6px 12px;">
+                        👑 Super Admin Mode
+                    </span>
+                    <span th:if="${isCoordinator}" class="badge" style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; font-weight: 600; padding: 6px 12px;">
+                        🎯 Department Coordinator (<span th:text="${userDept}">CSE</span>)
+                    </span>
+                </div>
+            </div>
+
+            <div class="table-wrapper" style="box-shadow: none; border: 1px solid #e2e8f0;">
+                <table style="font-size: 0.9rem;">
+                    <thead>
+                        <tr style="background: #f8fafc;">
+                            <th>System Username</th>
+                            <th>Designated Faculty / Department</th>
+                            <th>Assigned Security Role</th>
+                            <th>Scope & Operational Boundary</th>
+                            <th>Delete Authority</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="coord : ${coordinators}">
+                            <td>
+                                <strong style="color: var(--navy); font-family: monospace;" th:text="${coord.username}">cse.coordinator</strong>
+                            </td>
+                            <td>
+                                <span th:text="${coord.department != null ? coord.department : 'All Departments (Campus-wide)'}"></span>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${coord.role == 'ROLE_ADMIN' ? 'badge-primary' : 'badge-secondary'}"
+                                      th:text="${coord.role.replace('ROLE_', '')}">
+                                    COORDINATOR
+                                </span>
+                            </td>
+                            <td>
+                                <span th:if="${coord.role == 'ROLE_ADMIN'}" style="color: #047857; font-weight: 600;">
+                                    Full Administrative & Cross-Department Authority
+                                </span>
+                                <span th:unless="${coord.role == 'ROLE_ADMIN'}" style="color: #475569;">
+                                    Scoped strictly to <strong th:text="${coord.department}">Dept</strong> events & check-in
+                                </span>
+                            </td>
+                            <td>
+                                <span th:if="${coord.canDelete}" class="badge badge-success" style="font-size: 0.75rem;">Permitted</span>
+                                <span th:unless="${coord.canDelete}" class="badge badge-danger" style="font-size: 0.75rem;">Restricted (Admin Only)</span>
+                            </td>
+                            <td>
+                                <span style="display: inline-flex; align-items: center; gap: 5px; color: #16a34a; font-weight: 600; font-size: 0.82rem;">
+                                    ● Active
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </div>

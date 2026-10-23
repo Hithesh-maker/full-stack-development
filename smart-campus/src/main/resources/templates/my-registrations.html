@@ -17,6 +17,7 @@
             <li><a th:href="@{/}">Home</a></li>
             <li><a th:href="@{/events}">Events</a></li>
             <li><a th:href="@{/my-registrations}">Student Passes</a></li>
+            <li><a th:href="@{/verify/certificate}" style="color: #fde047; font-weight: 600;">Verify Certificate</a></li>
             <li><a th:href="@{/login}">Admin Portal</a></li>
         </ul>
         <div class="utility-quick">
@@ -43,6 +44,7 @@
                 <li><a th:href="@{/}">Home</a></li>
                 <li><a th:href="@{/events}">All Events</a></li>
                 <li><a th:href="@{/my-registrations}" class="active">My Tickets</a></li>
+                <li><a th:href="@{/verify/certificate}">Verify Certificate</a></li>
                 <li><a th:href="@{/login}">Faculty / Admin</a></li>
             </ul>
 
@@ -155,7 +157,7 @@
                 <tbody>
                     <tr th:each="reg : ${registrations}">
                         <td>
-                            <strong th:text="${'#SC-' + reg.id}" style="color: var(--navy);">#SC-101</strong>
+                            <strong th:text="${reg.token != null ? reg.token : ('#SC-' + reg.id)}" style="color: var(--navy); font-family: monospace; font-size: 0.88rem;">#SC-101</strong>
                         </td>
 
                         <td>
@@ -194,7 +196,18 @@
                             <span
                                 th:if="${reg.status == null or reg.status == 'CONFIRMED'}"
                                 class="badge badge-success">
-                                Active Pass
+                                ✓ Confirmed
+                            </span>
+                            <span
+                                th:if="${reg.status == 'CHECKED_IN'}"
+                                class="badge badge-primary" style="background: #1e40af;">
+                                🎟 Checked In
+                            </span>
+                            <span
+                                th:if="${reg.status == 'WAITLISTED'}"
+                                class="badge badge-warning" style="background: #b45309; color: #fff;"
+                                th:text="${'⏳ Waitlist #' + (reg.waitlistPosition != null ? reg.waitlistPosition : 1)}">
+                                ⏳ Waitlisted
                             </span>
                             <span
                                 th:if="${reg.status == 'CANCELLED'}"
@@ -204,19 +217,75 @@
                         </td>
 
                         <td>
-                            <div class="actions">
+                            <div class="actions" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                <!-- PDF Ticket Download -->
+                                <a
+                                    th:if="${reg.status == null or reg.status == 'CONFIRMED' or reg.status == 'CHECKED_IN'}"
+                                    th:href="@{/registrations/{id}/pdf(id=${reg.id})}"
+                                    target="_blank"
+                                    class="btn btn-sm"
+                                    style="background: var(--navy); color: #fff; padding: 4px 8px; font-size: 0.76rem;"
+                                    title="Download PDF Ticket">
+                                    📄 PDF Pass
+                                </a>
+
+                                <!-- Printable Conference Badge (Lanyard) -->
+                                <a
+                                    th:if="${reg.status == null or reg.status == 'CONFIRMED' or reg.status == 'CHECKED_IN'}"
+                                    th:href="@{/registrations/{id}/badge(id=${reg.id})}"
+                                    target="_blank"
+                                    class="btn btn-sm"
+                                    style="background: #991b1b; color: #fff; padding: 4px 8px; font-size: 0.76rem;"
+                                    title="Printable Lanyard Conference Badge">
+                                    🏷️ Badge
+                                </a>
+
+                                <!-- Calendar Download -->
+                                <a
+                                    th:if="${reg.event != null and (reg.status == null or reg.status == 'CONFIRMED' or reg.status == 'CHECKED_IN')}"
+                                    th:href="@{/events/{id}/calendar.ics(id=${reg.event.id})}"
+                                    class="btn btn-secondary btn-sm"
+                                    style="padding: 4px 8px; font-size: 0.76rem;"
+                                    title="Add to Calendar (.ICS)">
+                                    📅 .ics
+                                </a>
+
+                                <!-- WhatsApp Share Pass -->
+                                <a
+                                    th:if="${reg.status == null or reg.status == 'CONFIRMED' or reg.status == 'CHECKED_IN'}"
+                                    th:href="@{https://api.whatsapp.com/send(text=${'🎟️ Smart Campus Pass: ' + (reg.event != null ? reg.event.title : 'Event') + ' | Token: ' + reg.token + ' | Venue: ' + (reg.event != null ? reg.event.venue : 'Campus')})}"
+                                    target="_blank"
+                                    class="btn btn-sm"
+                                    style="background: #16a34a; color: #fff; padding: 4px 8px; font-size: 0.76rem;"
+                                    title="Share Pass on WhatsApp">
+                                    💬 WhatsApp
+                                </a>
+
+                                <!-- E-Certificate of Participation -->
+                                <a
+                                    th:if="${reg.canDownloadCertificate()}"
+                                    th:href="@{/registrations/{id}/certificate(id=${reg.id})}"
+                                    target="_blank"
+                                    class="btn btn-sm"
+                                    style="background: #b45309; color: #fff; padding: 4px 8px; font-size: 0.76rem;"
+                                    title="Download Official E-Certificate">
+                                    🎓 Certificate
+                                </a>
+
+                                <!-- Cancellation -->
                                 <form
-                                    th:if="${reg.status == null or reg.status == 'CONFIRMED'}"
-                                    th:action="@{/my-registrations/cancel/{id}(id=${reg.id})}"
+                                    th:if="${reg.status == null or reg.status == 'CONFIRMED' or reg.status == 'WAITLISTED'}"
+                                    th:action="@{'/my-registrations/cancel/' + ${reg.id}}"
                                     method="post"
                                     style="display: inline;">
                                     <input type="hidden" name="email" th:value="${email}">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                                     <button
                                         type="submit"
                                         class="btn btn-secondary btn-sm"
-                                        style="color: var(--danger); border-color: #fecaca;"
-                                        onclick="return confirm('Cancel this reservation? Your seat will be made available to other students.');">
-                                        Cancel Pass
+                                        style="color: var(--danger); border-color: #fecaca; padding: 4px 8px; font-size: 0.76rem;"
+                                        onclick="return confirm('Release this ticket reservation? If someone is on the waitlist, they will be automatically confirmed in your place.');">
+                                        Cancel
                                     </button>
                                 </form>
 
@@ -260,6 +329,7 @@
                     <li><a th:href="@{/}">Campus Home</a></li>
                     <li><a th:href="@{/events}">Event Directory</a></li>
                     <li><a th:href="@{/my-registrations}">My Student Passes</a></li>
+                    <li><a th:href="@{/verify/certificate}">Verify Certificate</a></li>
                     <li><a th:href="@{/login}">Faculty / Admin Sign In</a></li>
                 </ul>
             </div>
